@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CABJ · Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0A1628; --bg-card: #162236; --bg-card2: #1C2E45;
+      --blue: #22396B; --blue-mid: #2E4D82; --blue-light: #4A608F;
+      --gold: #F9BE3D; --gold-dark: #D9A020;
+      --white: #FFFFFF; --gray: #8A9BB5;
+      --alert: #E65100; --orange: #FF8F00; --green: #43A047; --purple: #9C6FE4;
+      --radius: 12px; --nav-h: 64px; --header-h: 60px;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--white); font-family: 'Barlow', sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+    #app { max-width: 430px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; position: relative; }
+    #scroll-wrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    #scroll-wrap::-webkit-scrollbar { width: 0; }
+
+    /* HEADER */
+    header { height: var(--header-h); position: sticky; top: 0; background: rgba(22,34,54,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(46,77,130,0.6); display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0; z-index: 10; }
+    .header-logo { width: 38px; height: 38px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .header-logo svg { width: 22px; height: 22px; }
+    .header-title { flex: 1; }
+    .header-title h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; line-height: 1; }
+    .header-title span { font-size: 11px; color: var(--gray); font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; }
+    .header-badge { background: var(--blue); border: 1px solid var(--blue-mid); border-radius: 8px; padding: 4px 10px; text-align: center; }
+    .header-badge .pos { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: var(--gold); line-height: 1; }
+    .header-badge .label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* MAIN */
+    main { flex: 1; }
+    .tab { display: none; padding-bottom: calc(var(--nav-h) + 32px); }
+    .tab.active { display: block; }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position: absolute; bottom: 12px; left: 12px; right: 12px; height: var(--nav-h); border-radius: 20px; background: rgba(255,255,255,0.03); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%); border: 1px solid rgba(255,255,255,0.10); display: flex; align-items: center; z-index: 10; box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 32px rgba(0,0,0,0.35); }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 0; border: none; background: none; color: var(--gray); transition: color 0.2s; }
+    .nav-item.active { color: var(--gold); }
+    .nav-item svg { width: 22px; height: 22px; }
+    .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
+
+    /* SECTION HEADER */
+    .section-header { padding: 16px 16px 8px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-count { font-size: 12px; color: var(--gray); background: var(--bg-card); padding: 3px 8px; border-radius: 20px; border: 1px solid var(--blue-mid); }
+
+    /* FILTER PILLS */
+    .filter-row { display: flex; gap: 8px; padding: 0 16px 8px; overflow-x: auto; scrollbar-width: none; }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; border: 1px solid var(--blue-mid); background: transparent; color: var(--gray); transition: all 0.2s; }
+    .pill.active { background: var(--gold); border-color: var(--gold); color: var(--bg); }
+
+    /* PLAYER GRID */
+    .player-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 4px 12px; }
+    .player-card { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--blue-mid); position: relative; cursor: pointer; transition: transform 0.15s; }
+    .player-card:active { transform: scale(0.97); }
+    .player-card.injured::after { content: ''; position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--alert); border-radius: 50%; box-shadow: 0 0 0 2px var(--bg-card); }
+    .player-photo { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: top center; display: block; background: var(--blue); }
+    .player-info { padding: 6px 8px 8px; }
+    .player-num { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; color: var(--gold); }
+    .player-name { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-pos-tag { display: inline-block; margin-top: 3px; font-size: 9px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; }
+    .pos-ARQ { background: rgba(249,190,61,0.2); color: var(--gold); }
+    .pos-DEF { background: rgba(74,96,143,0.4); color: #9AAFC8; }
+    .pos-MED { background: rgba(67,160,71,0.2); color: #81C784; }
+    .pos-DEL { background: rgba(156,111,228,0.2); color: #C9A8F5; }
+    .pos-CT  { background: rgba(0,188,212,0.15); color: #4DD0E1; }
+    .staff-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .staff-card { background: var(--bg-card); border-radius: var(--radius); padding: 14px 16px; border: 1px solid var(--blue-mid); display: flex; align-items: center; gap: 14px; }
+    .staff-initials { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); border: 1px solid var(--blue-mid); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; color: var(--blue-light); }
+    .staff-info { flex: 1; }
+    .staff-name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; line-height: 1; }
+    .staff-role { font-size: 12px; color: var(--gray); margin-top: 3px; }
+    .staff-dt .staff-initials { background: rgba(249,190,61,0.12); border-color: rgba(249,190,61,0.3); color: var(--gold); }
+    .staff-dt .staff-name { color: var(--gold); }
+
+    /* STATS */
+    .stats-tabs { display: flex; padding: 0 16px 8px; gap: 8px; }
+    #tab-plantel .stats-tabs, #tab-posiciones .stats-tabs, #tab-stats .stats-tabs { position: sticky; top: var(--header-h); z-index: 6; background: rgba(10,22,40,0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 10px 16px; border-bottom: 1px solid rgba(74,96,143,0.35); }
+    #plantelFilters, #zonaFilter { position: sticky; top: calc(var(--header-h) + 57px); z-index: 5; background: rgba(10,22,40,0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 8px 16px; border-bottom: 1px solid rgba(74,96,143,0.25); margin: 0; }
+    .stat-tab-btn { flex: 1; padding: 8px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--blue-mid); color: var(--gray); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
+    .stat-tab-btn.active { background: var(--gold); border-color: var(--gold); color: var(--bg); }
+    .stat-list { padding: 24px 16px 0; display: flex; flex-direction: column; gap: 6px; }
+    .fixture-events { margin-top:10px; padding-top:10px; border-top:1px solid rgba(74,96,143,0.25); display:flex; gap:4px; }
+    .ev-col { flex:1; display:flex; flex-direction:column; gap:4px; }
+    .ev-col.right { align-items:flex-end; }
+    .ev-item { display:flex; align-items:center; gap:5px; font-family:'Barlow Condensed',sans-serif; font-size:12px; color:var(--white); line-height:1; }
+    .ev-item.right { flex-direction:row-reverse; }
+    .ev-icon { flex-shrink:0; }
+    .ev-icon.goal   { width:7px; height:7px; background:var(--white); border-radius:50%; }
+    .ev-icon.yellow { width:6px; height:8px; background:#FFD600; border-radius:1px; }
+    .ev-icon.red    { width:6px; height:8px; background:var(--alert); border-radius:1px; }
+    .ev-clock { color:var(--gray); font-size:10px; }
+    .lineup-btn { width:100%; margin-top:12px; padding:9px; background:rgba(249,190,61,0.12); border:1px solid rgba(249,190,61,0.35); border-radius:10px; color:var(--gold); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; text-align:center; }
+    .lineup-sheet-header { padding:16px 16px 12px; border-bottom:1px solid rgba(74,96,143,0.3); display:flex; align-items:center; justify-content:space-between; }
+    .lineup-sheet-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; text-transform:uppercase; }
+    .lineup-sheet-close { width:30px; height:30px; border-radius:50%; background:var(--bg-card2); border:1px solid var(--blue-mid); color:var(--gray); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .lineup-cols { display:grid; grid-template-columns:1fr 1fr; gap:0; overflow-y:auto; max-height:65vh; }
+    .lineup-col { padding:12px 10px; }
+    .lineup-col:first-child { border-right:1px solid rgba(74,96,143,0.25); }
+    .lineup-col-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+    .lineup-col-logo { width:28px; height:28px; object-fit:contain; }
+    .lineup-col-name { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:800; text-transform:uppercase; line-height:1.1; }
+    .lineup-formation { font-size:10px; color:var(--gold); font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.5px; }
+    .lineup-section-lbl { font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--gray); margin:8px 0 5px; font-family:'Barlow Condensed',sans-serif; }
+    .lineup-player { display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px solid rgba(74,96,143,0.15); }
+    .lineup-player:last-child { border-bottom:none; }
+    .lineup-num { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; color:var(--gold); width:18px; text-align:center; flex-shrink:0; }
+    .lineup-name { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600; line-height:1; }
+    .lineup-name.sub { color:var(--gray); font-size:12px; }
+    .lineup-replaces { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:rgba(148,163,184,0.55); margin-left:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .live-dot { display:inline-block; width:7px; height:7px; background:var(--alert); border-radius:50%; flex-shrink:0; animation:livePulse 1.2s ease-in-out infinite; }
+    @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.65)} }
+    .live-tag { font-size:9px; font-family:'Barlow Condensed',sans-serif; font-weight:800; letter-spacing:0.8px; text-transform:uppercase; color:var(--alert); background:rgba(230,81,0,0.12); border:1px solid rgba(230,81,0,0.3); border-radius:4px; padding:2px 6px; }
+    .stat-row { display: flex; align-items: center; gap: 10px; background: var(--bg-card); border-radius: var(--radius); padding: 8px 12px; border: 1px solid var(--blue-mid); }
+    .stat-rank { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--blue-light); width: 20px; text-align: center; flex-shrink: 0; }
+    .stat-rank.top { color: var(--gold); }
+    .stat-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: top; flex-shrink: 0; background: var(--blue); border: 2px solid var(--blue-mid); }
+    .stat-info { flex: 1; min-width: 0; }
+    .stat-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stat-bar-wrap { height: 4px; background: var(--blue-mid); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+    .stat-bar { height: 100%; background: var(--gold); border-radius: 2px; }
+    .stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; color: var(--gold); flex-shrink: 0; line-height: 1; text-align: center; }
+    .stat-unit { font-size: 9px; color: var(--gray); text-align: center; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px; }
+    .stat-pj-breakdown { font-size: 10px; font-family: 'Barlow Condensed', sans-serif; margin-top: 3px; display: flex; gap: 6px; align-items: center; }
+    .stat-pj-tit { color: var(--gold); font-weight: 700; }
+    .stat-pj-sup { color: var(--gray); font-weight: 600; }
+    .stat-pj-sep { color: rgba(74,96,143,0.6); }
+    .stat-pj-min { color: var(--gray); font-weight: 600; }
+    .stat-pj-total { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; color: var(--gold); line-height: 1; text-align: center; white-space: nowrap; }
+    .stat-pj-pct { font-size: 9px; color: var(--gray); text-align: center; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px; margin-top: 2px; }
+
+    /* LESIONADOS */
+    .injury-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+    .injury-card { background: var(--bg-card); border-radius: var(--radius); padding: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--blue-mid); border-left-width: 3px; }
+    .injury-card.sev-high { border-left-color: var(--alert); }
+    .injury-card.sev-medium { border-left-color: var(--orange); }
+    .injury-card.sev-low { border-left-color: var(--green); }
+    .injury-photo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; object-position: top; flex-shrink: 0; background: var(--blue); }
+    .injury-info { flex: 1; min-width: 0; }
+    .injury-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .injury-type { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .injury-eta { text-align: right; flex-shrink: 0; max-width: 80px; }
+    .eta-label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Barlow Condensed', sans-serif; }
+    .eta-value { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .sev-high .eta-value { color: var(--alert); }
+    .sev-medium .eta-value { color: var(--orange); }
+    .sev-low .eta-value { color: var(--green); }
+
+    /* FIXTURE */
+    .fixture-pills-sticky { position: sticky; top: var(--header-h); z-index: 5; background: rgba(10,22,40,0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 16px 8px; border-bottom: 1px solid rgba(74,96,143,0.35); overflow: visible; }
+    .fixture-pills-sticky::after { content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 88px; background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none; z-index: 5; opacity: 0; transition: opacity 0.2s; }
+    #tab-fixture.has-past-fix .fixture-pills-sticky::after { opacity: 1; }
+    .fixture-list { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+    .fixture-section-lbl { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--gray); padding: 12px 16px 6px; }
+    .fixture-card { background: var(--bg-card); border-radius: var(--radius); padding: 14px; border: 1px solid var(--blue-mid); }
+    .fixture-card.next { border-color: var(--gold); background: linear-gradient(135deg, rgba(249,190,61,0.07), var(--bg-card)); }
+    .fixture-card.live { border-color: var(--gold); background: linear-gradient(135deg, rgba(249,190,61,0.18), rgba(249,190,61,0.06)); }
+    .fixture-top { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .comp-badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px; }
+    .comp-lib { background: rgba(249,190,61,0.2); color: var(--gold); }
+    .comp-ape { background: rgba(74,96,143,0.3); color: #9AAFC8; }
+    .comp-cop { background: rgba(67,160,71,0.2); color: #81C784; }
+    .next-tag { background: var(--gold); color: var(--bg); font-size: 9px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; }
+    .fixture-main { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .fixture-team { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .fixture-escudo { width: 44px; height: 44px; object-fit: contain; }
+    .fixture-team-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; line-height: 1.1; text-align: center; }
+    .fixture-team-name.boca { color: var(--gold); }
+    .fixture-vs { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--gray); flex-shrink: 0; }
+    .fixture-meta { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(74,96,143,0.4); }
+    .meta-item { text-align: center; }
+    .meta-label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Barlow Condensed', sans-serif; }
+    .meta-value { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; }
+
+    /* TABLA */
+    .table-section { padding: 16px; }
+    .table-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray); margin-bottom: 8px; }
+    .tabla { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--blue-mid); }
+    .tabla-header { display: grid; grid-template-columns: 24px 1fr repeat(4, 32px); gap: 4px; padding: 8px 12px; background: var(--blue); }
+    .tabla-header span { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; color: var(--gray); text-align: center; text-transform: uppercase; }
+    .tabla-header span:nth-child(2) { text-align: left; }
+    .tabla-row { display: grid; grid-template-columns: 24px 1fr repeat(4, 32px); gap: 4px; padding: 8px 12px; border-bottom: 1px solid rgba(74,96,143,0.25); align-items: center; }
+    .tabla-row:last-child { border-bottom: none; }
+    .tabla-row.boca-row { background: rgba(249,190,61,0.07); }
+    .tabla-row span { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; text-align: center; }
+    .t-pos { font-weight: 800; color: var(--gray); }
+    .boca-row .t-pos { color: var(--gold); }
+    .t-name { text-align: left !important; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .boca-row .t-name { color: var(--gold); font-weight: 800; }
+    .t-pts { font-weight: 800; font-size: 15px !important; }
+    .boca-row .t-pts { color: var(--gold); }
+    .disclaimer { font-size: 10px; color: var(--blue-light); text-align: center; padding: 8px; font-style: italic; }
+    .tabla-lib { display: grid; grid-template-columns: 24px 1fr repeat(5,28px); gap: 4px; padding: 8px 12px; border-bottom: 1px solid rgba(74,96,143,0.25); align-items: center; }
+    .tabla-lib:last-child { border-bottom: none; }
+    .tabla-lib.boca-row { background: rgba(249,190,61,0.07); }
+    .tabla-lib span { font-family:'Barlow Condensed',sans-serif; font-size:13px; text-align:center; }
+    .tabla-lib .t-name { text-align:left !important; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .boca-row .t-name { color:var(--gold); font-weight:800; }
+    .boca-row .t-pos { color:var(--gold); }
+    .boca-row .t-pts { color:var(--gold); font-weight:800; }
+    .fix-grupo-row { background:var(--bg-card); border-radius:8px; border:1px solid var(--blue-mid); padding:10px 12px; }
+    .fix-grupo-row.boca-match { border-color: rgba(249,190,61,0.4); }
+    .fix-grupo-fecha { font-size:10px; color:var(--gray); font-family:'Barlow Condensed',sans-serif; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+    .fix-grupo-match { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; }
+    .fix-grupo-match .hl { color:var(--gold); }
+
+    /* HOME */
+    .home-wrap { display:flex; flex-direction:column; align-items:center; min-height:calc(100vh - var(--header-h) - var(--nav-h)); padding:32px 20px 20px; text-align:center; }
+    .home-escudo { width:140px; height:auto; filter:drop-shadow(0 8px 32px rgba(249,190,61,0.25)); margin-bottom:24px; animation:escudoPulse 3s ease-in-out infinite; }
+    @keyframes escudoPulse { 0%,100%{ filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); } 50%{ filter:drop-shadow(0 8px 48px rgba(249,190,61,0.45)); } }
+    .home-frase { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; line-height:1.1; color:var(--gold); margin-bottom:6px; }
+    .home-sub { font-size:11px; color:var(--blue-light); letter-spacing:1px; text-transform:uppercase; font-family:'Barlow Condensed',sans-serif; margin-bottom:28px; }
+    .home-divider { width:48px; height:2px; background:var(--gold); border-radius:1px; margin:0 auto 24px; opacity:0.4; }
+    .home-widgets { display:flex; flex-direction:column; gap:6px; width:100%; }
+    .home-widget { background:var(--bg-card); border:1px solid var(--blue-mid); border-radius:8px; padding:8px 12px; display:flex; align-items:center; gap:10px; text-align:left; }
+    .hw-badge { flex-shrink:0; padding:2px 6px; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.3px; text-transform:uppercase; }
+    .hw-info { flex:1; min-width:0; }
+    .hw-comp { font-family:'Barlow Condensed',sans-serif; font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:1px; }
+    .hw-main { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:800; line-height:1; color:var(--white); }
+    .hw-main span { color:var(--gold); }
+    .hw-sub { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:var(--gray); margin-top:1px; }
+    .hw-pos { flex-shrink:0; text-align:center; min-width:36px; }
+    .hw-pos-num { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--gold); line-height:1; }
+    .hw-pos-lbl { font-family:'Barlow Condensed',sans-serif; font-size:9px; color:var(--gray); text-transform:uppercase; letter-spacing:0.3px; }
+
+    /* PLAYER MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(5,12,25,0.75); z-index:100; opacity:0; pointer-events:none; transition:opacity 0.25s; backdrop-filter:blur(4px); }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal-sheet { position:fixed; bottom:0; left:50%; transform:translateX(-50%) translateY(100%); width:100%; max-width:430px; background:var(--bg-card); border-radius:20px 20px 0 0; z-index:101; transition:transform 0.35s cubic-bezier(0.32,0,0,1); overflow:hidden; }
+    .modal-sheet.open { transform:translateX(-50%) translateY(0); }
+    .modal-drag { width:36px; height:4px; background:var(--blue-light); border-radius:2px; margin:12px auto 0; }
+    .modal-hero { position:relative; height:220px; overflow:hidden; background:linear-gradient(135deg, var(--blue) 0%, #0A1628 100%); }
+    .modal-hero img { width:100%; height:100%; object-fit:cover; object-position:top center; }
+    .modal-hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, var(--bg-card) 0%, transparent 60%); }
+    .modal-num-bg { position:absolute; right:-10px; top:-10px; font-family:'Barlow Condensed',sans-serif; font-size:120px; font-weight:800; color:rgba(249,190,61,0.08); line-height:1; pointer-events:none; }
+    .modal-hero-info { position:absolute; bottom:14px; left:16px; right:16px; }
+    .modal-pos-tag { display:inline-block; padding:3px 8px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px; }
+    .modal-name { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; line-height:1; }
+    .modal-num { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:600; color:var(--gold); margin-top:2px; }
+    .modal-body { padding:16px; }
+    .modal-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px; }
+    .modal-stat-box { background:var(--bg); border-radius:10px; padding:10px 8px; text-align:center; border:1px solid var(--blue-mid); }
+    .modal-stat-val { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; color:var(--gold); line-height:1; }
+    .modal-stat-lbl { font-family:'Barlow Condensed',sans-serif; font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+    .modal-injury-box { background:var(--bg); border-radius:10px; padding:12px 14px; border-left:3px solid var(--alert); display:flex; align-items:center; gap:10px; }
+    .modal-injury-icon { font-size:20px; flex-shrink:0; }
+    .modal-injury-title { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:var(--alert); text-transform:uppercase; letter-spacing:0.3px; }
+    .modal-injury-detail { font-size:12px; color:var(--gray); margin-top:2px; }
+    .ficha-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:rgba(74,96,143,0.25); border-radius:10px; overflow:hidden; border:1px solid rgba(74,96,143,0.25); }
+    .ficha-item { background:var(--bg); padding:10px 12px; }
+    .ficha-item.full { grid-column:1/-1; }
+    .ficha-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--gray); margin-bottom:2px; }
+    .ficha-value { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; color:var(--white); line-height:1.2; }
+    .modal-close { position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; background:rgba(10,22,40,0.6); border:none; color:var(--gray); cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:5; }
+    .modal-close svg { width:16px; height:16px; }
+  </style>
+</head>
+<body>
+<div id="app">
+<div id="scroll-wrap">
+
+  <header>
+    <img src="./Assets/escudo.svg" alt="CABJ" style="width:38px;height:38px;object-fit:contain;flex-shrink:0">
+    <div class="header-title">
+      <h1>BOCA JUNIORS</h1>
+      <span>Apertura 2026 · Fecha 12</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="tab-home" class="tab active">
+      <div class="home-wrap">
+        <img class="home-escudo" src="./Assets/escudo.svg" alt="Escudo CABJ">
+        <div class="home-frase">Boca no teme luchar</div>
+        <div class="home-sub">Club Atlético Boca Juniors</div>
+        <div class="home-divider"></div>
+        <div id="homeProximo" style="width:100%;margin-bottom:16px"></div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray);align-self:flex-start;margin-bottom:6px">Competencias</div>
+        <div class="home-widgets">
+
+          <!-- Apertura -->
+          <div class="home-widget">
+            <div class="hw-pos">
+              <div class="hw-pos-num">6°</div>
+              <div class="hw-pos-lbl">Lugar</div>
+            </div>
+            <div class="hw-info">
+              <div class="hw-comp">Apertura 2026</div>
+              <div class="hw-main"><span>17</span> pts</div>
+              <div class="hw-sub">12 PJ · 5G 2E 5P</div>
+            </div>
+            <div class="hw-badge comp-ape">Liga</div>
+          </div>
+
+          <!-- Libertadores -->
+          <div class="home-widget">
+            <div class="hw-pos">
+              <div class="hw-pos-num">1°</div>
+              <div class="hw-pos-lbl">Grupo D</div>
+            </div>
+            <div class="hw-info">
+              <div class="hw-comp">Copa Libertadores 2026</div>
+              <div class="hw-main"><span>0</span> pts</div>
+              <div class="hw-sub">Fase de grupos · Debut 7 abr</div>
+            </div>
+            <div class="hw-badge comp-lib">Conmebol</div>
+          </div>
+
+          <!-- Copa Argentina -->
+          <div class="home-widget">
+            <div class="hw-pos">
+              <div class="hw-pos-num" style="font-size:16px;padding-top:2px">16°</div>
+              <div class="hw-pos-lbl">avos</div>
+            </div>
+            <div class="hw-info">
+              <div class="hw-comp">Copa Argentina 2026</div>
+              <div class="hw-main">16avos de final</div>
+              <div class="hw-sub">Rival y fecha por confirmar</div>
+            </div>
+            <div class="hw-badge comp-cop">Copa</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- PLANTEL -->
+    <section id="tab-plantel" class="tab">
+      <div class="section-header">
+        <span class="section-title">Plantel</span>
+      </div>
+      <div class="stats-tabs">
+        <button class="stat-tab-btn active" onclick="switchPlantelSub('plantel',this)">Plantel</button>
+        <button class="stat-tab-btn" onclick="switchPlantelSub('bajas',this)">Bajas · 9</button>
+      </div>
+      <!-- Vista plantel -->
+      <div id="plantelView">
+        <div class="filter-row" id="plantelFilters">
+          <button class="pill active" onclick="filterPlantel('all',this)">Todos</button>
+          <button class="pill" onclick="filterPlantel('ARQ',this)">Arqueros</button>
+          <button class="pill" onclick="filterPlantel('DEF',this)">Defensores</button>
+          <button class="pill" onclick="filterPlantel('MED',this)">Mediocampistas</button>
+          <button class="pill" onclick="filterPlantel('DEL',this)">Delanteros</button>
+          <button class="pill" onclick="filterPlantel('CT',this)">C. Técnico</button>
+        </div>
+        <div class="player-grid" id="playerGrid"></div>
+      </div>
+      <!-- Vista bajas -->
+      <div id="bajasView" style="display:none">
+        <div style="padding:8px 16px 0">
+          <div class="injury-list" id="injuryList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section id="tab-stats" class="tab">
+      <div class="section-header">
+        <span class="section-title">Estadísticas</span>
+        <span class="section-count">Temporada 25/26</span>
+      </div>
+      <div class="stats-tabs">
+        <button class="stat-tab-btn active" onclick="switchStat('goles',this)">Goles</button>
+        <button class="stat-tab-btn" onclick="switchStat('asist',this)">Asistencias</button>
+        <button class="stat-tab-btn" onclick="switchStat('pj',this)">Partidos</button>
+      </div>
+      <div class="stat-list" id="statList"></div>
+
+    </section>
+
+    <!-- POSICIONES -->
+    <section id="tab-posiciones" class="tab">
+      <div class="section-header">
+        <span class="section-title">Posiciones</span>
+        <span class="section-count">Temporada 25/26</span>
+      </div>
+      <div class="stats-tabs">
+        <button class="stat-tab-btn active" onclick="switchPos('apertura',this)">Apertura</button>
+        <button class="stat-tab-btn" onclick="switchPos('libertadores',this)">Libertadores</button>
+        <button class="stat-tab-btn" onclick="switchPos('copa',this)">Copa Arg.</button>
+      </div>
+
+      <!-- Apertura -->
+      <div id="posView-apertura" class="table-section">
+        <div class="filter-row" id="zonaFilter" style="padding:8px 0">
+          <button class="pill active" onclick="switchZona('A',this)">Zona A</button>
+          <button class="pill" onclick="switchZona('B',this)">Zona B</button>
+          <button class="pill" onclick="switchZona('anual',this)">Anual</button>
+        </div>
+        <div id="zonaA-wrap">
+          <div class="tabla">
+            <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(8,22px)">
+              <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GF</span><span>GC</span><span>DIF</span><span>Pts</span>
+            </div>
+            <div id="tablaZonaA"></div>
+          </div>
+        </div>
+        <div id="zonaB-wrap" style="display:none">
+          <div class="tabla">
+            <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(8,22px)">
+              <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GF</span><span>GC</span><span>DIF</span><span>Pts</span>
+            </div>
+            <div id="tablaZonaB"></div>
+          </div>
+        </div>
+        <div id="zonaAnual-wrap" style="display:none">
+          <div class="tabla">
+            <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(8,22px)">
+              <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GF</span><span>GC</span><span>DIF</span><span>Pts</span>
+            </div>
+            <div id="tablaAnual"></div>
+          </div>
+        </div>
+        <div class="disclaimer">Fuente: promiedos.com.ar · Fecha 12</div>
+      </div>
+
+      <!-- Libertadores -->
+      <div id="posView-libertadores" class="table-section" style="display:none">
+        <div class="table-title">Grupo D</div>
+        <div class="tabla">
+          <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(5,28px)">
+            <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>P</span><span>GD</span><span>Pts</span>
+          </div>
+          <div id="tablaLibRows"></div>
+        </div>
+        <div class="disclaimer">★ Grupo aún no iniciado — debut 7 de abril vs. U. Católica</div>
+      </div>
+
+      <!-- Copa Argentina -->
+      <div id="posView-copa" class="table-section" style="display:none">
+        <div class="tabla" style="padding:20px 16px;text-align:center">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--gray)">16avos de final</div>
+          <div style="font-size:12px;color:var(--blue-light);margin-top:6px">Rival y fecha por confirmar</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- FIXTURE -->
+    <section id="tab-fixture" class="tab">
+      <div class="fixture-pills-sticky" id="fixturePills">
+        <div class="filter-row" id="fixFilter" style="padding:0">
+          <button class="pill active" onclick="filterFixture('liga',this)">Liga</button>
+          <button class="pill" onclick="filterFixture('libertadores',this)">Libertadores</button>
+          <button class="pill" onclick="filterFixture('copa',this)">Copa Argentina</button>
+        </div>
+      </div>
+      <div class="fixture-list" id="fixtureList"></div>
+    </section>
+  </main>
+
+</div><!-- /scroll-wrap -->
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Inicio</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('plantel',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span>Plantel</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('stats',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span>Stats</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('posiciones',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+      </svg>
+      <span>Posiciones</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('fixture',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span>Fixture</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="modal-overlay" id="lineupOverlay" onclick="closeLineup()"></div>
+<div class="modal-sheet" id="lineupSheet">
+  <div class="modal-drag"></div>
+  <div class="lineup-sheet-header">
+    <div class="lineup-sheet-title">Formaciones</div>
+    <button class="lineup-sheet-close" onclick="closeLineup()">✕</button>
+  </div>
+  <div class="lineup-cols" id="lineupCols"></div>
+</div>
+<div class="modal-overlay" id="modalOverlay" onclick="closePlayer()"></div>
+<div class="modal-sheet" id="modalSheet">
+  <div class="modal-hero">
+    <img id="mPhoto" src="" alt="">
+    <div class="modal-hero-overlay"></div>
+    <div class="modal-num-bg" id="mNumBg"></div>
+    <button class="modal-close" onclick="closePlayer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-hero-info">
+      <div class="modal-pos-tag pos-ARQ" id="mPosTag"></div>
+      <div class="modal-name" id="mName"></div>
+      <div class="modal-num" id="mNum"></div>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="modal-stats-grid">
+      <div class="modal-stat-box"><div class="modal-stat-val" id="mPJ">0</div><div class="modal-stat-lbl">Partidos</div></div>
+      <div class="modal-stat-box"><div class="modal-stat-val" id="mGoles">0</div><div class="modal-stat-lbl">Goles</div></div>
+      <div class="modal-stat-box"><div class="modal-stat-val" id="mAsist">0</div><div class="modal-stat-lbl">Asist.</div></div>
+      <div class="modal-stat-box"><div class="modal-stat-val" id="mMin">0</div><div class="modal-stat-lbl">Minutos</div></div>
+    </div>
+    <div id="mFicha" style="display:none;margin-bottom:12px"></div>
+<div class="modal-injury-box" id="mInjuryBox" style="display:none">
+      <div class="modal-injury-icon">🚨</div>
+      <div>
+        <div class="modal-injury-title">Lesionado</div>
+        <div class="modal-injury-detail" id="mInjuryDetail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATIC DATA =====
+const players = [
+  // sk orden: ARQ→[DIV,HAN,KIC,REF,SPD,POS] | resto→[RIT,TIR,PAS,REG,DEF,FIS] — forma Apertura 2026
+  { name:'Agustín Marchesín', short:'Marchesín', num:1,  pos:'ARQ', file:'Agustin_Marchesin',  pj:11, tit:11, goles:0, asist:0, min:982,  injured:true, sk:[84,80,74,85,56,86] },
+  { name:'Leandro Brey',       short:'Brey',       num:12, pos:'ARQ', file:'Leandro_Brey',       pj:2,  tit:1,  goles:0, asist:0, min:98,               sk:[72,70,60,74,34,74] },
+  { name:'Javier García',      short:'J. García',  num:13, pos:'ARQ', file:'Javier_Garcia',      pj:0,  tit:0,  goles:0, asist:0, min:0,                sk:[76,70,72,74,40,72] },
+  { name:'Lautaro Di Lollo',   short:'Di Lollo',   num:2,  pos:'DEF', file:'Lautaro_Di_Lollo',   pj:11, tit:11, goles:1, asist:0, min:990,              sk:[72,48,66,68,74,80] },
+  { name:'Lautaro Blanco',     short:'L. Blanco',  num:3,  pos:'DEF', file:'Lautaro_Blanco',     pj:11, tit:11, goles:1, asist:0, min:990,              sk:[80,58,74,76,74,80] },
+  { name:'Nicolás Figal',      short:'Figal',      num:4,  pos:'DEF', file:'Nicolas_Figal',      pj:1,  tit:1,  goles:0, asist:0, min:90,               sk:[72,48,66,68,78,80] },
+  { name:'Rodrigo Battaglia',  short:'Battaglia',  num:6,  pos:'DEF', file:'Rodrigo_Battaglia',  pj:0,  tit:0,  goles:0, asist:0, min:0,   injured:true, sk:[66,55,70,68,80,80] },
+  { name:'Malcom Braida',      short:'Braida',     num:27, pos:'DEF', file:'Malcom_Braida',      pj:2,  tit:1,  goles:0, asist:0, min:93,               sk:[78,58,70,74,72,76] },
+  { name:'Marcelo Weigandt',   short:'Weigandt',   num:23, pos:'DEF', file:'Marcelo_Weigandt',   pj:9,  tit:7,  goles:0, asist:0, min:656,              sk:[80,55,70,72,74,74] },
+  { name:'Juan Barinaga',      short:'Barinaga',   num:24, pos:'DEF', file:'Juan_Barinaga',      pj:5,  tit:5,  goles:0, asist:0, min:409,              sk:[70,46,64,65,70,72] },
+  { name:'Marco Pellegrino',   short:'Pellegrino', num:26, pos:'DEF', file:'Marco_Pellegrino',   pj:1,  tit:1,  goles:0, asist:1, min:90,               sk:[66,42,58,60,72,72] },
+  { name:'Ayrton Costa',       short:'A. Costa',   num:32, pos:'DEF', file:'Ayrton_Costa',       pj:11, tit:11, goles:0, asist:0, min:990,              sk:[74,50,68,70,78,74] },
+  { name:'Dylan Gorosito',     short:'Gorosito',   num:48, pos:'DEF', file:'Dylan_Gorosito',     pj:1,  tit:0,  goles:0, asist:0, min:16,               sk:[64,36,52,58,60,60] },
+  { name:'Leandro Paredes',    short:'Paredes',    num:5,  pos:'MED', file:'Leandro_Paredes',    pj:10, tit:9,  goles:1, asist:3, min:835,              sk:[66,74,88,84,76,76] },
+  { name:'Carlos Palacios',    short:'Palacios',   num:8,  pos:'MED', file:'Carlos_Palacios',    pj:0,  tit:0,  goles:0, asist:0, min:0,   injured:true, sk:[86,74,76,82,56,68] },
+  { name:'Williams Alarcón',   short:'Alarcón',    num:15, pos:'MED', file:'Williams_Alarcon',   pj:5,  tit:5,  goles:0, asist:0, min:340,              sk:[72,62,72,74,68,74] },
+  { name:'Milton Delgado',     short:'M. Delgado', num:18, pos:'MED', file:'Milton_Delgado',     pj:11, tit:8,  goles:0, asist:1, min:698,              sk:[78,66,76,74,84,86] },
+  { name:'Agustín Martegani',  short:'Martegani',  num:19, pos:'MED', file:'Agustin_Martegani',  pj:0,  tit:0,  goles:0, asist:0, min:0,                sk:[72,66,74,74,62,66] },
+  { name:'Alan Velasco',       short:'A. Velasco', num:20, pos:'MED', file:'Alan_Velasco',       pj:3,  tit:1,  goles:0, asist:0, min:99,               sk:[82,70,72,80,56,64] },
+  { name:'Ander Herrera',      short:'A. Herrera', num:21, pos:'MED', file:'Ander_Herrera',      pj:6,  tit:3,  goles:0, asist:0, min:320,              sk:[64,70,80,78,78,74] },
+  { name:'Kevin Zenón',        short:'Zenón',      num:22, pos:'MED', file:'Kevin_Zenon',        pj:4,  tit:2,  goles:0, asist:0, min:216,              sk:[84,68,78,78,64,70] },
+  { name:'Santiago Ascacíbar', short:'Ascacíbar',  num:25, pos:'MED', file:'Santiago_Ascacibar', pj:10, tit:9,  goles:2, asist:0, min:687, injured:true, sk:[70,68,70,66,82,84] },
+  { name:'Tomás Belmonte',     short:'Belmonte',   num:30, pos:'MED', file:'Tomas_Belmonte',     pj:6,  tit:4,  goles:0, asist:0, min:339, injured:true, sk:[72,66,70,72,74,84] },
+  { name:'Tomás Aranda',       short:'T. Aranda',  num:36, pos:'MED', file:'Tomas_Aranda',       pj:10, tit:4,  goles:1, asist:0, min:462,              sk:[78,70,78,76,70,76] },
+  { name:'Camilo Rey Domenech',short:'Rey D.',     num:38, pos:'MED', file:'Camilo_Rey_Domenech',pj:1,  tit:0,  goles:0, asist:0, min:4,                sk:[68,55,64,62,64,64] },
+  { name:'Joaquín Ruiz',       short:'J. Ruiz',    num:53, pos:'MED', file:'Joaquin_Ruiz',       pj:0,  tit:0,  goles:0, asist:0, min:0,                sk:[70,58,64,66,62,66] },
+  { name:'Exequiel Zeballos',  short:'Zeballos',   num:7,  pos:'DEL', file:'Exequiel_Zeballos',  pj:3,  tit:3,  goles:1, asist:1, min:270, injured:true, sk:[94,78,74,90,38,58] },
+  { name:'Milton Giménez',     short:'M. Giménez', num:9,  pos:'DEL', file:'Milton_Gimenez',     pj:0,  tit:0,  goles:0, asist:0, min:0,   injured:true, sk:[74,76,56,70,36,80] },
+  { name:'Edinson Cavani',     short:'Cavani',     num:10, pos:'DEL', file:'Edinson_Cavani',     pj:2,  tit:1,  goles:0, asist:0, min:104, injured:true, sk:[58,84,72,74,54,74] },
+  { name:'Lucas Janson',       short:'Janson',     num:11, pos:'DEL', file:'Lucas_Janson',       pj:4,  tit:4,  goles:0, asist:1, min:260,              sk:[86,70,66,76,42,66] },
+  { name:'Miguel Merentiel',   short:'Merentiel',  num:16, pos:'DEL', file:'Miguel_Merentiel',   pj:9,  tit:8,  goles:4, asist:1, min:680,              sk:[84,80,62,78,40,82] },
+  { name:'Adam Bareiro',       short:'Bareiro',    num:28, pos:'DEL', file:'Adam_Bareiro',       pj:6,  tit:6,  goles:3, asist:1, min:516,              sk:[78,80,64,74,42,80] },
+  { name:'Ángel Romero',       short:'Á. Romero',  num:29, pos:'DEL', file:'Angel_Romero',       pj:5,  tit:2,  goles:0, asist:0, min:213, injured:true, sk:[80,74,68,78,44,72] },
+  { name:'Gonzalo Gelini',     short:'Gelini',     num:37, pos:'DEL', file:'Gonzalo_Gelini',     pj:5,  tit:2,  goles:0, asist:1, min:184,              sk:[74,68,64,70,40,66] },
+  { name:'Iker Zufiaurre',     short:'Zufiaurre',  num:41, pos:'DEL', file:'Iker_Zufiaurre',     pj:10, tit:2,  goles:1, asist:0, min:236,              sk:[76,70,64,72,38,68] },
+  { name:'Juan Cruz Payal',    short:'Payal',      num:46, pos:'DEL', file:'Juan_Cruz_Payal',    pj:0,  goles:0, asist:0, min:0,                sk:[72,64,60,68,36,64] },
+];
+
+const fichas = {
+  // ARQUEROS
+  'Agustin_Marchesin':  { born:'16 de marzo de 1988',       birthPlace:'San Cayetano, Bs. As.',         nationality:'Argentino',  height:'1,88 m', from:'Gremio (Brasil)',              debut:'Boca 2 - Huracán 1, Apertura 2025 (2/2/2025)' },
+  'Leandro_Brey':       { born:'21 de septiembre de 2002',  birthPlace:'Lomas de Zamora, Bs. As.',      nationality:'Argentino',  height:'1,93 m', from:'Los Andes',                    debut:'Boca 2 - Always Ready 0, Copa Libertadores 2022 (12/4/2022)' },
+  'Javier_Garcia':      { born:'29 de enero de 1987',       birthPlace:'Ciudad de Bs. As.',             nationality:'Argentino',  height:'1,82 m', from:'Racing',                       debut:'Boca 2 - Lanús 1, Apertura 2008 (24/8/2008)' },
+  // DEFENSORES
+  'Lautaro_Di_Lollo':   { born:'10 de marzo de 2004',       birthPlace:'San Justo, Bs. As.',            nationality:'Argentino',  height:'1,88 m', from:'Inferiores',                   debut:'Nacional (Bol) 0 - Boca 0, Copa Sudamericana 2024 (3/4/2024)' },
+  'Lautaro_Blanco':     { born:'19 de febrero de 1999',     birthPlace:'Rosario, Santa Fe',             nationality:'Argentino',  height:'1,76 m', from:'Elche (España)',               debut:'Tigre 0 - Boca 2, Copa de la LPF 2024 (5/2/2024)' },
+  'Nicolas_Figal':      { born:'3 de abril de 1994',        birthPlace:'América, Bs. As.',              nationality:'Argentino',  height:'1,84 m', from:'Inter Miami (EE.UU.)',         debut:'Aldosivi 1 - Boca 2, Copa de la LPF 2023 (16/2/2022)' },
+  'Dylan_Gorosito':     { born:'3 de febrero de 2006',      birthPlace:'Moreno, Bs. As.',               nationality:'Argentino',  height:'1,73 m', from:'Inferiores',                   debut:'Defensa y Justicia 2 - Boca 2, Liga 2024 (21/7/2024)' },
+  'Rodrigo_Battaglia':  { born:'12 de julio de 1991',       birthPlace:'Ciudadela, Bs. As.',            nationality:'Argentino',  height:'1,88 m', from:'Atlético Mineiro (Brasil)',     debut:'Boca 0 - Argentinos 0, Apertura 2025 (26/1/2025)' },
+  'Marcelo_Weigandt':   { born:'11 de enero de 2000',       birthPlace:'Avellaneda, Bs. As.',           nationality:'Argentino',  height:'1,75 m', from:'Inter Miami / Inferiores',     debut:'Boca 2 - Estudiantes de Río Cuarto 0, Copa Argentina (19/4/2019)' },
+  'Juan_Barinaga':      { born:'10 de octubre de 2000',     birthPlace:'Rosario, Santa Fe',             nationality:'Argentino',  height:'1,76 m', from:'Belgrano',                     debut:'Boca 1 - Talleres 1 (8-7), Copa Argentina 2024 (7/9/2024)' },
+  'Marco_Pellegrino':   { born:'18 de julio de 2002',       birthPlace:'Ciudad de Buenos Aires',        nationality:'Argentino',  height:'1,84 m', from:'Milan (Italia)' },
+  'Ayrton_Costa':       { born:'12 de julio de 1999',       birthPlace:'Quilmes, Bs. As.',              nationality:'Argentino',  height:'1,79 m', from:'Royal Amberes (Bélgica)',      debut:'Boca 5 - Argentino de Monte Maíz 0, Copa Argentina (22/1/2025)' },
+  'Malcom_Braida':      { born:'17 de mayo de 1997',        birthPlace:'Córdoba',                       nationality:'Argentino',  height:'1,76 m', from:'San Lorenzo',                  debut:'Bayern Munich 2 - Boca 1, Mundial de Clubes 2025 (20/6/2025)' },
+  // MEDIOCAMPISTAS
+  'Leandro_Paredes':    { born:'29 de junio de 1994',       birthPlace:'San Justo, La Matanza',         nationality:'Argentino',  height:'1,82 m', from:'Roma (Italia)',                debut:'Boca 0 - Argentinos 2, Apertura 2010 (6/11/2010)' },
+  'Joaquin_Ruiz':       { born:'21 de julio de 2006',       birthPlace:'Tandil, Bs. As.',               nationality:'Argentino',  height:'1,79 m', from:'Inferiores',                   debut:'Lanús 1 - Boca 0, Liga 2024 (3/11/2024)' },
+  'Carlos_Palacios':    { born:'20 de julio de 2000',       birthPlace:'Renca, Chile',                  nationality:'Chileno',    height:'1,80 m', from:'Colo Colo (Chile)',             debut:'Boca 5 - Argentino de Monte Maíz 0, Copa Argentina (22/2/2025)' },
+  'Williams_Alarcon':   { born:'29 de noviembre de 2000',   birthPlace:'Conchalí, Chile',               nationality:'Chileno',    height:'1,82 m', from:'Huracán',                      debut:'Unión 1 - Boca 1, Apertura 2025 (29/1/2025)' },
+  'Milton_Delgado':     { born:'16 de junio de 2005',       birthPlace:'Rafael Castillo, Bs. As.',      nationality:'Argentino',  height:'1,66 m', from:'Inferiores',                   debut:'Nacional (Bol) 0 - Boca 0, Copa Sudamericana 2024 (3/4/2024)' },
+  'Agustin_Martegani':  { born:'20 de mayo de 2000',        birthPlace:'Rojas, Bs. As.',                nationality:'Argentino',  height:'1,82 m', from:'San Lorenzo',                  debut:'Boca 3 - Banfield 0, Liga 2024 (31/7/2024)' },
+  'Alan_Velasco':       { born:'27 de julio de 2002',       birthPlace:'Quilmes, Bs. As.',              nationality:'Argentino',  height:'1,67 m', from:'Dallas FC (EE.UU.)',           debut:'Boca 0 - Argentinos 0, Apertura 2025 (26/1/2025)' },
+  'Ander_Herrera':      { born:'14 de agosto de 1989',      birthPlace:'Bilbao, España',                nationality:'Español',    height:'1,82 m', from:'Athletic Bilbao (España)',      debut:'Boca 5 - Argentino de Monte Maíz 0, Copa Argentina (22/1/2025)' },
+  'Kevin_Zenon':        { born:'30 de julio de 2001',       birthPlace:'Goya, Corrientes',              nationality:'Argentino',  height:'1,81 m', from:'Unión',                        debut:'Platense 0 - Boca 0, Copa de la LPF 2024 (27/1/2024)' },
+  'Santiago_Ascacibar': { born:'25 de febrero de 1997',     birthPlace:'La Plata, Bs. As.',             nationality:'Argentino',  height:'1,69 m', from:'Estudiantes de La Plata' },
+  'Tomas_Belmonte':     { born:'27 de mayo de 1998',        birthPlace:'Lanús, Bs. As.',                nationality:'Argentino',  height:'1,78 m', from:'Toluca (México)',              debut:'Defensa y Justicia 2 - Boca 2, Liga 2024 (21/7/2024)' },
+  'Tomas_Aranda':       { born:'9 de mayo de 2007',         birthPlace:'Ciudadela, Bs. As.',            nationality:'Argentino',  height:'1,64 m', from:'Inferiores',                   debut:'Estudiantes 2 - Boca 1, Apertura 2026 (28/1/2026)' },
+  'Camilo_Rey_Domenech':{ born:'10 de marzo de 2006',       birthPlace:'Pilar, Bs. As.',                nationality:'Argentino',  height:'1,74 m', from:'Inferiores',                   debut:'Boca 5 - Argentino de Monte Maíz 0, Copa Argentina (22/1/2025)' },
+  'Juan_Cruz_Payal':    { born:'11 de junio de 2005',       birthPlace:'Esquel, Chubut',                nationality:'Argentino',  height:'1,68 m', from:'Inferiores' },
+  // DELANTEROS
+  'Exequiel_Zeballos':  { born:'24 de abril de 2002',       birthPlace:'La Banda, Stgo. del Estero',    nationality:'Argentino',  height:'1,75 m', from:'Inferiores',                   debut:'Boca 2 - Newell\'s 0, Copa Diego Maradona (29/11/2020)' },
+  'Milton_Gimenez':     { born:'12 de agosto de 1996',      birthPlace:'Grand Bourg, Bs. As.',          nationality:'Argentino',  height:'1,84 m', from:'Banfield',                     debut:'Defensa y Justicia 2 - Boca 2, Liga 2024 (21/7/2024)' },
+  'Edinson_Cavani':     { born:'14 de febrero de 1987',     birthPlace:'Salto, Uruguay',                nationality:'Uruguayo',   height:'1,85 m', from:'Valencia (España)',             debut:'Boca 2 - Nacional (U) 2 (4-2), Copa Libertadores 2023 (9/8/2023)' },
+  'Lucas_Janson':       { born:'16 de agosto de 1994',      birthPlace:'Olavarría, Bs. As.',            nationality:'Argentino',  height:'1,70 m', from:'Vélez',                        debut:'Nacional (U) 0 - Boca 0, Copa Libertadores 2023 (2/8/2023)' },
+  'Miguel_Merentiel':   { born:'24 de febrero de 1996',     birthPlace:'Paysandú, Uruguay',             nationality:'Uruguayo',   height:'1,79 m', from:'Palmeiras (Brasil)',            debut:'Boca 0 - Central Córdoba SdE 0, Liga 2023 (5/2/2023)' },
+  'Adam_Bareiro':       { born:'26 de julio de 1996',       birthPlace:'Asunción, Paraguay',            nationality:'Paraguayo',  height:'1,84 m', from:'Fortaleza (Brasil)' },
+  'Angel_Romero':       { born:'4 de julio de 1992',        birthPlace:'Fernando de la Mora, Paraguay', nationality:'Paraguayo',  height:'1,76 m', from:'Corinthians (Brasil)' },
+  'Gonzalo_Gelini':     { born:'15 de diciembre de 2006',   birthPlace:'Ezeiza, Bs. As.',               nationality:'Argentino',  height:'1,75 m', from:'Inferiores',                   debut:'Estudiantes 2 - Boca 1, Apertura 2026 (28/1/2026)' },
+  'Iker_Zufiaurre':     { born:'7 de agosto de 2005',       birthPlace:'Río Cuarto, Córdoba',           nationality:'Argentino',  height:'1,78 m', from:'Inferiores',                   debut:'Nacional (Bol) 0 - Boca 0, Copa Sudamericana 2024 (3/4/2024)' },
+};
+
+const injuries = [
+  { name:'Rodrigo Battaglia',  file:'Rodrigo_Battaglia',  num:6,  injury:'Cirugía tendón de Aquiles', eta:'6-8 meses',       sev:'high'   },
+  { name:'Agustín Marchesín',  file:'Agustin_Marchesin',  num:1,  injury:'Desgarro aductor grado 3',  eta:'~6 semanas',       sev:'high'   },
+  { name:'Edinson Cavani',     file:'Edinson_Cavani',     num:10, injury:'Lumbalgia recurrente',       eta:'2-3 semanas',      sev:'medium' },
+  { name:'Carlos Palacios',    file:'Carlos_Palacios',    num:8,  injury:'Sinovitis de rodilla',       eta:'Fin mar/abr',      sev:'medium' },
+  { name:'Milton Giménez',     file:'Milton_Gimenez',     num:9,  injury:'Pubalgia (postoperatorio)',  eta:'Fin mar/abr',      sev:'medium' },
+  { name:'Ángel Romero',       file:'Angel_Romero',       num:29, injury:'Lesión muscular',            eta:'Fin mar/abr',      sev:'medium' },
+  { name:'Santiago Ascacíbar', file:'Santiago_Ascacibar', num:25, injury:'Lesión muscular',            eta:'Sin fecha',        sev:'medium' },
+  { name:'Tomás Belmonte',     file:'Tomas_Belmonte',     num:30, injury:'En recuperación',            eta:'Sin fecha',        sev:'medium' },
+  { name:'Exequiel Zeballos',  file:'Exequiel_Zeballos',  num:7,  injury:'Desgarro grado 2',           eta:'Próximo a volver', sev:'low'    },
+];
+
+const staff = [
+  { name: 'Claudio Úbeda',      short: 'Úbeda',     role: 'DT',             file: 'Claudio_Ubeda'      },
+  { name: 'Juvenal Rodríguez',  short: 'Rodríguez', role: 'Ayudante',       file: 'Juvenal_Rodriguez'  },
+  { name: 'Adrián Gerónimo',    short: 'Gerónimo',  role: 'Prep. Físico',   file: 'Adrian_Geronimo'    },
+  { name: 'Cristian Aquino',    short: 'Aquino',    role: 'Prep. Físico',   file: 'Cristian_Aquino'    },
+  { name: 'Cristian Muñoz',     short: 'Muñoz',     role: 'Arqs.',          file: 'Cristian_Munoz'     },
+];
+
+// ===== ESPN API =====
+const BOCA_ID = '5';
+
+async function fetchCached(url, ttl = 3600000) {
+  const key = 'espnv2_' + url.replace(/\W/g, '').slice(-40);
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const { d, t } = JSON.parse(raw);
+      if (Date.now() - t < ttl) return d;
+    }
+  } catch(e) {}
+  try {
+    const r = await fetch(url);
+    const d = await r.json();
+    try { localStorage.setItem(key, JSON.stringify({ d, t: Date.now() })); } catch(e) {}
+    return d;
+  } catch(e) {
+    console.warn('ESPN fetch failed:', url, e);
+    return null;
+  }
+}
+
+function getStat(entry, name) {
+  const s = (entry.stats || []).find(x => x.name === name);
+  return s && 'value' in s ? Math.round(s.value) : 0;
+}
+
+function getScore(s) {
+  if (s == null) return null;
+  if (typeof s === 'object') return s.displayValue ?? null;
+  return String(s);
+}
+
+function fmt8(d) { return d.toISOString().slice(0, 10).replace(/-/g, ''); }
+
+function fmtDateShort(iso) {
+  const d = new Date(new Date(iso).getTime() - 3 * 3600000);
+  const M = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${d.getUTCDate()} ${M[d.getUTCMonth()]}`;
+}
+
+function fmtTimeAR(iso) {
+  const raw = new Date(iso);
+  // ESPN usa 18:00 UTC (15:00 AR) como placeholder para partidos sin horario confirmado
+  if (raw.getUTCHours() === 18 && raw.getUTCMinutes() === 0 && raw.getUTCSeconds() === 0) return 'A confirmar';
+  const d = new Date(raw.getTime() - 3 * 3600000);
+  const h = d.getUTCHours(), m = d.getUTCMinutes();
+  if (h === 0 && m === 0) return 'A confirmar';
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+function mkZonaEntry(entry, i) {
+  return {
+    pos: i + 1,
+    name: entry.team.displayName,
+    shortName: entry.team.shortDisplayName || entry.team.displayName,
+    espnId: entry.team.id,
+    pj: getStat(entry, 'gamesPlayed'),
+    g:  getStat(entry, 'wins'),
+    e:  getStat(entry, 'ties'),
+    p:  getStat(entry, 'losses'),
+    gf: getStat(entry, 'pointsFor'),
+    gc: getStat(entry, 'pointsAgainst'),
+    pts: getStat(entry, 'points'),
+    boca: entry.team.id === BOCA_ID
+  };
+}
+
+function sortZona(arr) {
+  arr.sort((a, b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc) || b.gf - a.gf);
+  arr.forEach((t, i) => t.pos = i + 1);
+  return arr;
+}
+
+function extractBocaFix(events, cat, compLabel, ccClass) {
+  const leagueSlug = cat === 'liga' ? 'arg.1' : cat === 'libertadores' ? 'conmebol.libertadores' : 'arg.copa';
+  return (events || []).flatMap(event => {
+    const comp = event.competitions?.[0];
+    if (!comp) return [];
+    const teams = comp.competitors || [];
+    const home = teams.find(t => t.homeAway === 'home');
+    const away = teams.find(t => t.homeAway === 'away');
+    if (!home || !away) return [];
+    const bocaHome = home.team.id === BOCA_ID;
+    const bocaAway = away.team.id === BOCA_ID;
+    if (!bocaHome && !bocaAway) return [];
+    const rival   = bocaHome ? away : home;
+    const bocaT   = bocaHome ? home : away;
+    const state      = comp.status?.type?.state;
+    const completed  = comp.status?.type?.completed || false;
+    const inProgress = state === 'in';
+    return [{
+      cat, comp: compLabel, cc: ccClass,
+      eventId: event.id,
+      league: leagueSlug,
+      date: event.date,
+      rival: rival.team.displayName,
+      rivalShort: rival.team.shortDisplayName || rival.team.displayName,
+      rivalId: rival.team.id,
+      loc: bocaHome ? 'Local' : 'Visitante',
+      completed, inProgress,
+      clock:  inProgress ? (comp.status?.displayClock || '') : null,
+      period: inProgress ? (comp.status?.period || 1) : null,
+      bScore: (completed || inProgress) ? getScore(bocaT.score) : null,
+      rScore: (completed || inProgress) ? getScore(rival.score) : null,
+      statusDetail: comp.status?.type?.shortDetail || '',
+      events: (comp.details || [])
+        .filter(d => ['Goal','Yellow Card','Red Card','Own Goal'].includes(d.type?.text))
+        .map(d => ({
+          type:   d.type.text,
+          clock:  d.clock?.displayValue || '',
+          teamId: d.team?.id || '',
+          player: d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || ''
+        }))
+    }];
+  });
+}
+
+function parseLiveSummary(summary, bocaId) {
+  if (!summary) return { events: [], lineup: null };
+
+  // Events from header details
+  const comp = summary.header?.competitions?.[0];
+  const events = (comp?.details || [])
+    .filter(d => ['Goal','Yellow Card','Red Card','Own Goal','Injury'].includes(d.type?.text))
+    .map(d => ({
+      type:   d.type.text,
+      clock:  d.clock?.displayValue || '',
+      teamId: d.team?.id || '',
+      player: d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || ''
+    }));
+
+  // Injuries from plays (ESPN sometimes doesn't put them in details)
+  (summary.plays || [])
+    .filter(p => p.type?.text === 'Injury')
+    .forEach(p => {
+      const player = p.participants?.[0]?.athlete?.shortName || p.participants?.[0]?.athlete?.displayName || '';
+      if (player && !events.some(e => e.type === 'Injury' && e.player === player)) {
+        events.push({
+          type: 'Injury', clock: p.clock?.displayValue || '',
+          teamId: p.team?.id || '', player
+        });
+      }
+    });
+
+  // Rosters
+  const rosters = summary.rosters || [];
+  if (!rosters.length) return { events, lineup: null };
+
+  // Build substitution map from plays: subbedIn athleteId → { replaces, clock }
+  const subMap = {};
+  (summary.plays || []).forEach(play => {
+    if (play.type?.text !== 'Substitution') return;
+    const subIn  = (play.participants || []).find(p => p.type === 'subIn');
+    const subOut = (play.participants || []).find(p => p.type === 'subOut');
+    if (subIn?.athlete?.id && subOut?.athlete) {
+      subMap[subIn.athlete.id] = {
+        replaces: subOut.athlete.shortName || subOut.athlete.displayName || '',
+        clock:    play.clock?.displayValue || ''
+      };
+    }
+  });
+
+  const parseTeam = rosterEntry => {
+    const starters = [], subs = [];
+    (rosterEntry.roster || []).forEach(p => {
+      const ath = p.athlete || {};
+      const entry = { num: parseInt(ath.jersey) || 0, name: ath.shortName || ath.displayName || '' };
+      if (p.starter) {
+        starters.push(entry);
+      } else if (p.subbedIn) {
+        const sub = subMap[ath.id];
+        subs.push({ ...entry, ...(sub ? { replaces: sub.replaces, clock: sub.clock } : {}) });
+      }
+    });
+    return { formation: rosterEntry.formation || '', starters, subs };
+  };
+
+  const bocaRoster  = rosters.find(r => r.team?.id === bocaId);
+  const rivalRoster = rosters.find(r => r.team?.id !== bocaId);
+  if (!bocaRoster || !rivalRoster) return { events, lineup: null };
+
+  return {
+    events,
+    lineup: { boca: parseTeam(bocaRoster), rival: parseTeam(rivalRoster) }
+  };
+}
+
+// ===== STATS FROM MATCH LINEUPS =====
+function normName(str) {
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function buildNameLookup() {
+  const map = {};
+  players.forEach(p => {
+    map[normName(p.name)] = p.file;
+    const parts = normName(p.name).split(' ');
+    if (parts.length >= 2 && !map[parts[parts.length - 1]])
+      map[parts[parts.length - 1]] = p.file;
+  });
+  return map;
+}
+
+function resolvePlayer(espnName, lookup) {
+  const n = normName(espnName);
+  if (lookup[n]) return lookup[n];
+  const parts = n.split(' ');
+  return lookup[parts[parts.length - 1]] || null;
+}
+
+function buildStatsFromSummaries(summaries) {
+  const lookup = buildNameLookup();
+  const stats = {};
+  players.forEach(p => { stats[p.file] = { pj: 0, tit: 0, goles: 0, asist: 0, min: 0 }; });
+
+  for (const summary of summaries) {
+    if (!summary?.boxscore?.players) continue;
+    const bocaEntry = summary.boxscore.players.find(tp => tp.team?.id === BOCA_ID);
+    if (!bocaEntry) continue;
+
+    for (const sg of (bocaEntry.statistics || [])) {
+      const labels = (sg.labels || sg.keys || []).map(l => (l || '').toUpperCase());
+      const minIdx = labels.findIndex(l => l.startsWith('MIN'));
+      const gIdx   = labels.findIndex(l => l === 'G' || l === 'GOALS');
+      const aIdx   = labels.findIndex(l => l === 'A' || l === 'ASSISTS');
+
+      for (const ath of (sg.athletes || [])) {
+        if (ath.didNotPlay) continue;
+        const file = resolvePlayer(ath.athlete?.displayName || '', lookup);
+        if (!file) continue;
+        const s = stats[file];
+        s.pj++;
+        if (ath.starter) s.tit++;
+        const vals = ath.stats || [];
+        if (minIdx >= 0) s.min += parseInt(vals[minIdx]) || 0;
+        if (gIdx   >= 0) s.goles += parseInt(vals[gIdx]) || 0;
+        if (aIdx   >= 0) s.asist += parseInt(vals[aIdx]) || 0;
+      }
+    }
+  }
+  return stats;
+}
+
+async function loadData() {
+  const now   = new Date();
+  const today = fmt8(now);
+  const to    = fmt8(new Date(now.getTime() + 120 * 86400000)); // 4 months ahead
+
+  // teamSched = all Boca liga matches this season (completed only, no 100-event limit)
+  // lFutFix   = scoreboard from today = only upcoming liga matches
+  // libFix    = upcoming Libertadores matches
+  const FIX_TTL = 15 * 60 * 1000; // 15 min para fixture (se actualizan con frecuencia)
+  const STD_TTL = 60 * 60 * 1000; // 1 hora para standings
+  const [lStd, teamSched, lFutFix, libFix, libStd] = await Promise.all([
+    fetchCached(`https://site.web.api.espn.com/apis/v2/sports/soccer/arg.1/standings?season=2026&type=0`, STD_TTL),
+    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/teams/${BOCA_ID}/schedule?season=2026`, FIX_TTL),
+    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}`, FIX_TTL),
+    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=${today}-${to}`, FIX_TTL),
+    fetchCached(`https://site.web.api.espn.com/apis/v2/sports/soccer/conmebol.libertadores/standings?season=2026`, STD_TTL)
+  ]);
+
+  // Zona standings — ESPN returns children[] with name "Group A" / "Group B"
+  let zonaA = [], zonaB = [];
+  const stdGroups = lStd?.children || lStd?.groups || [];
+  stdGroups.forEach(group => {
+    const entries = (group.standings?.entries || group.entries || []).map((e, i) => mkZonaEntry(e, i));
+    const gName = (group.name || group.abbreviation || '').toUpperCase();
+    if (gName.includes('A')) zonaA = entries;
+    else zonaB = entries;
+  });
+  sortZona(zonaA);
+  sortZona(zonaB);
+
+  // Tabla Anual
+  const tablaAnual = sortZona([...zonaA, ...zonaB].map(t => ({ ...t })));
+  tablaAnual.forEach((t, i) => {
+    t.copa = i < 3 ? 'lib' : i < 9 ? 'sud' : null;
+    t.desc = i === 29;
+    t.pos  = i + 1;
+  });
+
+  // Fixtures:
+  //   pastFix   = team schedule (all completed liga matches, full season history)
+  //   futureFix = scoreboard from today (upcoming liga matches, filter for Boca)
+  const pastFix   = extractBocaFix(teamSched?.events,  'liga', 'Apertura 2026', 'comp-ape');
+  const futureFix = extractBocaFix(lFutFix?.events,    'liga', 'Apertura 2026', 'comp-ape');
+  const liberFix  = extractBocaFix(libFix?.events, 'libertadores', 'Libertadores 2026', 'comp-lib');
+
+  // Merge liga (deduplicate on date in case of overlap)
+  const seenDates = new Set(pastFix.map(f => f.date));
+  const ligaFix   = [...pastFix, ...futureFix.filter(f => !seenDates.has(f.date))];
+  const allFix    = [...ligaFix, ...liberFix].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Copa Argentina + Libertadores team schedules (for stats)
+  const [copaTeamSched, libTeamSched] = await Promise.all([
+    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.copa/teams/${BOCA_ID}/schedule?season=2026`, FIX_TTL),
+    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/teams/${BOCA_ID}/schedule?season=2026`, FIX_TTL)
+  ]);
+
+  // Collect completed event IDs across all competitions
+  const completedEvents = [];
+  [[teamSched, 'arg.1'], [copaTeamSched, 'arg.copa'], [libTeamSched, 'conmebol.libertadores']]
+    .forEach(([sched, league]) => {
+      (sched?.events || []).forEach(ev => {
+        if (ev.competitions?.[0]?.status?.type?.completed)
+          completedEvents.push({ id: ev.id, league });
+      });
+    });
+
+  // Fetch match summaries (24h TTL — past results don't change)
+  const summaries = await Promise.all(
+    completedEvents.map(({ id, league }) =>
+      fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/summary?event=${id}`, 86400000)
+    )
+  );
+  const playerStats = buildStatsFromSummaries(summaries);
+
+  // Libertadores group (Boca's group)
+  let bocaGroup = [];
+  const libGroups = libStd?.children || libStd?.groups || [];
+  libGroups.forEach(group => {
+    const entries = group.standings?.entries || group.entries || [];
+    if (entries.some(e => e.team?.id === BOCA_ID)) {
+      bocaGroup = entries.map((e, i) => ({
+        pos: i + 1, name: e.team.displayName, espnId: e.team.id,
+        pj: getStat(e, 'gamesPlayed'), g: getStat(e, 'wins'), p: getStat(e, 'losses'),
+        gd: getStat(e, 'pointsFor') - getStat(e, 'pointsAgainst'),
+        pts: getStat(e, 'points'), boca: e.team.id === BOCA_ID
+      }));
+    }
+  });
+
+  // Fetch summaries for any live events (short TTL — busted every 45s by refreshLive)
+  const liveEvents = allFix.filter(f => f.inProgress);
+  if (liveEvents.length) {
+    const liveSummaries = await Promise.all(
+      liveEvents.map(f =>
+        fetchCached(
+          `https://site.api.espn.com/apis/site/v2/sports/soccer/${f.league}/summary?event=${f.eventId}`,
+          30000
+        )
+      )
+    );
+    liveEvents.forEach((f, i) => {
+      const parsed = parseLiveSummary(liveSummaries[i], BOCA_ID);
+      f.events = parsed.events;
+      f.lineup = parsed.lineup;
+    });
+  }
+
+  return { zonaA, zonaB, tablaAnual, allFix, bocaGroup, playerStats };
+}
+
+// ===== LIVE DATA STORE =====
+let liveData = null;
+let currentFixCat = 'liga';
+
+// ===== RENDER PLANTEL =====
+function renderAvgAge() {
+  const ages = players.map(p => fichas[p.file]?.born ? calcAge(fichas[p.file].born) : null).filter(a => a !== null);
+  const avg = ages.length ? (ages.reduce((s, a) => s + a, 0) / ages.length).toFixed(1) : '—';
+  const el = document.getElementById('plantelAvgAge');
+  if (el) el.textContent = `Promedio ${avg} años`;
+}
+
+function renderPlantel(filter = 'all') {
+  let html;
+  if (filter === 'CT') {
+    const grid = document.getElementById('playerGrid');
+    grid.style.display = 'none';
+    let wrap = document.getElementById('staffList');
+    if (!wrap) { wrap = document.createElement('div'); wrap.id = 'staffList'; grid.parentNode.insertBefore(wrap, grid.nextSibling); }
+    wrap.style.display = '';
+    wrap.className = 'staff-list';
+    wrap.innerHTML = staff.map(s => {
+      return `<div class="staff-card">
+        <div class="staff-info">
+          <div class="staff-name">${s.name}</div>
+          <div class="staff-role">${s.role}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  } else {
+    document.getElementById('playerGrid').style.display = '';
+    const wrap = document.getElementById('staffList');
+    if (wrap) wrap.style.display = 'none';
+    const data = filter === 'all' ? players : players.filter(p => p.pos === filter);
+    html = data.map(p => `
+      <div class="player-card ${p.injured ? 'injured' : ''}" onclick="openPlayer('${p.file}')">
+        <img class="player-photo" src="${img(p.file)}" alt="${p.short}" loading="lazy">
+        <div class="player-info">
+          <div class="player-num">#${p.num}</div>
+          <div class="player-name">${p.short}</div>
+          <span class="player-pos-tag pos-${p.pos}">${p.pos}</span>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('playerGrid').innerHTML = html;
+}
+function filterPlantel(f, btn) {
+  document.querySelectorAll('#plantelFilters .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderPlantel(f);
+}
+
+// ===== XI INICIAL =====
+
+
+// ===== RENDER STATS =====
+const statLabel = { goles:'gol', asist:'ast' };
+function renderStats(stat = 'goles') {
+  const sorted = [...players].filter(p => p[stat] > 0).sort((a, b) => b[stat] - a[stat]);
+  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:Barlow Condensed">Sin datos</div>'; return; }
+  const max = sorted[0][stat];
+  document.getElementById('statList').innerHTML = sorted.map((p, i) => `
+    <div class="stat-row">
+      <div class="stat-rank ${i < 3 ? 'top' : ''}">${i + 1}</div>
+      <img class="stat-photo" src="${img(p.file)}" alt="${p.short}">
+      <div class="stat-info">
+        <div class="stat-name">${p.short}</div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${(p[stat]/max)*100}%"></div></div>
+      </div>
+      <div>
+        <div class="stat-value">${p[stat]}</div>
+        <div class="stat-unit">${statLabel[stat]}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderStatsPartidos() {
+  const totalPJ = liveData?.allFix?.filter(f => f.completed).length || Math.max(...players.map(p => p.pj));
+  const sorted = [...players].filter(p => p.pj > 0).sort((a, b) => b.pj - a.pj || b.min - a.min);
+  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:Barlow Condensed">Sin datos</div>'; return; }
+  document.getElementById('statList').innerHTML = sorted.map((p, i) => {
+    const tit = p.tit ?? 0;
+    const ban = p.pj - tit;
+    const pct = Math.round((p.pj / totalPJ) * 100);
+    const minFmt = p.min >= 1000 ? (p.min / 1000).toFixed(1) + 'k' : p.min;
+    return `
+    <div class="stat-row">
+      <div class="stat-rank ${i < 3 ? 'top' : ''}">${i + 1}</div>
+      <img class="stat-photo" src="${img(p.file)}" alt="${p.short}">
+      <div class="stat-info">
+        <div class="stat-name">${p.short}</div>
+        <div class="stat-pj-breakdown">
+          <span class="stat-pj-tit">${tit} TIT</span>
+          <span class="stat-pj-sep">·</span>
+          <span class="stat-pj-sup">${ban} BAN</span>
+          <span class="stat-pj-sep">·</span>
+          <span class="stat-pj-min">${minFmt} min</span>
+        </div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${pct}%"></div></div>
+      </div>
+      <div style="flex-shrink:0;text-align:center">
+        <div class="stat-pj-total">${p.pj}<span style="font-size:13px;color:var(--gray);font-weight:600"> /${totalPJ}</span></div>
+        <div class="stat-pj-pct">${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function switchStat(s, btn) {
+  document.querySelectorAll('#tab-stats .stat-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (s === 'pj') renderStatsPartidos();
+  else renderStats(s);
+}
+
+// ===== RENDER INJURIES =====
+function renderInjuries() {
+  document.getElementById('injuryList').innerHTML = injuries.map(inj => `
+    <div class="injury-card sev-${inj.sev}">
+      <img class="injury-photo" src="${img(inj.file)}" alt="${inj.name}">
+      <div class="injury-info">
+        <div class="injury-name">${inj.name}</div>
+        <div class="injury-type">${inj.injury}</div>
+      </div>
+      <div class="injury-eta">
+        <div class="eta-label">Regreso</div>
+        <div class="eta-value">${inj.eta}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ===== FIXTURE =====
+function teamLogoImg(espnId) {
+  if (espnId === BOCA_ID) return `<img class="fixture-escudo" src="./Assets/escudo.svg" alt="Boca">`;
+  return `<img class="fixture-escudo" src="https://a.espncdn.com/i/teamlogos/soccer/500/${espnId}.png" alt="" onerror="this.style.opacity=0.3">`;
+}
+
+function buildFixtureCard(f, highlight = false, showEvents = true) {
+  const bocaTeam = `<div class="fixture-team">${teamLogoImg(BOCA_ID)}<div class="fixture-team-name boca">Boca Juniors</div></div>`;
+  const rivalTeam = `<div class="fixture-team">${teamLogoImg(f.rivalId)}<div class="fixture-team-name">${f.rivalShort || f.rival}</div></div>`;
+  const isLocal = f.loc === 'Local';
+
+  let center;
+  if (f.inProgress) {
+    const homeScore = isLocal ? f.bScore : f.rScore;
+    const awayScore = isLocal ? f.rScore : f.bScore;
+    const half = f.period === 2 ? '2T' : '1T';
+    const clockStr = f.clock ? `${f.clock} · ${half}` : half;
+    center = `<div style="text-align:center;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--white);line-height:1">${homeScore ?? 0} - ${awayScore ?? 0}</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:4px">
+        <span class="live-dot"></span>
+        <span style="font-size:10px;color:var(--alert);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.5px">${clockStr}</span>
+      </div>
+    </div>`;
+  } else if (f.completed) {
+    const homeScore = isLocal ? f.bScore : f.rScore;
+    const awayScore = isLocal ? f.rScore : f.bScore;
+    const bInt = parseInt(f.bScore), rInt = parseInt(f.rScore);
+    const color = bInt > rInt ? 'var(--green)' : bInt < rInt ? 'var(--alert)' : 'var(--gold)';
+    const res   = bInt > rInt ? 'Victoria'    : bInt < rInt ? 'Derrota'      : 'Empate';
+    center = `<div style="text-align:center;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:${color};line-height:1">${homeScore} - ${awayScore}</div>
+      <div style="font-size:9px;color:${color};font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">${res}</div>
+    </div>`;
+  } else {
+    center = `<div class="fixture-vs">VS</div>`;
+  }
+
+  return `
+    <div class="fixture-card ${f.inProgress ? 'live' : highlight ? 'next' : ''}">
+      <div class="fixture-top">
+        <span class="comp-badge ${f.cc}">${f.comp}</span>
+        ${f.inProgress ? '<span class="live-tag">En vivo</span>' : highlight ? '<span class="next-tag">Próximo</span>' : ''}
+      </div>
+      <div class="fixture-main">
+        ${isLocal ? bocaTeam : rivalTeam}
+        ${center}
+        ${isLocal ? rivalTeam : bocaTeam}
+      </div>
+      ${f.inProgress && showEvents && f.lineup ? `<button class="lineup-btn" onclick="openLineup(event)">Ver formaciones</button>` : ''}
+      ${(() => {
+        const evs = f.events || [];
+        if (!evs.length || !showEvents) return '';
+        const bocaEvs  = evs.filter(e => e.teamId === BOCA_ID);
+        const rivalEvs = evs.filter(e => e.teamId !== BOCA_ID);
+        const leftEvs  = isLocal ? bocaEvs  : rivalEvs;
+        const rightEvs = isLocal ? rivalEvs : bocaEvs;
+        const evIcon = t => {
+          if (t === 'Goal')        return `<span class="ev-icon goal"></span>`;
+          if (t === 'Yellow Card') return `<span class="ev-icon yellow"></span>`;
+          if (t === 'Red Card')    return `<span class="ev-icon red"></span>`;
+          if (t === 'Injury')      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="9" height="9" style="flex-shrink:0;display:inline-block;vertical-align:middle"><circle cx="50" cy="50" r="48" fill="#E53935"/><rect x="42" y="18" width="16" height="64" rx="4" fill="white"/><rect x="18" y="42" width="64" height="16" rx="4" fill="white"/></svg>`;
+          return '';
+        };
+        const renderEv = (e, right) =>
+          `<div class="ev-item${right ? ' right' : ''}">
+            ${evIcon(e.type)}
+            <span>${e.player}</span>
+            <span class="ev-clock">${e.clock}</span>
+          </div>`;
+        return `<div class="fixture-events">
+          <div class="ev-col">${leftEvs.map(e => renderEv(e, false)).join('')}</div>
+          <div class="ev-col right">${rightEvs.map(e => renderEv(e, true)).join('')}</div>
+        </div>`;
+      })()}
+      ${f.inProgress ? '' : `<div class="fixture-meta">
+        <div class="meta-item"><div class="meta-label">Fecha</div><div class="meta-value">${fmtDateShort(f.date)}</div></div>
+        <div class="meta-item"><div class="meta-label">Hora</div><div class="meta-value">${f.completed ? 'Final' : fmtTimeAR(f.date)}</div></div>
+        <div class="meta-item"><div class="meta-label">Condición</div><div class="meta-value">${f.loc}</div></div>
+      </div>`}
+    </div>`;
+}
+
+function renderFixture() {
+  const allFix = liveData?.allFix || [];
+  const now = new Date();
+
+  // Home widget: partido en vivo > próximo
+  const liveMatch = allFix.find(f => f.inProgress);
+  currentLineup = liveMatch?.lineup || null;
+  currentLiveMatch = liveMatch || null;
+  const proximo   = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);
+  const homeMatch = liveMatch || proximo;
+  document.getElementById('homeProximo').innerHTML = homeMatch
+    ? buildFixtureCard(homeMatch, !liveMatch)
+    : `<div style="padding:16px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif">Sin próximos partidos</div>`;
+
+  _renderFixList(allFix, now);
+}
+
+function _renderFixList(allFix, now) {
+  now = now || new Date();
+  const filtered    = allFix.filter(f => f.cat === currentFixCat);
+  const hasLive     = filtered.some(f => f.inProgress);
+  const proximoCat  = filtered.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);  // 1º próximo en esta competencia
+  const globalProx  = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);    // próximo global (todas las competencias)
+
+  let html = '';
+  if (filtered.length) {
+    let resultadosLbl = false;
+    for (const f of filtered) {
+      if (!resultadosLbl && f.completed) {
+        html += `<div class="fixture-section-lbl">Resultados</div>`;
+        resultadosLbl = true;
+      }
+      if (f.inProgress) {
+        html += `<div class="fixture-section-lbl" id="proximoLabel">En vivo</div>`;
+      } else if (f === proximoCat && !hasLive) {
+        html += `<div class="fixture-section-lbl" id="proximoLabel">Próximo partido</div>`;
+      }
+      html += buildFixtureCard(f, !hasLive && f === globalProx, false);
+    }
+  } else {
+    html = `<div style="padding:24px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif">Sin partidos disponibles</div>`;
+  }
+  document.getElementById('fixtureList').innerHTML = html;
+  const hasPast = filtered.some(f => f.completed);
+  document.getElementById('tab-fixture')?.classList.toggle('has-past-fix', hasPast);
+  requestAnimationFrame(scrollToProximo);
+}
+
+function filterFixture(cat, btn) {
+  currentFixCat = cat;
+  document.querySelectorAll('#fixFilter .pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  _renderFixList(liveData?.allFix || [], new Date());
+}
+
+
+function scrollToProximo() {
+  const app   = document.getElementById('scroll-wrap');
+  // Si hay partido en vivo, scrollear a él en lugar del próximo
+  const liveCard = document.querySelector('#fixtureList .fixture-card.live');
+  if (liveCard && app) {
+    const top = liveCard.getBoundingClientRect().top + app.scrollTop - document.querySelector('header').offsetHeight - 60;
+    app.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    return;
+  }
+  const label = document.getElementById('proximoLabel') ||
+                document.querySelector('#fixtureList .fixture-card.next');
+  const pills = document.querySelector('.fixture-pills-sticky');
+  if (!app) return;
+
+  const prevCard = label?.previousElementSibling;
+  if (!label || !prevCard) {
+    app.scrollTop = 0;
+    return;
+  }
+
+  const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 60;
+  const pillsH  = pills ? pills.offsetHeight : 0;
+  const peek    = Math.round(prevCard.offsetHeight * 0.5) + 16;
+  const appRect   = app.getBoundingClientRect();
+  const labelRect = label.getBoundingClientRect();
+  app.scrollTop   = (labelRect.top - appRect.top + app.scrollTop) - headerH - pillsH - peek;
+}
+
+// ===== POSICIONES / TABS =====
+function switchPos(comp, btn) {
+  btn.closest('.stats-tabs').querySelectorAll('.stat-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['apertura','libertadores','copa'].forEach(c => {
+    document.getElementById(`posView-${c}`).style.display = c === comp ? '' : 'none';
+  });
+}
+function switchPlantelSub(view, btn) {
+  document.querySelectorAll('.stats-tabs .stat-tab-btn').forEach(b => {
+    if (btn.closest('.stats-tabs') === b.closest('.stats-tabs')) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  document.getElementById('plantelView').style.display = view === 'plantel' ? '' : 'none';
+  document.getElementById('bajasView').style.display   = view === 'bajas'   ? '' : 'none';
+}
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  btn.classList.add('active');
+  const app = document.getElementById('scroll-wrap');
+  if (tab === 'fixture') {
+    app.scrollTop = 0;
+    requestAnimationFrame(scrollToProximo);
+  } else {
+    app.scrollTop = 0;
+  }
+}
+function switchZona(zona, btn) {
+  btn.closest('.filter-row').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('zonaA-wrap').style.display    = zona === 'A'     ? '' : 'none';
+  document.getElementById('zonaB-wrap').style.display    = zona === 'B'     ? '' : 'none';
+  document.getElementById('zonaAnual-wrap').style.display = zona === 'anual' ? '' : 'none';
+}
+
+// ===== TABLAS =====
+const ff = `font-family:'Barlow Condensed',sans-serif;`;
+function zonaRow(t) {
+  const dif = t.gf - t.gc;
+  const difStr   = dif > 0 ? `+${dif}` : `${dif}`;
+  const difColor = dif > 0 ? 'var(--green)' : dif < 0 ? 'var(--alert)' : 'var(--gray)';
+  const bc = t.boca ? 'var(--gold)' : 'var(--white)';
+  return `
+  <div style="display:grid;grid-template-columns:24px 1fr repeat(8,22px);gap:4px;padding:7px 12px;border-bottom:1px solid rgba(74,96,143,0.25);align-items:center;${t.boca?'background:rgba(249,190,61,0.07)':''}">
+    <span style="${ff}font-size:13px;font-weight:800;color:${t.boca?'var(--gold)':'var(--gray)'};text-align:center">${t.pos}</span>
+    <span style="${ff}font-size:13px;font-weight:${t.boca?800:600};color:${bc};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.boca?'★ ':''}${t.name}</span>
+    <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.pj}</span>
+    <span style="${ff}font-size:12px;text-align:center">${t.g}</span>
+    <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.e}</span>
+    <span style="${ff}font-size:12px;text-align:center">${t.p}</span>
+    <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gf}</span>
+    <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gc}</span>
+    <span style="${ff}font-size:12px;text-align:center;font-weight:700;color:${difColor}">${difStr}</span>
+    <span style="${ff}font-size:14px;font-weight:800;text-align:center;color:${bc}">${t.pts}</span>
+  </div>`;
+}
+
+function renderTables(data) {
+  if (!data) return;
+  const { zonaA, zonaB, tablaAnual, bocaGroup } = data;
+  document.getElementById('tablaZonaA').innerHTML = zonaA.map(zonaRow).join('');
+  document.getElementById('tablaZonaB').innerHTML = zonaB.map(zonaRow).join('');
+
+  const copaColor = { lib:'#43A047', sud:'#FF8F00' };
+  document.getElementById('tablaAnual').innerHTML = tablaAnual.map(t => {
+    const dif = t.gf - t.gc;
+    const difStr   = dif > 0 ? `+${dif}` : `${dif}`;
+    const difColor = dif > 0 ? 'var(--green)' : dif < 0 ? 'var(--alert)' : 'var(--gray)';
+    const borderColor = t.boca ? 'var(--gold)' : t.desc ? '#B71C1C' : t.copa ? copaColor[t.copa] : 'transparent';
+    const bg = t.boca ? 'rgba(249,190,61,0.07)' : t.desc ? 'rgba(183,28,28,0.08)' : t.copa==='lib' ? 'rgba(67,160,71,0.05)' : t.copa==='sud' ? 'rgba(255,143,0,0.05)' : '';
+    const bc = t.boca ? 'var(--gold)' : 'var(--white)';
+    return `
+    <div style="display:grid;grid-template-columns:24px 1fr repeat(8,22px);gap:4px;padding:7px 12px;border-bottom:1px solid rgba(74,96,143,0.25);border-left:3px solid ${borderColor};align-items:center;background:${bg}">
+      <span style="${ff}font-size:13px;font-weight:800;color:${t.boca?'var(--gold)':'var(--gray)'};text-align:center">${t.pos}</span>
+      <span style="${ff}font-size:13px;font-weight:${t.boca?800:600};color:${bc};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.boca?'★ ':''}${t.name}</span>
+      <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.pj}</span>
+      <span style="${ff}font-size:12px;text-align:center">${t.g}</span>
+      <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.e}</span>
+      <span style="${ff}font-size:12px;text-align:center">${t.p}</span>
+      <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gf}</span>
+      <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gc}</span>
+      <span style="${ff}font-size:12px;text-align:center;font-weight:700;color:${difColor}">${difStr}</span>
+      <span style="${ff}font-size:14px;font-weight:800;text-align:center;color:${bc}">${t.pts}</span>
+    </div>`;
+  }).join('') + `
+  <div style="display:flex;gap:16px;padding:10px 12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:2px;background:#43A047"></div><span style="${ff}font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:0.4px">Libertadores</span></div>
+    <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:2px;background:#FF8F00"></div><span style="${ff}font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:0.4px">Sudamericana</span></div>
+    <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:2px;background:#B71C1C"></div><span style="${ff}font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:0.4px">Descenso</span></div>
+  </div>`;
+
+  document.getElementById('tablaLibRows').innerHTML = bocaGroup.map(t => `
+    <div class="tabla-lib ${t.boca?'boca-row':''}">
+      <span class="t-pos">${t.pos}</span>
+      <span class="t-name">${t.name}</span>
+      <span>${t.pj}</span><span>${t.g}</span><span>${t.p}</span>
+      <span>${t.gd > 0 ? '+'+t.gd : t.gd}</span>
+      <span class="t-pts">${t.pts}</span>
+    </div>`).join('');
+}
+
+function renderHomeWidgets(data) {
+  if (!data) return;
+  const bocaZona  = data.zonaA.find(t => t.boca) || data.zonaB.find(t => t.boca);
+  const bocaLib   = data.bocaGroup.find(t => t.boca);
+  const widgets   = document.querySelectorAll('.home-widget');
+  if (bocaZona && widgets[0]) {
+    widgets[0].querySelector('.hw-pos-num').textContent = `${bocaZona.pos}°`;
+    widgets[0].querySelector('.hw-main').innerHTML = `<span>${bocaZona.pts}</span> pts`;
+    widgets[0].querySelector('.hw-sub').textContent = `${bocaZona.pj} PJ · ${bocaZona.g}G ${bocaZona.e}E ${bocaZona.p}P`;
+  }
+  if (bocaLib && widgets[1]) {
+    widgets[1].querySelector('.hw-pos-num').textContent = `${bocaLib.pos}°`;
+    widgets[1].querySelector('.hw-sub').textContent = bocaLib.pj > 0
+      ? `${bocaLib.pj} PJ · ${bocaLib.g}G ${bocaLib.p}P`
+      : 'Fase de grupos · Debut 7 abr';
+  }
+}
+
+const img = f => `./Assets/${f}.jpg`;
+const posLabels = { ARQ:'Arquero', DEF:'Defensor', MED:'Mediocampista', DEL:'Delantero' };
+
+function calcAge(bornStr) {
+  const meses = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
+  const p = bornStr.toLowerCase().replace(/ de /g, ' ').split(' ');
+  const day = parseInt(p[0]), month = meses[p[1]], year = parseInt(p[2]);
+  if (isNaN(day) || month === undefined || isNaN(year)) return null;
+  const today = new Date();
+  let age = today.getFullYear() - year;
+  if (today.getMonth() < month || (today.getMonth() === month && today.getDate() < day)) age--;
+  return age;
+}
+
+function calcOVR(sk, pos) {
+  const w = {
+    ARQ: [0.21, 0.21, 0.14, 0.05, 0.25, 0.14],
+    DEF: [0.05, 0.05, 0.10, 0.10, 0.50, 0.20],
+    MED: [0.10, 0.10, 0.30, 0.25, 0.10, 0.15],
+    DEL: [0.20, 0.30, 0.10, 0.25, 0.05, 0.10],
+  }[pos] || [1/6,1/6,1/6,1/6,1/6,1/6];
+  return Math.round(sk.reduce((s,v,i) => s + v*w[i], 0));
+}
+
+function buildHex(sk, pos) {
+  const isGK = pos === 'ARQ';
+  const labels = isGK
+    ? ['DIV','HAN','KIC','REF','SPD','POS']
+    : ['RIT','TIR','PAS','REG','DEF','FIS'];
+  const ovr = calcOVR(sk, pos);
+  const ovrColor = ovr >= 80 ? '#F9BE3D' : ovr >= 70 ? '#81C784' : '#9AAFC8';
+
+  const cx = 95, cy = 95, R = 68, n = 6;
+  const angles = Array.from({length:n}, (_,i) => -Math.PI/2 + i*Math.PI*2/n);
+
+  const hexPts = lvl => angles.map(a => `${cx+lvl*R*Math.cos(a)},${cy+lvl*R*Math.sin(a)}`).join(' ');
+  const grid = [0.25,0.5,0.75,1].map(l =>
+    `<polygon points="${hexPts(l)}" fill="${l===1?'rgba(34,57,107,0.3)':'none'}" stroke="rgba(74,96,143,0.35)" stroke-width="0.8"/>`).join('');
+  const axes = angles.map(a =>
+    `<line x1="${cx}" y1="${cy}" x2="${cx+R*Math.cos(a)}" y2="${cy+R*Math.sin(a)}" stroke="rgba(74,96,143,0.35)" stroke-width="0.8"/>`).join('');
+  const statPts = sk.map((v,i) => {
+    const r = (v/99)*R;
+    return `${cx+r*Math.cos(angles[i])},${cy+r*Math.sin(angles[i])}`;
+  }).join(' ');
+  const lbls = labels.map((lbl,i) => {
+    const lo = 16, lx = cx+(R+lo)*Math.cos(angles[i]), ly = cy+(R+lo)*Math.sin(angles[i]);
+    return `<text x="${lx.toFixed(1)}" y="${(ly-4).toFixed(1)}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="9" font-weight="700" letter-spacing="0.5" fill="rgba(138,155,181,0.9)">${lbl}</text>
+            <text x="${lx.toFixed(1)}" y="${(ly+8).toFixed(1)}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="13" font-weight="800" fill="#F9BE3D">${sk[i]}</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 190 190" width="190" height="190" style="overflow:visible">
+    ${grid}${axes}
+    <polygon points="${statPts}" fill="rgba(249,190,61,0.15)" stroke="#F9BE3D" stroke-width="1.5" stroke-linejoin="round"/>
+    <text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="10" font-weight="700" letter-spacing="1" fill="rgba(138,155,181,0.8)">OVR</text>
+    <text x="${cx}" y="${cy+16}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="28" font-weight="800" fill="${ovrColor}">${ovr}</text>
+    ${lbls}
+  </svg>`;
+}
+
+function openPlayer(file) {
+  const p = players.find(x => x.file === file);
+  if (!p) return;
+
+  document.getElementById('mPhoto').src = img(p.file);
+  document.getElementById('mNumBg').textContent = p.num;
+  document.getElementById('mName').textContent = p.name;
+  document.getElementById('mNum').textContent = `#${p.num} · ${posLabels[p.pos]}`;
+
+  const posTag = document.getElementById('mPosTag');
+  posTag.textContent = p.pos;
+  posTag.className = `modal-pos-tag pos-${p.pos}`;
+
+  document.getElementById('mPJ').textContent = p.pj;
+  document.getElementById('mGoles').textContent = p.goles;
+  document.getElementById('mAsist').textContent = p.asist;
+  document.getElementById('mMin').textContent = p.min.toLocaleString();
+
+  const injuryBox = document.getElementById('mInjuryBox');
+  const injData = injuries.find(x => x.file === file);
+  if (injData) {
+    document.getElementById('mInjuryDetail').textContent = `${injData.injury} · Regreso: ${injData.eta}`;
+    injuryBox.style.display = 'flex';
+    const colors = { high: 'var(--alert)', medium: 'var(--orange)', low: 'var(--green)' };
+    injuryBox.style.borderLeftColor = colors[injData.sev];
+    injuryBox.querySelector('.modal-injury-title').style.color = colors[injData.sev];
+    injuryBox.querySelector('.modal-injury-icon').textContent = injData.sev === 'low' ? '🟡' : '🚨';
+  } else {
+    injuryBox.style.display = 'none';
+  }
+
+  const fichaEl = document.getElementById('mFicha');
+  const f = fichas[p.file];
+  if (f) {
+    const edad = f.born ? calcAge(f.born) : null;
+    const items = [
+      f.born        ? `<div class="ficha-item"><div class="ficha-label">Fecha de nacimiento</div><div class="ficha-value">${f.born}</div></div>` : '',
+      edad !== null ? `<div class="ficha-item"><div class="ficha-label">Edad</div><div class="ficha-value">${edad} años</div></div>` : '',
+      f.nationality ? `<div class="ficha-item"><div class="ficha-label">Nacionalidad</div><div class="ficha-value">${f.nationality}</div></div>` : '',
+      f.height      ? `<div class="ficha-item"><div class="ficha-label">Altura</div><div class="ficha-value">${f.height}</div></div>` : '',
+      f.from        ? `<div class="ficha-item full"><div class="ficha-label">Procedencia</div><div class="ficha-value">${f.from}</div></div>` : '',
+      f.birthPlace  ? `<div class="ficha-item full"><div class="ficha-label">Lugar de nacimiento</div><div class="ficha-value">${f.birthPlace}</div></div>` : '',
+      f.debut       ? `<div class="ficha-item full"><div class="ficha-label">Debut en Boca</div><div class="ficha-value" style="font-size:12px;font-weight:600">${f.debut}</div></div>` : '',
+    ].filter(Boolean).join('');
+    fichaEl.innerHTML = `<div class="ficha-grid">${items}</div>`;
+    fichaEl.style.display = '';
+  } else {
+    fichaEl.style.display = 'none';
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modalSheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayer() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('modalSheet').classList.remove('open');
+}
+
+// ===== INIT =====
+// ===== LINEUP SHEET =====
+let currentLineup = null;
+let currentLiveMatch = null;
+
+function openLineup(e) {
+  e.stopPropagation();
+  if (!currentLineup || !currentLiveMatch) return;
+  const { boca, rival } = currentLineup;
+  const events = currentLiveMatch.events || [];
+
+  // Build event map: normalized player name → array of event types
+  const evMap = {};
+  events.forEach(ev => {
+    const key = ev.player.toLowerCase();
+    if (!evMap[key]) evMap[key] = [];
+    evMap[key].push(ev.type);
+  });
+
+  const eventIcons = name => {
+    const types = evMap[name.toLowerCase()] || [];
+    return types.map(t => {
+      if (t === 'Goal')        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="11" height="11" style="margin-left:4px;flex-shrink:0;display:inline-block;vertical-align:middle"><circle cx="50" cy="50" r="48" fill="#111"/><polygon points="50,7 63,17 59,32 41,32 37,17" fill="white"/><polygon points="15,29 29,24 39,38 30,51 14,46" fill="white"/><polygon points="85,29 86,46 70,51 61,38 71,24" fill="white"/><polygon points="13,57 30,51 37,65 25,76 10,68" fill="white"/><polygon points="87,57 90,68 75,76 63,65 70,51" fill="white"/><polygon points="41,72 59,72 64,86 50,94 36,86" fill="white"/></svg>`;
+      if (t === 'Yellow Card') return `<span style="display:inline-block;width:7px;height:9px;background:#FFD600;border-radius:1px;margin-left:4px;flex-shrink:0"></span>`;
+      if (t === 'Red Card')    return `<span style="display:inline-block;width:7px;height:9px;background:#E53935;border-radius:1px;margin-left:4px;flex-shrink:0"></span>`;
+      if (t === 'Injury')      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="11" height="11" style="margin-left:4px;flex-shrink:0;display:inline-block;vertical-align:middle"><circle cx="50" cy="50" r="48" fill="#E53935"/><rect x="42" y="18" width="16" height="64" rx="4" fill="white"/><rect x="18" y="42" width="64" height="16" rx="4" fill="white"/></svg>`;
+      return '';
+    }).join('');
+  };
+
+  const rivalName = document.querySelector('#homeProximo .fixture-team-name:not(.boca)')?.textContent || 'Rival';
+  const rivalLogoSrc = document.querySelector('#homeProximo .fixture-escudo:not([alt="Boca"])')?.src || '';
+
+  const renderCol = (team, isBoca) => {
+    const logoHtml = isBoca
+      ? `<img class="lineup-col-logo" src="./Assets/escudo.svg">`
+      : `<img class="lineup-col-logo" src="${rivalLogoSrc}" onerror="this.style.opacity=0.3">`;
+    const name = isBoca ? 'Boca Juniors' : rivalName;
+    const subIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 12" width="13" height="9" style="flex-shrink:0;display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="0,11 4.5,1 9,11" fill="#43A047"/><polygon points="9,1 13.5,11 18,1" fill="#E53935"/></svg>`;
+    const renderPlayers = (list, isSub) => list.map(p =>
+      `<div class="lineup-player">
+        <span class="lineup-num">${p.num}</span>
+        ${isSub && p.replaces ? subIcon : ''}
+        <span class="lineup-name${isSub ? ' sub' : ''}">${p.name}</span>
+        ${isSub && p.replaces ? `<span class="lineup-replaces">${p.replaces}</span>` : ''}
+        ${eventIcons(p.name)}
+      </div>`
+    ).join('');
+    return `<div class="lineup-col">
+      <div class="lineup-col-header">${logoHtml}<div><div class="lineup-col-name">${name}</div><div class="lineup-formation">${team.formation}</div></div></div>
+      <div class="lineup-section-lbl">Titulares</div>${renderPlayers(team.starters, false)}
+      <div class="lineup-section-lbl">Suplentes</div>${renderPlayers(team.subs, true)}
+    </div>`;
+  };
+
+  document.getElementById('lineupCols').innerHTML = renderCol(boca, true) + renderCol(rival, false);
+  document.getElementById('lineupOverlay').classList.add('open');
+  document.getElementById('lineupSheet').classList.add('open');
+}
+
+function closeLineup() {
+  document.getElementById('lineupOverlay').classList.remove('open');
+  document.getElementById('lineupSheet').classList.remove('open');
+}
+
+// ===== LIVE MATCH REFRESH =====
+let liveTimer = null;
+
+function bustFixtureCache() {
+  const now = new Date();
+  const today = fmt8(now);
+  const to = fmt8(new Date(now.getTime() + 120 * 86400000));
+  const urls = [
+    `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}`,
+    `https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=${today}-${to}`,
+    `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/teams/${BOCA_ID}/schedule?season=2026`,
+    `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.copa/teams/${BOCA_ID}/schedule?season=2026`
+  ];
+  // Bust live summary cache so next loadData() fetches fresh data
+  (liveData?.allFix || []).filter(f => f.inProgress).forEach(f => {
+    urls.push(`https://site.api.espn.com/apis/site/v2/sports/soccer/${f.league}/summary?event=${f.eventId}`);
+  });
+  urls.forEach(url => {
+    try { localStorage.removeItem('espnv2_' + url.replace(/\W/g, '').slice(-40)); } catch(e) {}
+  });
+}
+
+async function refreshLive() {
+  bustFixtureCache();
+  try {
+    liveData = await loadData();
+    renderFixture();
+    checkLiveTimer();
+  } catch(e) { console.warn('refreshLive error:', e); }
+}
+
+function checkLiveTimer() {
+  const hasLive = liveData?.allFix?.some(f => f.inProgress);
+  if (hasLive && !liveTimer) {
+    liveTimer = setInterval(refreshLive, 45000);
+  } else if (!hasLive && liveTimer) {
+    clearInterval(liveTimer);
+    liveTimer = null;
+  }
+}
+
+(async function init() {
+  renderPlantel();
+  renderAvgAge();
+  renderInjuries();
+  document.getElementById('statList').innerHTML = `<div style="padding:32px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700">Cargando stats...</div>`;
+
+  const loading = `<div style="padding:24px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700">Cargando datos...</div>`;
+  ['tablaZonaA','tablaZonaB','tablaAnual','tablaLibRows'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = loading;
+  });
+
+  try {
+    liveData = await loadData();
+    // Merge live stats into players array
+    if (liveData.playerStats) {
+      players.forEach(p => {
+        const s = liveData.playerStats[p.file];
+        if (!s || s.pj === 0) return;
+        p.pj = s.pj; p.tit = s.tit; p.goles = s.goles; p.asist = s.asist; p.min = s.min;
+      });
+      const activeBtn = document.querySelector('#tab-stats .stat-tab-btn.active');
+      const activeStat = activeBtn?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+      if (activeStat === 'pj') renderStatsPartidos();
+      else renderStats(activeStat || 'goles');
+    }
+    renderTables(liveData);
+    renderFixture();
+    checkLiveTimer();
+  } catch(e) {
+    console.error('Error cargando datos ESPN:', e);
+    renderStats('goles'); // fallback a datos estáticos si falla la API
+    const err = `<div style="padding:24px;text-align:center;color:var(--alert);font-family:'Barlow Condensed',sans-serif;font-size:13px">Error al cargar. Verificá tu conexión.</div>`;
+    ['tablaZonaA','tablaZonaB','tablaAnual'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = err;
+    });
+  }
+  try { renderHomeWidgets(liveData); } catch(e) { console.warn('renderHomeWidgets:', e); }
+})();
+</script>
+</body>
+</html>
