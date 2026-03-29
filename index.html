@@ -893,18 +893,30 @@ function buildStatsFromSummaries(summaryData) {
       const file = resolvePlayer(name, lookup);
       if (!file || !stats[file]) continue;
       const s = stats[file];
-      const app = getStat(p, 'appearances');
+      // Some competitions (Copa Arg) don't return stats — use starter/subbedIn as fallback
+      const app = getStat(p, 'appearances') || (p.starter || p.subbedIn ? 1 : 0);
       if (!app) continue;
       s.pj.total++; s.pj[lk]++;
       if (p.starter) { s.tit.total++; s.tit[lk]++; }
-      const g = getStat(p, 'totalGoals');
-      if (g) { s.goles.total += g; s.goles[lk] += g; }
-      const a = getStat(p, 'goalAssists');
-      if (a) { s.asist.total += a; s.asist[lk] += a; }
-      const yc = getStat(p, 'yellowCards');
-      if (yc) { s.amarillas.total += yc; s.amarillas[lk] += yc; }
-      const rc = getStat(p, 'redCards');
-      if (rc) { s.rojas.total += rc; s.rojas[lk] += rc; }
+    }
+
+    // keyEvents: goals, assists, cards — consistent across all competitions
+    for (const ev of (summary.keyEvents || [])) {
+      if (ev.team?.id !== BOCA_ID) continue;
+      const type = ev.type?.text;
+      const p0 = ev.participants?.[0]?.athlete?.displayName || '';
+      const p1 = ev.participants?.[1]?.athlete?.displayName || '';
+      if (type === 'Yellow Card') {
+        const f = resolvePlayer(p0, lookup);
+        if (f && stats[f]) { stats[f].amarillas.total++; stats[f].amarillas[lk]++; }
+      } else if (type === 'Red Card') {
+        const f = resolvePlayer(p0, lookup);
+        if (f && stats[f]) { stats[f].rojas.total++; stats[f].rojas[lk]++; }
+      } else if (ev.scoringPlay && !ev.ownGoal) {
+        const sf = resolvePlayer(p0, lookup);
+        if (sf && stats[sf]) { stats[sf].goles.total++; stats[sf].goles[lk]++; }
+        if (p1) { const af = resolvePlayer(p1, lookup); if (af && stats[af]) { stats[af].asist.total++; stats[af].asist[lk]++; } }
+      }
     }
   }
   return stats;
