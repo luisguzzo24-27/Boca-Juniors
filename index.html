@@ -1210,11 +1210,10 @@ function renderStats(stat = 'goles', comp) {
     return { ...p, _val: val };
   }).filter(p => p._val > 0).sort((a, b) => b._val - a._val);
 
-  if (!rows.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px">Sin datos</div>'; return; }
-
   const colGrid = '20px 1fr 32px';
   const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}"><span>#</span><span style="text-align:left">Jugador</span><span>${statLabel[stat]||stat.toUpperCase()}</span></div>`;
-  const bodyRows = rows.map((p, i) => `
+  const bodyRows = rows.length
+    ? rows.map((p, i) => `
     <div class="tabla-row" style="grid-template-columns:${colGrid}">
       <span class="t-pos" style="${i<3?'color:var(--gold)':''}">${i+1}</span>
       <span class="t-name" style="display:flex;align-items:center;gap:8px">
@@ -1222,7 +1221,8 @@ function renderStats(stat = 'goles', comp) {
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
       </span>
       <span class="t-pts" style="${i<3?'color:var(--gold)':''}">${p._val}</span>
-    </div>`).join('');
+    </div>`).join('')
+    : `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
   document.getElementById('statList').innerHTML = `<div style="padding:0 16px 16px"><div class="tabla">${mkZonaFilter(cf,'switchStatGenComp')}${header}<div class="tabla-scroll">${bodyRows}</div></div></div>`;
 }
@@ -1237,11 +1237,10 @@ function renderStatsPartidos(comp) {
     return { ...p, _pj: pj, _tit: tit, _ban: pj - tit };
   }).filter(p => p._pj > 0).sort((a, b) => b._pj - a._pj || b._tit - a._tit);
 
-  if (!rows.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px">Sin datos</div>'; return; }
-
   const colGrid = '20px 1fr 28px 28px 32px';
   const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}"><span>#</span><span style="text-align:left">Jugador</span><span>TIT</span><span>BAN</span><span>PJ</span></div>`;
-  const bodyRows = rows.map((p, i) => `
+  const bodyRows = rows.length
+    ? rows.map((p, i) => `
     <div class="tabla-row" style="grid-template-columns:${colGrid}">
       <span class="t-pos" style="${i<3?'color:var(--gold)':''}">${i+1}</span>
       <span class="t-name" style="display:flex;align-items:center;gap:8px">
@@ -1251,7 +1250,8 @@ function renderStatsPartidos(comp) {
       <span>${p._tit}</span>
       <span>${p._ban}</span>
       <span class="t-pts" style="${i<3?'color:var(--gold)':''}">${p._pj}</span>
-    </div>`).join('');
+    </div>`).join('')
+    : `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
   document.getElementById('statList').innerHTML = `<div style="padding:0 16px 16px"><div class="tabla">${mkZonaFilter(cf,'switchStatGenComp')}${header}<div class="tabla-scroll">${bodyRows}</div></div></div>`;
 }
@@ -1295,11 +1295,6 @@ function renderStatsTarjetas(tipo, comp) {
     .filter(p => p._val > 0)
     .sort((a, b) => b._val - a._val);
 
-  if (!rows.length) {
-    document.getElementById('statList').innerHTML = '<div style="text-align:center;color:var(--gray);padding:32px;font-family:inherit">Sin datos</div>';
-    return;
-  }
-
   // Columns depend on filter: Todos → APE COP LIB TOT | single comp → just the count
   const showAll = compFilter === 'total';
   const colGrid = showAll ? '20px 1fr repeat(3,28px) 32px' : '20px 1fr 32px';
@@ -1334,7 +1329,7 @@ function renderStatsTarjetas(tipo, comp) {
       </span>
       ${cols}
     </div>`;
-  }).join('');
+  }).join('') || `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
   document.getElementById('statList').innerHTML = `
     <div style="padding:0 16px 16px">
@@ -1350,7 +1345,7 @@ function switchStat(s, btn) {
   moveStatPill(btn, true);
   activeStatComp = 'total';
   if (s === 'pj') renderStatsPartidos();
-  else if (isCards) renderStatsTarjetas(s);
+  else if (s === 'amarillas' || s === 'rojas') renderStatsTarjetas(s);
   else renderStats(s);
 }
 
