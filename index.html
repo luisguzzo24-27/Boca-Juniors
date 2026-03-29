@@ -1195,8 +1195,8 @@ function mkZonaFilter(comp, fn) {
   return `<div class="zona-tabs">
     <button class="zona-tab${comp==='total'?' active':''}" onclick="${fn}('total')">Todos</button>
     <button class="zona-tab${comp==='liga'?' active':''}" onclick="${fn}('liga')">Apertura</button>
-    <button class="zona-tab${comp==='copa'?' active':''}" onclick="${fn}('copa')">Copa Arg</button>
-    <button class="zona-tab${comp==='lib'?' active':''}" onclick="${fn}('lib')">Libertadores</button>
+    <button class="zona-tab${comp==='copa'?' active':''}" onclick="${fn}('copa')">Copa Arg.</button>
+    <button class="zona-tab${comp==='lib'?' active':''}" onclick="${fn}('lib')">Libert.</button>
   </div>`;
 }
 
@@ -1307,8 +1307,8 @@ function renderStatsTarjetas(tipo, comp) {
   const zonaTabsHTML = `<div class="zona-tabs">
     <button class="zona-tab${compFilter==='total'?' active':''}" onclick="switchStatComp('total')">Todos</button>
     <button class="zona-tab${compFilter==='liga'?' active':''}" onclick="switchStatComp('liga')">Apertura</button>
-    <button class="zona-tab${compFilter==='copa'?' active':''}" onclick="switchStatComp('copa')">Copa Arg</button>
-    <button class="zona-tab${compFilter==='lib'?' active':''}" onclick="switchStatComp('lib')">Libertadores</button>
+    <button class="zona-tab${compFilter==='copa'?' active':''}" onclick="switchStatComp('copa')">Copa Arg.</button>
+    <button class="zona-tab${compFilter==='lib'?' active':''}" onclick="switchStatComp('lib')">Libert.</button>
   </div>`;
 
   const header = showAll
