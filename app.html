@@ -11,9 +11,9 @@
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:image" content="https://luisguzzo24-27.github.io/Boca-Juniors/Assets/escudo.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button, input, select, textarea { font-family: inherit; }
     :root {
       --bg: #0A1628; --bg-card: #162236; --bg-card2: #1C2E45;
       --blue: #22396B; --blue-mid: #2E4D82; --blue-light: #4A608F;
@@ -22,7 +22,7 @@
       --alert: #E65100; --orange: #FF8F00; --green: #43A047; --purple: #9C6FE4;
       --radius: 12px; --nav-h: 64px; --header-h: 60px;
     }
-    html, body { height: 100%; background: var(--bg); color: var(--white); font-family: 'Barlow', sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+    html, body { height: 100%; background: var(--bg); color: var(--white); font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
     #app { max-width: 430px; margin: 0 auto; height: 100vh; height: 100dvh; display: flex; flex-direction: column; position: relative; }
     #scroll-wrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     #scroll-wrap::-webkit-scrollbar { width: 0; }
@@ -32,45 +32,51 @@
     .header-logo { width: 38px; height: 38px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .header-logo svg { width: 22px; height: 22px; }
     .header-title { flex: 1; }
-    .header-title h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 0.5px; line-height: 1; }
-    .header-title span { font-size: 11px; color: var(--gray); font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; }
+    .header-title h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.38px; line-height: 1.25; }
+    .header-title span { font-size: 11px; color: var(--gray); font-weight: 500; letter-spacing: 0.07px; text-transform: uppercase; }
     .header-badge { background: var(--blue); border: 1px solid var(--blue-mid); border-radius: 8px; padding: 4px 10px; text-align: center; }
-    .header-badge .pos { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: var(--gold); line-height: 1; }
-    .header-badge .label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-badge .pos { font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; letter-spacing: 0.35px; }
+    .header-badge .label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
 
     /* MAIN */
     main { flex: 1; }
     .tab { display: none; padding-bottom: calc(var(--nav-h) + 32px); }
     .tab.active { display: block; }
 
-    /* BOTTOM NAV */
-    .bottom-nav { position: absolute; bottom: 12px; left: 12px; right: 12px; height: var(--nav-h); border-radius: 20px; background: rgba(255,255,255,0.03); backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%); border: 1px solid rgba(255,255,255,0.10); display: flex; align-items: center; z-index: 10; box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 32px rgba(0,0,0,0.35); }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 0; border: none; background: none; color: var(--gray); transition: color 0.2s; }
-    .nav-item.active { color: var(--gold); }
-    .nav-item svg { width: 22px; height: 22px; }
-    .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
+    /* BOTTOM NAV — Apple Music Liquid Glass */
+    .bottom-nav { position: absolute; bottom: 12px; left: 12px; right: 12px; height: var(--nav-h); border-radius: 22px; background: rgba(28,28,30,0.55); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 0.5px solid rgba(255,255,255,0.08); display: flex; align-items: center; z-index: 10; box-shadow: 0 8px 32px rgba(0,0,0,0.4); overflow: hidden; }
+    .nav-pill { position: absolute; top: 6px; bottom: 6px; border-radius: 16px; background: rgba(255,255,255,0.18); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 0.5px solid rgba(255,255,255,0.15); box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.22), 0 1px 4px rgba(0,0,0,0.15); pointer-events: none; z-index: 0; transition: left 0.4s cubic-bezier(0.34,1.56,0.64,1), width 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; padding: 8px 0; border: none; background: none; color: rgba(142,142,147,0.8); position: relative; z-index: 1; transition: color 0.25s ease, transform 0.15s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease; transform-origin: center; -webkit-tap-highlight-color: transparent; }
+    .nav-item:active { transform: scale(0.85); opacity: 0.8; transition: transform 0.1s ease, opacity 0.1s ease; }
+    .nav-item.active { color: var(--gold); opacity: 1; }
+    .nav-item svg { width: 22px; height: 22px; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    .nav-item span { font-size: 10px; font-weight: 500; letter-spacing: 0.12px; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    .nav-item.active span { font-weight: 500; transform: none; }
 
     /* SECTION HEADER */
     .section-header { padding: 16px 16px 8px; display: flex; align-items: center; justify-content: space-between; }
-    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-    .section-count { font-size: 12px; color: var(--gray); background: var(--bg-card); padding: 3px 8px; border-radius: 20px; border: 1px solid var(--blue-mid); }
+    .section-title { font-size: 22px; font-weight: 700; letter-spacing: 0.35px; line-height: 1.27; }
+    .section-count { font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--gray); background: var(--bg-card); padding: 3px 8px; border-radius: 20px; border: 1px solid var(--blue-mid); }
 
     /* FILTER PILLS */
     .filter-row { display: flex; gap: 8px; padding: 0 16px 8px; overflow-x: auto; scrollbar-width: none; }
     .filter-row::-webkit-scrollbar { display: none; }
-    .pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; border: 1px solid var(--blue-mid); background: transparent; color: var(--gray); transition: all 0.2s; }
-    .pill.active { background: var(--gold); border-color: var(--gold); color: var(--bg); }
+    .pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; letter-spacing: -0.08px; cursor: pointer; border: none; background: transparent; color: var(--gray); position: relative; z-index: 1; transition: color 0.22s ease; -webkit-tap-highlight-color: transparent; }
+    .pill.active { color: var(--gold); }
+    #plantelFilters.slider-ready .pill.active { color: var(--bg); }
+    .filter-pill-slider { position: absolute; border-radius: 20px; background: var(--gold); pointer-events: none; z-index: 0; transition: left 0.42s cubic-bezier(0.34,1.56,0.64,1), width 0.42s cubic-bezier(0.34,1.56,0.64,1), top 0.42s cubic-bezier(0.34,1.56,0.64,1), height 0.42s cubic-bezier(0.34,1.56,0.64,1); }
 
-    /* PLAYER GRID */
-    .player-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 4px 12px; }
-    .player-card { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--blue-mid); position: relative; cursor: pointer; transition: transform 0.15s; }
-    .player-card:active { transform: scale(0.97); }
-    .player-card.injured::after { content: ''; position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--alert); border-radius: 50%; box-shadow: 0 0 0 2px var(--bg-card); }
-    .player-photo { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: top center; display: block; background: var(--blue); }
-    .player-info { padding: 6px 8px 8px; }
-    .player-num { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; color: var(--gold); }
-    .player-name { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .player-pos-tag { display: inline-block; margin-top: 3px; font-size: 9px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; }
+    /* PLAYER GRID — Full-bleed Apple Music style */
+    .player-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px 12px; }
+    .player-card { border-radius: 14px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.15s; aspect-ratio: 3/4; box-shadow: 0 2px 16px rgba(0,0,0,0.35), 0 0 18px rgba(22,40,80,0.2); }
+    .player-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, #122048 0%, #122048 30%, #F9BE3D 30%, #F9BE3D 62%, #122048 62%, #122048 100%); z-index: 0; pointer-events: none; }
+    .player-card:active { transform: scale(0.96); }
+    .player-card.injured::after { content: ''; position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; background: var(--alert); border-radius: 50%; box-shadow: 0 0 6px rgba(230,81,0,0.6); z-index: 3; }
+    .player-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; background: transparent; position: relative; z-index: 1; }
+    .player-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 8px 8px; background: linear-gradient(to top, rgba(6,14,26,0.92) 0%, rgba(17,40,68,0.6) 50%, transparent 100%); z-index: 2; }
+    .player-num { font-size: 10px; font-weight: 600; color: var(--gold); letter-spacing: 0.06em; text-transform: uppercase; }
+    .player-name { font-size: 13px; font-weight: 600; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.08px; color: var(--white); }
+    .player-pos-tag { display: inline-block; margin-top: 2px; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; }
     .pos-ARQ { background: rgba(249,190,61,0.2); color: var(--gold); }
     .pos-DEF { background: rgba(74,96,143,0.4); color: #9AAFC8; }
     .pos-MED { background: rgba(67,160,71,0.2); color: #81C784; }
@@ -78,68 +84,75 @@
     .pos-CT  { background: rgba(0,188,212,0.15); color: #4DD0E1; }
     .staff-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
     .staff-card { background: var(--bg-card); border-radius: var(--radius); padding: 14px 16px; border: 1px solid var(--blue-mid); display: flex; align-items: center; gap: 14px; }
-    .staff-initials { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); border: 1px solid var(--blue-mid); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; color: var(--blue-light); }
+    .staff-initials { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); border: 1px solid var(--blue-mid); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; font-weight: 600; color: var(--blue-light); }
     .staff-info { flex: 1; }
-    .staff-name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; line-height: 1; }
-    .staff-role { font-size: 12px; color: var(--gray); margin-top: 3px; }
+    .staff-name { font-size: 17px; font-weight: 600; line-height: 1.29; letter-spacing: -0.37px; }
+    .staff-role { font-size: 12px; font-weight: 400; color: var(--gray); margin-top: 3px; letter-spacing: 0; }
     .staff-dt .staff-initials { background: rgba(249,190,61,0.12); border-color: rgba(249,190,61,0.3); color: var(--gold); }
     .staff-dt .staff-name { color: var(--gold); }
 
     /* STATS */
-    .stats-tabs { display: flex; padding: 0 16px 8px; gap: 8px; }
-    #tab-plantel .stats-tabs, #tab-posiciones .stats-tabs, #tab-stats .stats-tabs { position: sticky; top: var(--header-h); z-index: 6; background: rgba(10,22,40,0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 10px 16px; border-bottom: 1px solid rgba(74,96,143,0.35); }
-    #plantelFilters, #zonaFilter { position: sticky; top: calc(var(--header-h) + 57px); z-index: 5; background: rgba(10,22,40,0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 8px 16px; border-bottom: 1px solid rgba(74,96,143,0.25); margin: 0; }
-    .stat-tab-btn { flex: 1; padding: 8px; border-radius: 8px; background: var(--bg-card); border: 1px solid var(--blue-mid); color: var(--gray); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
-    .stat-tab-btn.active { background: var(--gold); border-color: var(--gold); color: var(--bg); }
-    .stat-list { padding: 24px 16px 0; display: flex; flex-direction: column; gap: 6px; }
+    .stats-tabs { display: flex; align-items: center; padding: 0 16px 8px; gap: 8px; }
+    #tab-plantel .stats-tabs, #tab-posiciones .stats-tabs, #tab-stats .stats-tabs { position: sticky; top: var(--header-h); z-index: 8; background: rgba(10,22,40,0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 10px 16px 12px; align-items: center; }
+    .zona-tabs { display: flex; border-bottom: 1px solid rgba(74,96,143,0.3); background:var(--bg-card); border-radius:var(--radius) var(--radius) 0 0; }
+    .zona-tab { flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease; margin-bottom: -1px; -webkit-tap-highlight-color: transparent; }
+    .zona-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+    .plantel-sticky-header { position: sticky; top: var(--header-h); z-index: 6; background: rgba(10,22,40,0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    #plantelFilters { padding: 10px 16px; margin: 0; position: relative; }
+    .stats-tabs { position: relative; }
+    .stat-tab-btn { flex: 1; padding: 8px; border-radius: 20px; background: transparent; border: none; color: var(--gray); font-size: 13px; font-weight: 600; letter-spacing: -0.08px; cursor: pointer; position: relative; z-index: 1; transition: color 0.22s ease; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; justify-content: center; line-height: 1; align-self: center; }
+    .stat-tab-btn.active { color: var(--gold); }
+    .stats-tabs.slider-ready .stat-tab-btn.active { color: var(--bg); }
+    .stats-tab-slider { position: absolute; border-radius: 20px; background: var(--gold); pointer-events: none; z-index: 0; transition: left 0.42s cubic-bezier(0.34,1.56,0.64,1), width 0.42s cubic-bezier(0.34,1.56,0.64,1), top 0.42s cubic-bezier(0.34,1.56,0.64,1), height 0.42s cubic-bezier(0.34,1.56,0.64,1); }
+    .stat-list { padding: 0 16px; display: flex; flex-direction: column; gap: 6px; }
     .fixture-events { margin-top:10px; padding-top:10px; border-top:1px solid rgba(74,96,143,0.25); display:flex; gap:4px; }
     .ev-col { flex:1; display:flex; flex-direction:column; gap:4px; }
     .ev-col.right { align-items:flex-end; }
-    .ev-item { display:flex; align-items:center; gap:5px; font-family:'Barlow Condensed',sans-serif; font-size:12px; color:var(--white); line-height:1; }
+    .ev-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--white); line-height:1; }
     .ev-item.right { flex-direction:row-reverse; }
     .ev-icon { flex-shrink:0; }
     .ev-icon.goal   { width:7px; height:7px; background:var(--white); border-radius:50%; }
     .ev-icon.yellow { width:6px; height:8px; background:#FFD600; border-radius:1px; }
     .ev-icon.red    { width:6px; height:8px; background:var(--alert); border-radius:1px; }
     .ev-clock { color:var(--gray); font-size:10px; }
-    .lineup-btn { width:100%; margin-top:12px; padding:9px; background:rgba(249,190,61,0.12); border:1px solid rgba(249,190,61,0.35); border-radius:10px; color:var(--gold); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; cursor:pointer; text-align:center; }
+    .lineup-btn { width:100%; margin-top:12px; padding:9px; background:rgba(249,190,61,0.12); border:1px solid rgba(249,190,61,0.35); border-radius:10px; color:var(--gold); font-size:15px; font-weight:600; letter-spacing:-0.24px; cursor:pointer; text-align:center; }
     .lineup-sheet-header { padding:16px 16px 12px; border-bottom:1px solid rgba(74,96,143,0.3); display:flex; align-items:center; justify-content:space-between; }
-    .lineup-sheet-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; text-transform:uppercase; }
+    .lineup-sheet-title { font-size:17px; font-weight:700; letter-spacing:-0.37px; }
     .lineup-sheet-close { width:30px; height:30px; border-radius:50%; background:var(--bg-card2); border:1px solid var(--blue-mid); color:var(--gray); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .lineup-cols { display:grid; grid-template-columns:1fr 1fr; gap:0; overflow-y:auto; max-height:65vh; }
     .lineup-col { padding:12px 10px; }
     .lineup-col:first-child { border-right:1px solid rgba(74,96,143,0.25); }
     .lineup-col-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
     .lineup-col-logo { width:28px; height:28px; object-fit:contain; }
-    .lineup-col-name { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:800; text-transform:uppercase; line-height:1.1; }
-    .lineup-formation { font-size:10px; color:var(--gold); font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.5px; }
-    .lineup-section-lbl { font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--gray); margin:8px 0 5px; font-family:'Barlow Condensed',sans-serif; }
+    .lineup-col-name { font-size:13px; font-weight:600; letter-spacing:-0.08px; line-height:1.38; }
+    .lineup-formation { font-size:10px; color:var(--gold); font-weight:500; letter-spacing:0.12px; }
+    .lineup-section-lbl { font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--gray); margin:8px 0 5px; }
     .lineup-player { display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px solid rgba(74,96,143,0.15); }
     .lineup-player:last-child { border-bottom:none; }
-    .lineup-num { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; color:var(--gold); width:18px; text-align:center; flex-shrink:0; }
-    .lineup-name { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600; line-height:1; }
+    .lineup-num { font-size:11px; font-weight:600; color:var(--gold); width:18px; text-align:center; flex-shrink:0; letter-spacing:0.07px; }
+    .lineup-name { font-size:13px; font-weight:600; line-height:1; letter-spacing:-0.08px; }
     .lineup-name.sub { color:var(--gray); font-size:12px; }
-    .lineup-replaces { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:rgba(148,163,184,0.55); margin-left:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lineup-replaces { font-size:11px; font-weight:400; color:rgba(148,163,184,0.55); margin-left:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:0.07px; }
     .live-dot { display:inline-block; width:7px; height:7px; background:var(--alert); border-radius:50%; flex-shrink:0; animation:livePulse 1.2s ease-in-out infinite; }
     @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.65)} }
-    .live-tag { font-size:9px; font-family:'Barlow Condensed',sans-serif; font-weight:800; letter-spacing:0.8px; text-transform:uppercase; color:var(--alert); background:rgba(230,81,0,0.12); border:1px solid rgba(230,81,0,0.3); border-radius:4px; padding:2px 6px; }
+    .live-tag { font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--alert); background:rgba(230,81,0,0.12); border:1px solid rgba(230,81,0,0.3); border-radius:4px; padding:2px 6px; }
     .stat-row { display: flex; align-items: center; gap: 10px; background: var(--bg-card); border-radius: var(--radius); padding: 8px 12px; border: 1px solid var(--blue-mid); }
-    .stat-rank { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--blue-light); width: 20px; text-align: center; flex-shrink: 0; }
+    .stat-rank { font-size: 17px; font-weight: 700; color: var(--blue-light); width: 20px; text-align: center; flex-shrink: 0; letter-spacing: -0.37px; }
     .stat-rank.top { color: var(--gold); }
     .stat-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: top; flex-shrink: 0; background: var(--blue); border: 2px solid var(--blue-mid); }
     .stat-info { flex: 1; min-width: 0; }
-    .stat-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stat-name { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .stat-bar-wrap { height: 4px; background: var(--blue-mid); border-radius: 2px; margin-top: 4px; overflow: hidden; }
     .stat-bar { height: 100%; background: var(--gold); border-radius: 2px; }
-    .stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; color: var(--gold); flex-shrink: 0; line-height: 1; text-align: center; }
-    .stat-unit { font-size: 9px; color: var(--gray); text-align: center; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px; }
-    .stat-pj-breakdown { font-size: 10px; font-family: 'Barlow Condensed', sans-serif; margin-top: 3px; display: flex; gap: 6px; align-items: center; }
-    .stat-pj-tit { color: var(--gold); font-weight: 700; }
-    .stat-pj-sup { color: var(--gray); font-weight: 600; }
+    .stat-value { font-size: 26px; font-weight: 700; color: var(--gold); flex-shrink: 0; line-height: 1; text-align: center; letter-spacing: 0.36px; }
+    .stat-unit { font-size: 10px; font-weight: 500; color: var(--gray); text-align: center; letter-spacing: 0.12px; text-transform: uppercase; }
+    .stat-pj-breakdown { font-size: 11px; margin-top: 3px; display: flex; gap: 6px; align-items: center; letter-spacing: 0.07px; }
+    .stat-pj-tit { color: var(--gold); font-weight: 600; }
+    .stat-pj-sup { color: var(--gray); font-weight: 500; }
     .stat-pj-sep { color: rgba(74,96,143,0.6); }
-    .stat-pj-min { color: var(--gray); font-weight: 600; }
-    .stat-pj-total { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; color: var(--gold); line-height: 1; text-align: center; white-space: nowrap; }
-    .stat-pj-pct { font-size: 9px; color: var(--gray); text-align: center; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px; margin-top: 2px; }
+    .stat-pj-min { color: var(--gray); font-weight: 500; }
+    .stat-pj-total { font-size: 13px; font-weight: 700; color: var(--gold); line-height: 1; text-align: center; white-space: nowrap; letter-spacing: -0.08px; }
+    .stat-pj-pct { font-size: 10px; font-weight: 500; color: var(--gray); text-align: center; letter-spacing: 0.12px; margin-top: 2px; text-transform: uppercase; }
 
     /* LESIONADOS */
     .injury-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
@@ -149,122 +162,154 @@
     .injury-card.sev-low { border-left-color: var(--green); }
     .injury-photo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; object-position: top; flex-shrink: 0; background: var(--blue); }
     .injury-info { flex: 1; min-width: 0; }
-    .injury-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .injury-type { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .injury-name { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .injury-type { font-size: 13px; font-weight: 400; color: var(--gray); margin-top: 2px; letter-spacing: -0.08px; }
     .injury-eta { text-align: right; flex-shrink: 0; max-width: 80px; }
-    .eta-label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Barlow Condensed', sans-serif; }
-    .eta-value { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .eta-label { font-size: 10px; font-weight: 500; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; }
+    .eta-value { font-size: 13px; font-weight: 600; line-height: 1.38; letter-spacing: -0.08px; }
     .sev-high .eta-value { color: var(--alert); }
     .sev-medium .eta-value { color: var(--orange); }
     .sev-low .eta-value { color: var(--green); }
 
-    /* FIXTURE */
-    .fixture-pills-sticky { position: sticky; top: var(--header-h); z-index: 5; background: rgba(10,22,40,0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 16px 8px; border-bottom: 1px solid rgba(74,96,143,0.35); overflow: visible; }
-    .fixture-pills-sticky::after { content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 88px; background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none; z-index: 5; opacity: 0; transition: opacity 0.2s; }
-    #tab-fixture.has-past-fix .fixture-pills-sticky::after { opacity: 1; }
-    .fixture-list { padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
-    .fixture-section-lbl { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--gray); padding: 12px 16px 6px; }
-    .fixture-card { background: var(--bg-card); border-radius: var(--radius); padding: 14px; border: 1px solid var(--blue-mid); }
+    /* CALENDAR */
+    .cal-sticky { position: sticky; top: var(--header-h); z-index: 6; background: rgba(10,22,40,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .cal-section-header { padding: 10px 16px 4px; }
+    .cal-section-title { font-size: 22px; font-weight: 700; letter-spacing: 0.35px; line-height: 1.27; }
+    .cal-month-strip { position: relative; display: flex; overflow-x: auto; scrollbar-width: none; padding: 8px 12px; gap: 0; }
+    .cal-month-strip::-webkit-scrollbar { display: none; }
+    .cal-month-btn { flex-shrink: 0; padding: 0 16px; font-size: 15px; font-weight: 600; letter-spacing: -0.24px; color: var(--gray); background: transparent; border: none; cursor: pointer; position: relative; z-index: 1; transition: color 0.25s ease; white-space: nowrap; min-height: 44px; display: flex; align-items: center; line-height: 1; -webkit-tap-highlight-color: transparent; }
+    .cal-month-btn.active { color: var(--gold); }
+    #calMonthStrip.slider-ready .cal-month-btn.active { color: var(--bg); }
+    .cal-month-pill { position: absolute; top: 50%; transform: translateY(-50%); height: 30px; border-radius: 20px; background: var(--gold); pointer-events: none; z-index: 0; transition: left 0.42s cubic-bezier(0.34,1.56,0.64,1), width 0.42s cubic-bezier(0.34,1.56,0.64,1); }
+    .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 12px 6px 2px; }
+    .cal-weekdays span { text-align: center; font-size: 10px; font-weight: 500; color: var(--gray); letter-spacing: 0.12px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 2px 6px 6px; }
+    .cal-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1px; height: 50px; border-radius: 6px; transition: background 0.15s; }
+    .cal-cell.has-match { cursor: pointer; }
+    .cal-cell.has-match:active { background: rgba(74,96,143,0.2); }
+    .cal-num { font-size: 12px; font-weight: 600; color: var(--gray); line-height: 1; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+    .cal-cell.today .cal-num { background: rgba(255,255,255,0.14); color: var(--white); }
+    .cal-logo-wrap { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: box-shadow 0.25s ease; }
+    .cal-cell.selected .cal-logo-wrap { box-shadow: 0 0 0 2px var(--gold); }
+    .cal-cell.today-match .cal-logo-wrap { box-shadow: 0 0 0 2px rgba(255,255,255,0.5); }
+    .cal-rival-logo { width: 28px; height: 28px; object-fit: contain; }
+    .cal-rival-logo.past { opacity: 0.45; filter: saturate(0.35); }
+    .cal-multi-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; margin-top: 2px; }
+    .cal-detail { padding: 12px 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+    .cal-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px 24px; background: var(--bg-card); border-radius: var(--radius); border: 1px dashed rgba(74,96,143,0.4); }
+    .cal-empty-logo { width: 48px; height: 48px; opacity: 0.35; filter: saturate(0); }
+    .cal-empty-title { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; color: var(--gray); }
+    .cal-empty-sub { font-size: 12px; color: var(--gray); opacity: 0.6; text-align: center; line-height: 1.4; }
+    .fixture-section-lbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray); padding: 12px 16px 6px; }
+    .fixture-card { background: var(--bg-card); border-radius: var(--radius); padding: 18px 14px; border: 1px solid var(--blue-mid); }
     .fixture-card.next { border-color: var(--gold); background: linear-gradient(135deg, rgba(249,190,61,0.07), var(--bg-card)); }
     .fixture-card.live { border-color: var(--gold); background: linear-gradient(135deg, rgba(249,190,61,0.18), rgba(249,190,61,0.06)); }
     .fixture-top { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-    .comp-badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.3px; }
+    .comp-badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
     .comp-lib { background: rgba(249,190,61,0.2); color: var(--gold); }
     .comp-ape { background: rgba(74,96,143,0.3); color: #9AAFC8; }
     .comp-cop { background: rgba(67,160,71,0.2); color: #81C784; }
-    .next-tag { background: var(--gold); color: var(--bg); font-size: 9px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; }
-    .fixture-main { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .fixture-team { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    .fixture-escudo { width: 44px; height: 44px; object-fit: contain; }
-    .fixture-team-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; line-height: 1.1; text-align: center; }
+    .next-tag { background: var(--gold); color: var(--bg); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; }
+    .fixture-main { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 8px 0; }
+    .fixture-team { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .fixture-escudo { width: 52px; height: 52px; object-fit: contain; }
+    .fixture-team-name { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; line-height: 1.33; text-align: center; }
     .fixture-team-name.boca { color: var(--gold); }
-    .fixture-vs { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--gray); flex-shrink: 0; }
-    .fixture-meta { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(74,96,143,0.4); }
+    .fixture-center { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; gap: 2px; }
+    .fixture-vs { font-size: 13px; font-weight: 600; letter-spacing: -0.08px; color: var(--gray); }
+    .fixture-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(74,96,143,0.4); }
     .meta-item { text-align: center; }
-    .meta-label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Barlow Condensed', sans-serif; }
-    .meta-value { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; }
+    .meta-item:first-child { text-align: left; }
+    .meta-item:last-child { text-align: right; }
+    .meta-label { font-size: 10px; font-weight: 500; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; }
+    .meta-value { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; }
 
     /* TABLA */
-    .table-section { padding: 16px; }
-    .table-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray); margin-bottom: 8px; }
-    .tabla { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--blue-mid); }
+    .table-section { padding: 0 16px 16px; }
+    .table-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray); margin-bottom: 8px; }
+    .tabla { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--blue-mid); }
+    .tabla-scroll { max-height:62vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    .tabla-scroll::-webkit-scrollbar { width:0; }
     .tabla-header { display: grid; grid-template-columns: 24px 1fr repeat(4, 32px); gap: 4px; padding: 8px 12px; background: var(--blue); }
-    .tabla-header span { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; color: var(--gray); text-align: center; text-transform: uppercase; }
+    .tabla-header span { font-size: 11px; font-weight: 600; color: var(--gray); text-align: center; text-transform: uppercase; letter-spacing: 0.06em; }
     .tabla-header span:nth-child(2) { text-align: left; }
     .tabla-row { display: grid; grid-template-columns: 24px 1fr repeat(4, 32px); gap: 4px; padding: 8px 12px; border-bottom: 1px solid rgba(74,96,143,0.25); align-items: center; }
-    .tabla-row:last-child { border-bottom: none; }
+    .tabla-row:last-child { border-bottom: none; border-radius: 0 0 var(--radius) var(--radius); }
     .tabla-row.boca-row { background: rgba(249,190,61,0.07); }
-    .tabla-row span { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; text-align: center; }
-    .t-pos { font-weight: 800; color: var(--gray); }
+    .tabla-row span { font-size: 14px; text-align: center; }
+    .t-pos { font-weight: 700; color: var(--gray); }
     .boca-row .t-pos { color: var(--gold); }
     .t-name { text-align: left !important; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .boca-row .t-name { color: var(--gold); font-weight: 800; }
-    .t-pts { font-weight: 800; font-size: 15px !important; }
+    .boca-row .t-name { color: var(--gold); font-weight: 700; }
+    .t-pts { font-weight: 700; font-size: 15px !important; }
     .boca-row .t-pts { color: var(--gold); }
     .disclaimer { font-size: 10px; color: var(--blue-light); text-align: center; padding: 8px; font-style: italic; }
     .tabla-lib { display: grid; grid-template-columns: 24px 1fr repeat(5,28px); gap: 4px; padding: 8px 12px; border-bottom: 1px solid rgba(74,96,143,0.25); align-items: center; }
     .tabla-lib:last-child { border-bottom: none; }
     .tabla-lib.boca-row { background: rgba(249,190,61,0.07); }
-    .tabla-lib span { font-family:'Barlow Condensed',sans-serif; font-size:13px; text-align:center; }
+    .tabla-lib span { font-size:13px; text-align:center; }
     .tabla-lib .t-name { text-align:left !important; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .boca-row .t-name { color:var(--gold); font-weight:800; }
+    .boca-row .t-name { color:var(--gold); font-weight:700; }
     .boca-row .t-pos { color:var(--gold); }
-    .boca-row .t-pts { color:var(--gold); font-weight:800; }
+    .boca-row .t-pts { color:var(--gold); font-weight:700; }
     .fix-grupo-row { background:var(--bg-card); border-radius:8px; border:1px solid var(--blue-mid); padding:10px 12px; }
     .fix-grupo-row.boca-match { border-color: rgba(249,190,61,0.4); }
-    .fix-grupo-fecha { font-size:10px; color:var(--gray); font-family:'Barlow Condensed',sans-serif; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
-    .fix-grupo-match { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; }
+    .fix-grupo-fecha { font-size:10px; color:var(--gray); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+    .fix-grupo-match { font-size:15px; font-weight:700; }
     .fix-grupo-match .hl { color:var(--gold); }
 
     /* HOME */
-    .home-wrap { display:flex; flex-direction:column; align-items:center; min-height:calc(100vh - var(--header-h) - var(--nav-h)); padding:32px 20px 20px; text-align:center; }
+    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; height:calc(100vh - var(--header-h) - var(--nav-h) - 24px); height:calc(100dvh - var(--header-h) - var(--nav-h) - 24px); padding:0 20px; text-align:center; }
     .home-escudo { width:140px; height:auto; filter:drop-shadow(0 8px 32px rgba(249,190,61,0.25)); margin-bottom:24px; animation:escudoPulse 3s ease-in-out infinite; }
     @keyframes escudoPulse { 0%,100%{ filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); } 50%{ filter:drop-shadow(0 8px 48px rgba(249,190,61,0.45)); } }
-    .home-frase { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; line-height:1.1; color:var(--gold); margin-bottom:6px; }
-    .home-sub { font-size:11px; color:var(--blue-light); letter-spacing:1px; text-transform:uppercase; font-family:'Barlow Condensed',sans-serif; margin-bottom:28px; }
+    .home-frase { font-size:28px; font-weight:700; letter-spacing:0.36px; line-height:1.21; color:var(--gold); margin-bottom:6px; }
+    .home-sub { font-size:11px; font-weight:500; color:var(--blue-light); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:28px; }
     .home-divider { width:48px; height:2px; background:var(--gold); border-radius:1px; margin:0 auto 24px; opacity:0.4; }
     .home-widgets { display:flex; flex-direction:column; gap:6px; width:100%; }
     .home-widget { background:var(--bg-card); border:1px solid var(--blue-mid); border-radius:8px; padding:8px 12px; display:flex; align-items:center; gap:10px; text-align:left; }
-    .hw-badge { flex-shrink:0; padding:2px 6px; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.3px; text-transform:uppercase; }
+    .hw-badge { flex-shrink:0; padding:2px 6px; border-radius:3px; font-size:10px; font-weight:700; letter-spacing:0.3px; text-transform:uppercase; }
     .hw-info { flex:1; min-width:0; }
-    .hw-comp { font-family:'Barlow Condensed',sans-serif; font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:1px; }
-    .hw-main { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:800; line-height:1; color:var(--white); }
+    .hw-comp { font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:1px; }
+    .hw-main { font-size:15px; font-weight:700; line-height:1; color:var(--white); }
     .hw-main span { color:var(--gold); }
-    .hw-sub { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:var(--gray); margin-top:1px; }
+    .hw-sub { font-size:11px; color:var(--gray); margin-top:1px; }
     .hw-pos { flex-shrink:0; text-align:center; min-width:36px; }
-    .hw-pos-num { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--gold); line-height:1; }
-    .hw-pos-lbl { font-family:'Barlow Condensed',sans-serif; font-size:9px; color:var(--gray); text-transform:uppercase; letter-spacing:0.3px; }
+    .hw-pos-num { font-size:22px; font-weight:700; color:var(--gold); line-height:1; }
+    .hw-pos-lbl { font-size:9px; color:var(--gray); text-transform:uppercase; letter-spacing:0.3px; }
 
-    /* PLAYER MODAL */
-    .modal-overlay { position:fixed; inset:0; background:rgba(5,12,25,0.75); z-index:100; opacity:0; pointer-events:none; transition:opacity 0.25s; backdrop-filter:blur(4px); }
+    /* PLAYER MODAL — Apple Music Style */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100; opacity:0; pointer-events:none; transition:opacity 0.3s ease; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
     .modal-overlay.open { opacity:1; pointer-events:all; }
-    .modal-sheet { position:fixed; bottom:0; left:50%; transform:translateX(-50%) translateY(100%); width:100%; max-width:430px; background:var(--bg-card); border-radius:20px 20px 0 0; z-index:101; transition:transform 0.35s cubic-bezier(0.32,0,0,1); overflow:hidden; }
+    .modal-sheet { position:fixed; bottom:0; left:50%; transform:translateX(-50%) translateY(100%); width:100%; max-width:430px; max-height:92vh; background:rgba(22,34,54,0.72); backdrop-filter:blur(40px) saturate(180%); -webkit-backdrop-filter:blur(40px) saturate(180%); border-radius:20px 20px 0 0; z-index:101; transition:transform 0.45s cubic-bezier(0.34,1.56,0.64,1); overflow:hidden; overflow-y:auto; border-top:0.5px solid rgba(255,255,255,0.12); box-shadow:0 -8px 40px rgba(0,0,0,0.5); }
     .modal-sheet.open { transform:translateX(-50%) translateY(0); }
-    .modal-drag { width:36px; height:4px; background:var(--blue-light); border-radius:2px; margin:12px auto 0; }
-    .modal-hero { position:relative; height:220px; overflow:hidden; background:linear-gradient(135deg, var(--blue) 0%, #0A1628 100%); }
+    .modal-drag { width:36px; height:4px; background:rgba(255,255,255,0.25); border-radius:2px; margin:10px auto 0; }
+    .modal-hero { position:relative; height:280px; overflow:hidden; background:linear-gradient(135deg, var(--blue) 0%, #0A1628 100%); }
     .modal-hero img { width:100%; height:100%; object-fit:cover; object-position:top center; }
-    .modal-hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, var(--bg-card) 0%, transparent 60%); }
-    .modal-num-bg { position:absolute; right:-10px; top:-10px; font-family:'Barlow Condensed',sans-serif; font-size:120px; font-weight:800; color:rgba(249,190,61,0.08); line-height:1; pointer-events:none; }
-    .modal-hero-info { position:absolute; bottom:14px; left:16px; right:16px; }
-    .modal-pos-tag { display:inline-block; padding:3px 8px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px; }
-    .modal-name { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; line-height:1; }
-    .modal-num { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:600; color:var(--gold); margin-top:2px; }
+    .modal-hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(22,34,54,0.95) 0%, rgba(22,34,54,0.3) 40%, transparent 70%); }
+    .modal-hero::after { content:''; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(22,40,80,0.3) 0%, rgba(10,22,40,0.1) 40%, rgba(6,14,26,0.5) 100%); mix-blend-mode:multiply; pointer-events:none; }
+    .modal-num-bg { position:absolute; right:-10px; top:-10px; font-size:140px; font-weight:700; color:rgba(249,190,61,0.06); line-height:1; pointer-events:none; mix-blend-mode:overlay; }
+    .modal-hero-info { position:absolute; bottom:16px; left:16px; right:16px; z-index:2; }
+    .modal-pos-tag { display:inline-block; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:6px; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); background:rgba(255,255,255,0.12); border:0.5px solid rgba(255,255,255,0.1); }
+    .modal-name { font-size:28px; font-weight:700; line-height:1.21; letter-spacing:0.36px; }
+    .modal-num { font-size:14px; font-weight:600; color:var(--gold); margin-top:2px; opacity:0.85; }
     .modal-body { padding:16px; }
-    .modal-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px; }
-    .modal-stat-box { background:var(--bg); border-radius:10px; padding:10px 8px; text-align:center; border:1px solid var(--blue-mid); }
-    .modal-stat-val { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; color:var(--gold); line-height:1; }
-    .modal-stat-lbl { font-family:'Barlow Condensed',sans-serif; font-size:10px; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
-    .modal-injury-box { background:var(--bg); border-radius:10px; padding:12px 14px; border-left:3px solid var(--alert); display:flex; align-items:center; gap:10px; }
+    .modal-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px; }
+    .modal-stat-box { background:rgba(255,255,255,0.08); backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%); border-radius:12px; padding:12px 8px; text-align:center; border:0.5px solid rgba(255,255,255,0.1); box-shadow:inset 0 0.5px 0 rgba(255,255,255,0.15); }
+    .modal-stat-val { font-size:26px; font-weight:700; color:var(--gold); line-height:1; letter-spacing:0.36px; }
+    .modal-stat-lbl { font-size:9px; font-weight:500; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px; }
+    .modal-injury-box { background:rgba(230,81,0,0.1); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:12px; padding:12px 14px; border:0.5px solid rgba(230,81,0,0.25); display:flex; align-items:center; gap:10px; margin-top:12px; }
     .modal-injury-icon { font-size:20px; flex-shrink:0; }
-    .modal-injury-title { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:var(--alert); text-transform:uppercase; letter-spacing:0.3px; }
-    .modal-injury-detail { font-size:12px; color:var(--gray); margin-top:2px; }
-    .ficha-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:rgba(74,96,143,0.25); border-radius:10px; overflow:hidden; border:1px solid rgba(74,96,143,0.25); }
-    .ficha-item { background:var(--bg); padding:10px 12px; }
-    .ficha-item.full { grid-column:1/-1; }
-    .ficha-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--gray); margin-bottom:2px; }
-    .ficha-value { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; color:var(--white); line-height:1.2; }
-    .modal-close { position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; background:rgba(10,22,40,0.6); border:none; color:var(--gray); cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:5; }
-    .modal-close svg { width:16px; height:16px; }
+    .modal-injury-title { font-size:13px; font-weight:600; color:var(--alert); letter-spacing:-0.08px; }
+    .modal-injury-detail { font-size:12px; color:rgba(255,255,255,0.5); margin-top:2px; }
+    .ficha-grid { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.08); }
+    .ficha-item { padding:10px 14px; border-bottom:0.5px solid rgba(255,255,255,0.06); }
+    .ficha-item:last-child { border-bottom:none; }
+    .ficha-item.full { }
+    .ficha-label { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; color:rgba(255,255,255,0.4); margin-bottom:2px; }
+    .ficha-value { font-size:15px; font-weight:600; color:var(--white); line-height:1.33; letter-spacing:-0.24px; }
+    .modal-close { position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,0.35); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:0.5px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:5; transition:transform 0.15s ease, background 0.15s ease; }
+    .modal-close:active { transform:scale(0.85); background:rgba(0,0,0,0.5); }
+    .modal-close svg { width:14px; height:14px; }
   </style>
 </head>
 <body>
@@ -275,7 +320,6 @@
     <img src="./Assets/escudo.svg" alt="CABJ" style="width:38px;height:38px;object-fit:contain;flex-shrink:0">
     <div class="header-title">
       <h1>BOCA JUNIORS</h1>
-      <span>Apertura 2026 · Fecha 12</span>
     </div>
   </header>
 
@@ -288,66 +332,12 @@
         <div class="home-sub">Club Atlético Boca Juniors</div>
         <div class="home-divider"></div>
         <div id="homeProximo" style="width:100%;margin-bottom:16px"></div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--gray);align-self:flex-start;margin-bottom:6px">Competencias</div>
-        <div class="home-widgets">
-
-          <!-- Apertura -->
-          <div class="home-widget">
-            <div class="hw-pos">
-              <div class="hw-pos-num">6°</div>
-              <div class="hw-pos-lbl">Lugar</div>
-            </div>
-            <div class="hw-info">
-              <div class="hw-comp">Apertura 2026</div>
-              <div class="hw-main"><span>17</span> pts</div>
-              <div class="hw-sub">12 PJ · 5G 2E 5P</div>
-            </div>
-            <div class="hw-badge comp-ape">Liga</div>
-          </div>
-
-          <!-- Libertadores -->
-          <div class="home-widget">
-            <div class="hw-pos">
-              <div class="hw-pos-num">1°</div>
-              <div class="hw-pos-lbl">Grupo D</div>
-            </div>
-            <div class="hw-info">
-              <div class="hw-comp">Copa Libertadores 2026</div>
-              <div class="hw-main"><span>0</span> pts</div>
-              <div class="hw-sub">Fase de grupos · Debut 7 abr</div>
-            </div>
-            <div class="hw-badge comp-lib">Conmebol</div>
-          </div>
-
-          <!-- Copa Argentina -->
-          <div class="home-widget">
-            <div class="hw-pos">
-              <div class="hw-pos-num" style="font-size:16px;padding-top:2px">16°</div>
-              <div class="hw-pos-lbl">avos</div>
-            </div>
-            <div class="hw-info">
-              <div class="hw-comp">Copa Argentina 2026</div>
-              <div class="hw-main">16avos de final</div>
-              <div class="hw-sub">Rival y fecha por confirmar</div>
-            </div>
-            <div class="hw-badge comp-cop">Copa</div>
-          </div>
-
-        </div>
       </div>
     </section>
 
     <!-- PLANTEL -->
     <section id="tab-plantel" class="tab">
-      <div class="section-header">
-        <span class="section-title">Plantel</span>
-      </div>
-      <div class="stats-tabs">
-        <button class="stat-tab-btn active" onclick="switchPlantelSub('plantel',this)">Plantel</button>
-        <button class="stat-tab-btn" onclick="switchPlantelSub('bajas',this)">Bajas · 9</button>
-      </div>
-      <!-- Vista plantel -->
-      <div id="plantelView">
+      <div class="plantel-sticky-header">
         <div class="filter-row" id="plantelFilters">
           <button class="pill active" onclick="filterPlantel('all',this)">Todos</button>
           <button class="pill" onclick="filterPlantel('ARQ',this)">Arqueros</button>
@@ -355,7 +345,11 @@
           <button class="pill" onclick="filterPlantel('MED',this)">Mediocampistas</button>
           <button class="pill" onclick="filterPlantel('DEL',this)">Delanteros</button>
           <button class="pill" onclick="filterPlantel('CT',this)">C. Técnico</button>
+          <button class="pill" onclick="filterPlantel('lesionados',this)">Lesionados</button>
         </div>
+      </div>
+      <!-- Vista plantel -->
+      <div id="plantelView">
         <div class="player-grid" id="playerGrid"></div>
       </div>
       <!-- Vista bajas -->
@@ -368,10 +362,6 @@
 
     <!-- STATS -->
     <section id="tab-stats" class="tab">
-      <div class="section-header">
-        <span class="section-title">Estadísticas</span>
-        <span class="section-count">Temporada 25/26</span>
-      </div>
       <div class="stats-tabs">
         <button class="stat-tab-btn active" onclick="switchStat('goles',this)">Goles</button>
         <button class="stat-tab-btn" onclick="switchStat('asist',this)">Asistencias</button>
@@ -383,10 +373,6 @@
 
     <!-- POSICIONES -->
     <section id="tab-posiciones" class="tab">
-      <div class="section-header">
-        <span class="section-title">Posiciones</span>
-        <span class="section-count">Temporada 25/26</span>
-      </div>
       <div class="stats-tabs">
         <button class="stat-tab-btn active" onclick="switchPos('apertura',this)">Apertura</button>
         <button class="stat-tab-btn" onclick="switchPos('libertadores',this)">Libertadores</button>
@@ -395,33 +381,19 @@
 
       <!-- Apertura -->
       <div id="posView-apertura" class="table-section">
-        <div class="filter-row" id="zonaFilter" style="padding:8px 0">
-          <button class="pill active" onclick="switchZona('A',this)">Zona A</button>
-          <button class="pill" onclick="switchZona('B',this)">Zona B</button>
-          <button class="pill" onclick="switchZona('anual',this)">Anual</button>
-        </div>
-        <div id="zonaA-wrap">
-          <div class="tabla">
-            <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(8,22px)">
-              <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GF</span><span>GC</span><span>DIF</span><span>Pts</span>
-            </div>
+        <div class="tabla">
+          <div class="zona-tabs">
+            <button class="zona-tab active" onclick="switchZona('A',this)">Zona A</button>
+            <button class="zona-tab" onclick="switchZona('B',this)">Zona B</button>
+            <button class="zona-tab" onclick="switchZona('anual',this)">Anual</button>
+          </div>
+          <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(8,22px)">
+            <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GF</span><span>GC</span><span>DIF</span><span>Pts</span>
+          </div>
+          <div class="tabla-scroll">
             <div id="tablaZonaA"></div>
-          </div>
-        </div>
-        <div id="zonaB-wrap" style="display:none">
-          <div class="tabla">
-            <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(8,22px)">
-              <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GF</span><span>GC</span><span>DIF</span><span>Pts</span>
-            </div>
-            <div id="tablaZonaB"></div>
-          </div>
-        </div>
-        <div id="zonaAnual-wrap" style="display:none">
-          <div class="tabla">
-            <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(8,22px)">
-              <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>E</span><span>P</span><span>GF</span><span>GC</span><span>DIF</span><span>Pts</span>
-            </div>
-            <div id="tablaAnual"></div>
+            <div id="tablaZonaB" style="display:none"></div>
+            <div id="tablaAnual" style="display:none"></div>
           </div>
         </div>
         <div class="disclaimer">Fuente: promiedos.com.ar · Fecha 12</div>
@@ -442,56 +414,57 @@
       <!-- Copa Argentina -->
       <div id="posView-copa" class="table-section" style="display:none">
         <div class="tabla" style="padding:20px 16px;text-align:center">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--gray)">16avos de final</div>
+          <div style="font-size:15px;font-weight:600;color:var(--gray);letter-spacing:-0.24px">16avos de final</div>
           <div style="font-size:12px;color:var(--blue-light);margin-top:6px">Rival y fecha por confirmar</div>
         </div>
       </div>
 
     </section>
 
-    <!-- FIXTURE -->
+    <!-- FIXTURE / CALENDARIO -->
     <section id="tab-fixture" class="tab">
-      <div class="fixture-pills-sticky" id="fixturePills">
-        <div class="filter-row" id="fixFilter" style="padding:0">
-          <button class="pill active" onclick="filterFixture('liga',this)">Liga</button>
-          <button class="pill" onclick="filterFixture('libertadores',this)">Libertadores</button>
-          <button class="pill" onclick="filterFixture('copa',this)">Copa Argentina</button>
+      <div class="cal-sticky">
+        <div class="cal-month-strip" id="calMonthStrip"></div>
+        <div class="cal-weekdays">
+          <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
         </div>
+        <div class="cal-grid" id="calGrid"></div>
       </div>
-      <div class="fixture-list" id="fixtureList"></div>
+      <div class="cal-detail" id="calDetail"></div>
     </section>
   </main>
 
 </div><!-- /scroll-wrap -->
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('home',this)">
+  <nav class="bottom-nav" id="bottomNav">
+    <div class="nav-pill" id="navPill"></div>
+    <button class="nav-item active" data-tab="home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
       <span>Inicio</span>
     </button>
-    <button class="nav-item" onclick="switchTab('plantel',this)">
+    <button class="nav-item" data-tab="plantel">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
       </svg>
       <span>Plantel</span>
     </button>
-    <button class="nav-item" onclick="switchTab('stats',this)">
+    <button class="nav-item" data-tab="stats">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
       </svg>
       <span>Stats</span>
     </button>
-    <button class="nav-item" onclick="switchTab('posiciones',this)">
+    <button class="nav-item" data-tab="posiciones">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
         <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
       </svg>
       <span>Posiciones</span>
     </button>
-    <button class="nav-item" onclick="switchTab('fixture',this)">
+    <button class="nav-item" data-tab="fixture">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
         <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
@@ -653,24 +626,38 @@ const staff = [
 // ===== ESPN API =====
 const BOCA_ID = '5';
 
+const _inflightFetches = {};
 async function fetchCached(url, ttl = 3600000) {
   const key = 'espnv2_' + url.replace(/\W/g, '').slice(-40);
+  let cached = null;
   try {
     const raw = localStorage.getItem(key);
-    if (raw) {
-      const { d, t } = JSON.parse(raw);
-      if (Date.now() - t < ttl) return d;
-    }
+    if (raw) { const { d, t } = JSON.parse(raw); cached = { d, age: Date.now() - t }; }
   } catch(e) {}
-  try {
-    const r = await fetch(url);
-    const d = await r.json();
-    try { localStorage.setItem(key, JSON.stringify({ d, t: Date.now() })); } catch(e) {}
-    return d;
-  } catch(e) {
-    console.warn('ESPN fetch failed:', url, e);
-    return null;
+
+  // Fresh cache → devolver inmediatamente
+  if (cached && cached.age < ttl) return cached.d;
+
+  // Sin caché previo → esperar el fetch
+  if (!cached) {
+    if (_inflightFetches[key]) return _inflightFetches[key];
+    _inflightFetches[key] = fetch(url).then(r => r.json()).then(d => {
+      try { localStorage.setItem(key, JSON.stringify({ d, t: Date.now() })); } catch(e) {}
+      delete _inflightFetches[key];
+      return d;
+    }).catch(e => { console.warn('ESPN fetch failed:', url, e); delete _inflightFetches[key]; return null; });
+    return _inflightFetches[key];
   }
+
+  // Stale cache → devolver stale ahora, refrescar en background
+  if (!_inflightFetches[key]) {
+    _inflightFetches[key] = fetch(url).then(r => r.json()).then(d => {
+      try { localStorage.setItem(key, JSON.stringify({ d, t: Date.now() })); } catch(e) {}
+      delete _inflightFetches[key];
+      return d;
+    }).catch(e => { delete _inflightFetches[key]; return null; });
+  }
+  return cached.d;
 }
 
 function getStat(entry, name) {
@@ -947,6 +934,18 @@ async function loadData() {
   const ligaFix   = [...pastFix, ...futureFix.filter(f => !seenDates.has(f.date))];
   const allFix    = [...ligaFix, ...liberFix].sort((a, b) => new Date(a.date) - new Date(b.date));
 
+  // Render home card early — no esperar summaries ni copa (Phase 3)
+  {
+    const _now = new Date();
+    const _live = allFix.find(f => f.inProgress);
+    const _prox = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= _now);
+    const _match = _live || _prox;
+    const el = document.getElementById('homeProximo');
+    if (el) el.innerHTML = _match
+      ? buildFixtureCard(_match, !_live)
+      : `<div style="padding:16px;text-align:center;color:var(--gray)">Sin próximos partidos</div>`;
+  }
+
   // Copa Argentina + Libertadores team schedules (for stats)
   const [copaTeamSched, libTeamSched] = await Promise.all([
     fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.copa/teams/${BOCA_ID}/schedule?season=2026`, FIX_TTL),
@@ -1029,7 +1028,8 @@ function renderPlantel(filter = 'all') {
     wrap.style.display = '';
     wrap.className = 'staff-list';
     wrap.innerHTML = staff.map(s => {
-      return `<div class="staff-card">
+      return `<div class="staff-card${s.role === 'DT' ? ' staff-dt' : ''}">
+        <div class="staff-initials">${s.short.slice(0,2).toUpperCase()}</div>
         <div class="staff-info">
           <div class="staff-name">${s.name}</div>
           <div class="staff-role">${s.role}</div>
@@ -1054,10 +1054,84 @@ function renderPlantel(filter = 'all') {
   }
   document.getElementById('playerGrid').innerHTML = html;
 }
-function filterPlantel(f, btn) {
+function movePlantelPill(btn, animate = true) {
+  const row = document.getElementById('plantelFilters');
+  if (!row || !btn || !btn.offsetWidth) return; // tab oculto, skip
+  let pill = row.querySelector('.filter-pill-slider');
+  if (!pill) { pill = document.createElement('div'); pill.className = 'filter-pill-slider'; row.prepend(pill); }
+  pill.style.transition = animate ? '' : 'none';
+  pill.style.left   = btn.offsetLeft + 'px';
+  pill.style.width  = btn.offsetWidth + 'px';
+  pill.style.top    = btn.offsetTop + 'px';
+  pill.style.height = btn.offsetHeight + 'px';
+  row.classList.add('slider-ready');
+  if (!animate) requestAnimationFrame(() => { pill.style.transition = ''; });
+}
+
+function applyPlantelFilter(f, btn, animate = true) {
   document.querySelectorAll('#plantelFilters .pill').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  renderPlantel(f);
+  movePlantelPill(btn, animate);
+  if (f === 'lesionados') {
+    document.getElementById('playerGrid').style.display = 'none';
+    const staff = document.getElementById('staffList');
+    if (staff) staff.style.display = 'none';
+    document.getElementById('bajasView').style.display = '';
+  } else {
+    document.getElementById('bajasView').style.display = 'none';
+    renderPlantel(f);
+  }
+}
+
+function filterPlantel(f, btn) { applyPlantelFilter(f, btn, true); }
+
+function initPlantelFilterDrag() {
+  const row = document.getElementById('plantelFilters');
+  if (!row) return;
+  let startX = null, isDragging = false;
+
+  function btnAtClientX(clientX) {
+    const relX = clientX - row.getBoundingClientRect().left + row.scrollLeft;
+    return [...row.querySelectorAll('.pill')]
+      .find(b => relX >= b.offsetLeft && relX <= b.offsetLeft + b.offsetWidth) || null;
+  }
+
+  function commitBtn(btn, animate) {
+    if (!btn) return;
+    const f = btn.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+    if (f) applyPlantelFilter(f, btn, animate);
+  }
+
+  row.addEventListener('pointerdown', e => {
+    if (!e.target.closest('.pill')) return;
+    startX = e.clientX; isDragging = false;
+    row.setPointerCapture(e.pointerId);
+  });
+
+  row.addEventListener('pointermove', e => {
+    if (startX === null) return;
+    if (!isDragging && Math.abs(e.clientX - startX) < 8) return;
+    isDragging = true;
+    const btn = btnAtClientX(e.clientX);
+    if (!btn) return;
+    row.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const pill = row.querySelector('.filter-pill-slider');
+    if (pill) {
+      pill.style.transition = 'left 0.08s ease, width 0.08s ease';
+      pill.style.left  = btn.offsetLeft + 'px';
+      pill.style.width = btn.offsetWidth + 'px';
+    }
+  });
+
+  row.addEventListener('pointerup', e => {
+    if (startX === null) return;
+    const btn = btnAtClientX(e.clientX) || row.querySelector('.pill.active');
+    startX = null; isDragging = false;
+    commitBtn(btn, true);
+  });
+
+  row.addEventListener('pointercancel', () => { startX = null; isDragging = false; });
 }
 
 // ===== XI INICIAL =====
@@ -1067,7 +1141,7 @@ function filterPlantel(f, btn) {
 const statLabel = { goles:'gol', asist:'ast' };
 function renderStats(stat = 'goles') {
   const sorted = [...players].filter(p => p[stat] > 0).sort((a, b) => b[stat] - a[stat]);
-  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:Barlow Condensed">Sin datos</div>'; return; }
+  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:inherit">Sin datos</div>'; return; }
   const max = sorted[0][stat];
   document.getElementById('statList').innerHTML = sorted.map((p, i) => `
     <div class="stat-row">
@@ -1087,7 +1161,7 @@ function renderStats(stat = 'goles') {
 function renderStatsPartidos() {
   const totalPJ = liveData?.allFix?.filter(f => f.completed).length || Math.max(...players.map(p => p.pj));
   const sorted = [...players].filter(p => p.pj > 0).sort((a, b) => b.pj - a.pj || b.min - a.min);
-  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:Barlow Condensed">Sin datos</div>'; return; }
+  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:inherit">Sin datos</div>'; return; }
   document.getElementById('statList').innerHTML = sorted.map((p, i) => {
     const tit = p.tit ?? 0;
     const ban = p.pj - tit;
@@ -1115,11 +1189,75 @@ function renderStatsPartidos() {
     </div>`;
   }).join('');
 }
+function moveStatPill(btn, animate = true) {
+  const tabs = btn?.closest('.stats-tabs');
+  if (!tabs || !btn || !btn.offsetWidth) return;
+  let pill = tabs.querySelector('.stats-tab-slider');
+  if (!pill) { pill = document.createElement('div'); pill.className = 'stats-tab-slider'; tabs.prepend(pill); }
+  const tr = tabs.getBoundingClientRect();
+  const br = btn.getBoundingClientRect();
+  pill.style.transition = animate ? '' : 'none';
+  pill.style.left   = (br.left - tr.left) + 'px';
+  pill.style.width  = br.width + 'px';
+  pill.style.top    = (br.top - tr.top) + 'px';
+  pill.style.height = br.height + 'px';
+  tabs.classList.add('slider-ready');
+  if (!animate) requestAnimationFrame(() => { pill.style.transition = ''; });
+}
+
 function switchStat(s, btn) {
   document.querySelectorAll('#tab-stats .stat-tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  moveStatPill(btn, true);
   if (s === 'pj') renderStatsPartidos();
   else renderStats(s);
+}
+
+function initStatsDrag(tabsEl) {
+  const tabs = tabsEl || document.querySelector('#tab-stats .stats-tabs');
+  if (!tabs) return;
+  const isPosTab = tabs.closest('#tab-posiciones') !== null;
+  let startX = null, isDragging = false;
+
+  function btnAtClientX(clientX) {
+    return [...tabs.querySelectorAll('.stat-tab-btn')]
+      .find(b => { const r = b.getBoundingClientRect(); return clientX >= r.left && clientX <= r.right; }) || null;
+  }
+
+  tabs.addEventListener('pointerdown', e => {
+    if (!e.target.closest('.stat-tab-btn')) return;
+    startX = e.clientX; isDragging = false;
+    tabs.setPointerCapture(e.pointerId);
+  });
+
+  tabs.addEventListener('pointermove', e => {
+    if (startX === null) return;
+    if (!isDragging && Math.abs(e.clientX - startX) < 8) return;
+    isDragging = true;
+    const btn = btnAtClientX(e.clientX);
+    if (!btn) return;
+    tabs.querySelectorAll('.stat-tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const pill = tabs.querySelector('.stats-tab-slider');
+    if (pill) {
+      pill.style.transition = 'left 0.08s ease, width 0.08s ease';
+      pill.style.left  = btn.offsetLeft + 'px';
+      pill.style.width = btn.offsetWidth + 'px';
+    }
+  });
+
+  tabs.addEventListener('pointerup', e => {
+    if (startX === null) return;
+    const btn = btnAtClientX(e.clientX) || tabs.querySelector('.stat-tab-btn.active');
+    startX = null; isDragging = false;
+    if (!btn) return;
+    const s = btn.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+    if (!s) return;
+    if (isPosTab) switchPos(s, btn);
+    else switchStat(s, btn);
+  });
+
+  tabs.addEventListener('pointercancel', () => { startX = null; isDragging = false; });
 }
 
 // ===== RENDER INJURIES =====
@@ -1156,10 +1294,10 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
     const half = f.period === 2 ? '2T' : '1T';
     const clockStr = f.clock ? `${f.clock} · ${half}` : half;
     center = `<div style="text-align:center;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:var(--white);line-height:1">${homeScore ?? 0} - ${awayScore ?? 0}</div>
+      <div style="font-size:26px;font-weight:700;color:var(--white);line-height:1">${homeScore ?? 0} - ${awayScore ?? 0}</div>
       <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:4px">
         <span class="live-dot"></span>
-        <span style="font-size:10px;color:var(--alert);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.5px">${clockStr}</span>
+        <span style="font-size:10px;color:var(--alert);font-weight:700;letter-spacing:0.5px">${clockStr}</span>
       </div>
     </div>`;
   } else if (f.completed) {
@@ -1169,8 +1307,8 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
     const color = bInt > rInt ? 'var(--green)' : bInt < rInt ? 'var(--alert)' : 'var(--gold)';
     const res   = bInt > rInt ? 'Victoria'    : bInt < rInt ? 'Derrota'      : 'Empate';
     center = `<div style="text-align:center;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:${color};line-height:1">${homeScore} - ${awayScore}</div>
-      <div style="font-size:9px;color:${color};font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">${res}</div>
+      <div style="font-size:26px;font-weight:700;color:${color};line-height:1">${homeScore} - ${awayScore}</div>
+      <div style="font-size:9px;color:${color};text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">${res}</div>
     </div>`;
   } else {
     center = `<div class="fixture-vs">VS</div>`;
@@ -1215,7 +1353,7 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
       })()}
       ${f.inProgress ? '' : `<div class="fixture-meta">
         <div class="meta-item"><div class="meta-label">Fecha</div><div class="meta-value">${fmtDateShort(f.date)}</div></div>
-        <div class="meta-item"><div class="meta-label">Hora</div><div class="meta-value">${f.completed ? 'Final' : fmtTimeAR(f.date)}</div></div>
+        <div class="meta-item"><div class="meta-label">${f.completed ? 'Estado' : 'Hora'}</div><div class="meta-value">${f.completed ? 'Final' : fmtTimeAR(f.date)}</div></div>
         <div class="meta-item"><div class="meta-label">Condición</div><div class="meta-value">${f.loc}</div></div>
       </div>`}
     </div>`;
@@ -1233,117 +1371,383 @@ function renderFixture() {
   const homeMatch = liveMatch || proximo;
   document.getElementById('homeProximo').innerHTML = homeMatch
     ? buildFixtureCard(homeMatch, !liveMatch)
-    : `<div style="padding:16px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif">Sin próximos partidos</div>`;
+    : `<div style="padding:16px;text-align:center;color:var(--gray)">Sin próximos partidos</div>`;
 
-  _renderFixList(allFix, now);
+  buildCalendar();
 }
 
-function _renderFixList(allFix, now) {
-  now = now || new Date();
-  const filtered    = allFix.filter(f => f.cat === currentFixCat);
-  const hasLive     = filtered.some(f => f.inProgress);
-  const proximoCat  = filtered.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);  // 1º próximo en esta competencia
-  const globalProx  = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);    // próximo global (todas las competencias)
+function jumpToNextMatch() {
+  if (!liveData?.allFix?.length) return;
+  const now = new Date();
+  const next = liveData.allFix.find(f => f.inProgress) ||
+               liveData.allFix.find(f => !f.completed && new Date(f.date) >= now);
+  if (!next) return;
+  const dateStr = next.date.slice(0, 10);
+  const [y, m] = dateStr.split('-').map(Number);
+  const targetMonth = m - 1;
+  if (y !== calActiveYear || targetMonth !== calActiveMonth) {
+    calActiveYear = y; calActiveMonth = targetMonth;
+    renderCalGrid();
+  }
+  // Esperar un frame para que el tab sea visible y el layout esté calculado
+  requestAnimationFrame(() => {
+    const strip = document.getElementById('calMonthStrip');
+    const btns = strip?.querySelectorAll('.cal-month-btn');
+    let activeBtn = null;
+    btns?.forEach(b => {
+      const isTarget = parseInt(b.dataset.month) === targetMonth;
+      b.classList.toggle('active', isTarget);
+      if (isTarget) activeBtn = b;
+    });
+    if (activeBtn) moveCalPill(activeBtn, false);
+    selectCalDay(dateStr, false);
+  });
+}
 
-  let html = '';
-  if (filtered.length) {
-    let resultadosLbl = false;
-    for (const f of filtered) {
-      if (!resultadosLbl && f.completed) {
-        html += `<div class="fixture-section-lbl">Resultados</div>`;
-        resultadosLbl = true;
-      }
-      if (f.inProgress) {
-        html += `<div class="fixture-section-lbl" id="proximoLabel">En vivo</div>`;
-      } else if (f === proximoCat && !hasLive) {
-        html += `<div class="fixture-section-lbl" id="proximoLabel">Próximo partido</div>`;
-      }
-      html += buildFixtureCard(f, !hasLive && f === globalProx, false);
+// ===== CALENDAR =====
+let calActiveYear, calActiveMonth, calSelectedDate = null, calFixByDate = {};
+const CAL_MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function initCalStripDrag(strip) {
+  let startX = null, isDragging = false;
+
+  function btnAtClientX(clientX) {
+    const relX = clientX - strip.getBoundingClientRect().left + strip.scrollLeft;
+    return [...strip.querySelectorAll('.cal-month-btn')]
+      .find(b => relX >= b.offsetLeft && relX <= b.offsetLeft + b.offsetWidth) || null;
+  }
+
+  function commitBtn(btn) {
+    if (!btn) return;
+    const pill = strip.querySelector('.cal-month-pill');
+    if (pill) {
+      pill.style.transition = ''; // spring del CSS
+      pill.style.left  = btn.offsetLeft + 'px';
+      pill.style.width = btn.offsetWidth + 'px';
     }
-  } else {
-    html = `<div style="padding:24px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif">Sin partidos disponibles</div>`;
+    strip.querySelectorAll('.cal-month-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const month = parseInt(btn.dataset.month);
+    if (month !== calActiveMonth) {
+      calActiveMonth = month;
+      renderCalGrid();
+      autoSelectMonth(calActiveYear, month);
+    }
   }
-  document.getElementById('fixtureList').innerHTML = html;
-  const hasPast = filtered.some(f => f.completed);
-  document.getElementById('tab-fixture')?.classList.toggle('has-past-fix', hasPast);
-  requestAnimationFrame(scrollToProximo);
+
+  strip.addEventListener('pointerdown', e => {
+    if (!e.target.closest('.cal-month-btn')) return;
+    startX = e.clientX; isDragging = false;
+    strip.setPointerCapture(e.pointerId);
+  });
+
+  strip.addEventListener('pointermove', e => {
+    if (startX === null) return;
+    if (!isDragging && Math.abs(e.clientX - startX) < 8) return;
+    isDragging = true;
+    const btn = btnAtClientX(e.clientX);
+    if (!btn) return;
+    strip.querySelectorAll('.cal-month-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const pill = strip.querySelector('.cal-month-pill');
+    if (pill) {
+      pill.style.transition = 'left 0.08s ease, width 0.08s ease';
+      pill.style.left  = btn.offsetLeft + 'px';
+      pill.style.width = btn.offsetWidth + 'px';
+    }
+  });
+
+  strip.addEventListener('pointerup', e => {
+    if (startX === null) return;
+    const btn = btnAtClientX(e.clientX) || strip.querySelector('.cal-month-btn.active');
+    startX = null; isDragging = false;
+    commitBtn(btn); // mismo spring para tap y drag
+  });
+
+  strip.addEventListener('pointercancel', () => { startX = null; isDragging = false; });
 }
 
-function filterFixture(cat, btn) {
-  currentFixCat = cat;
-  document.querySelectorAll('#fixFilter .pill').forEach(p => p.classList.remove('active'));
+function buildCalendar() {
+  const allFix = liveData?.allFix || [];
+  if (!allFix.length) return;
+
+  calFixByDate = {};
+  allFix.forEach(f => {
+    const d = f.date.slice(0, 10);
+    if (!calFixByDate[d]) calFixByDate[d] = [];
+    calFixByDate[d].push(f);
+  });
+
+  const now = new Date();
+  const years = [...new Set(allFix.map(f => f.date.slice(0, 4)))].sort();
+  const year = years[0] || now.getFullYear();
+  // Mostrar todos los meses del año (enero→diciembre)
+  const allMonths = Array.from({length: 12}, (_, i) => `${year}-${String(i+1).padStart(2,'0')}`);
+
+  const nowYM = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const activeYM = allMonths.includes(nowYM) ? nowYM :
+    allMonths.find(m => m >= nowYM) || allMonths[allMonths.length-1];
+  [calActiveYear, calActiveMonth] = activeYM.split('-').map(Number);
+  calActiveMonth -= 1;
+
+  const strip = document.getElementById('calMonthStrip');
+  if (!strip) return;
+  strip.innerHTML = allMonths.map(ym => {
+    const [y, m] = ym.split('-').map(Number);
+    const active = y === calActiveYear && (m-1) === calActiveMonth;
+    return `<button class="cal-month-btn${active?' active':''}" data-month="${m-1}">${CAL_MONTHS_ES[m-1]}</button>`;
+  }).join('');
+  initCalStripDrag(strip);
+
+  renderCalGrid();
+  autoSelectMonth(calActiveYear, calActiveMonth);
+
+  requestAnimationFrame(() => {
+    const activeBtn = strip.querySelector('.cal-month-btn.active');
+    if (activeBtn) moveCalPill(activeBtn, false);
+  });
+}
+
+function moveCalPill(btn, animate = true) {
+  const strip = document.getElementById('calMonthStrip');
+  if (!strip || !btn || !btn.offsetWidth) return;
+  let pill = strip.querySelector('.cal-month-pill');
+  if (!pill) { pill = document.createElement('div'); pill.className = 'cal-month-pill'; strip.prepend(pill); }
+  pill.style.transition = animate ? '' : 'none';
+  pill.style.left  = btn.offsetLeft + 'px';
+  pill.style.width = btn.offsetWidth + 'px';
+  strip.classList.add('slider-ready');
+  if (!animate) requestAnimationFrame(() => { pill.style.transition = ''; });
+}
+
+function switchCalMonth(year, month, btn) {
+  calActiveYear = year; calActiveMonth = month;
+  document.querySelectorAll('#calMonthStrip .cal-month-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  _renderFixList(liveData?.allFix || [], new Date());
+  moveCalPill(btn, true);
+  calSelectedDate = null;
+  renderCalGrid();
+  autoSelectMonth(year, month);
 }
 
-
-function scrollToProximo() {
-  const app   = document.getElementById('scroll-wrap');
-  // Si hay partido en vivo, scrollear a él en lugar del próximo
-  const liveCard = document.querySelector('#fixtureList .fixture-card.live');
-  if (liveCard && app) {
-    const top = liveCard.getBoundingClientRect().top + app.scrollTop - document.querySelector('header').offsetHeight - 60;
-    app.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+function autoSelectMonth(year, month) {
+  const now = new Date();
+  const datesInMonth = Object.keys(calFixByDate).filter(d => {
+    const [y, m] = d.split('-').map(Number);
+    return y === year && m - 1 === month;
+  }).sort();
+  if (!datesInMonth.length) {
+    calSelectedDate = null;
+    document.querySelectorAll('#calGrid .cal-cell.selected').forEach(el => el.classList.remove('selected'));
+    document.getElementById('calDetail').innerHTML = `
+      <div class="cal-empty">
+        <img class="cal-empty-logo" src="./Assets/escudo.svg" alt="Boca Juniors">
+        <span class="cal-empty-title">Sin partidos confirmados</span>
+        <span class="cal-empty-sub">El fixture de este mes aún no fue publicado oficialmente.</span>
+      </div>`;
     return;
   }
-  const label = document.getElementById('proximoLabel') ||
-                document.querySelector('#fixtureList .fixture-card.next');
-  const pills = document.querySelector('.fixture-pills-sticky');
-  if (!app) return;
+  // Primer partido futuro/en vivo del mes, o el último si todos son pasados
+  const next = datesInMonth.find(d => {
+    const f = calFixByDate[d][0];
+    return f.inProgress || (!f.completed && new Date(f.date) >= now);
+  });
+  selectCalDay(next || datesInMonth[datesInMonth.length - 1], false);
+}
 
-  const prevCard = label?.previousElementSibling;
-  if (!label || !prevCard) {
-    app.scrollTop = 0;
-    return;
-  }
+function renderCalGrid() {
+  const year = calActiveYear, month = calActiveMonth;
+  const firstDay = new Date(year, month, 1);
+  const offset = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
-  const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 60;
-  const pillsH  = pills ? pills.offsetHeight : 0;
-  const peek    = Math.round(prevCard.offsetHeight * 0.5) + 16;
-  const appRect   = app.getBoundingClientRect();
-  const labelRect = label.getBoundingClientRect();
-  app.scrollTop   = (labelRect.top - appRect.top + app.scrollTop) - headerH - pillsH - peek;
+  let cells = [];
+  for (let i = 0; i < offset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  document.getElementById('calGrid').innerHTML = cells.map(d => {
+    if (!d) return `<div class="cal-cell"></div>`;
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const matches = calFixByDate[dateStr] || [];
+    const hasMatch = matches.length > 0;
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === calSelectedDate;
+
+    const classes = ['cal-cell',
+      hasMatch ? 'has-match' : '',
+      isToday ? (hasMatch ? 'today-match' : 'today') : '',
+      isSelected && !isToday ? 'selected' : '',
+    ].filter(Boolean).join(' ');
+
+    let content = '';
+    if (hasMatch) {
+      const f = matches[0];
+      const logoUrl = f.rivalId === BOCA_ID
+        ? './Assets/escudo.svg'
+        : `https://a.espncdn.com/i/teamlogos/soccer/500/${f.rivalId}.png`;
+      content = `<div class="cal-logo-wrap"><img class="cal-rival-logo${f.completed?' past':''}" src="${logoUrl}" alt="${f.rival}" onerror="this.style.opacity=0.2"></div>`;
+      if (matches.length > 1) content += `<span class="cal-multi-dot"></span>`;
+    } else {
+      content = `<span class="cal-num">${d}</span>`;
+    }
+
+    const click = hasMatch ? `onclick="selectCalDay('${dateStr}',true)"` : '';
+    return `<div class="${classes}" data-date="${dateStr}" ${click}>${content}</div>`;
+  }).join('');
+}
+
+function selectCalDay(dateStr, scroll) {
+  calSelectedDate = dateStr;
+  // Intercambiar clases sin re-renderizar (preserva transición CSS)
+  document.querySelectorAll('#calGrid .cal-cell.selected').forEach(el => el.classList.remove('selected'));
+  const cells = document.querySelectorAll('#calGrid .cal-cell[data-date]');
+  cells.forEach(el => { if (el.dataset.date === dateStr) el.classList.add('selected'); });
+  const matches = calFixByDate[dateStr] || [];
+  const detail = document.getElementById('calDetail');
+  if (!matches.length) { detail.innerHTML = ''; return; }
+  detail.innerHTML = matches.map(f => buildFixtureCard(f, false, true)).join('');
 }
 
 // ===== POSICIONES / TABS =====
 function switchPos(comp, btn) {
   btn.closest('.stats-tabs').querySelectorAll('.stat-tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  moveStatPill(btn, true);
   ['apertura','libertadores','copa'].forEach(c => {
     document.getElementById(`posView-${c}`).style.display = c === comp ? '' : 'none';
   });
 }
-function switchPlantelSub(view, btn) {
-  document.querySelectorAll('.stats-tabs .stat-tab-btn').forEach(b => {
-    if (btn.closest('.stats-tabs') === b.closest('.stats-tabs')) b.classList.remove('active');
-  });
-  btn.classList.add('active');
-  document.getElementById('plantelView').style.display = view === 'plantel' ? '' : 'none';
-  document.getElementById('bajasView').style.display   = view === 'bajas'   ? '' : 'none';
+function moveNavPill(btn, animate = true) {
+  const pill = document.getElementById('navPill');
+  if (!pill || !btn) return;
+  pill.style.transition = animate ? '' : 'none';
+  const pad = 4;
+  pill.style.left  = (btn.offsetLeft + pad) + 'px';
+  pill.style.width = (btn.offsetWidth - pad * 2) + 'px';
+  if (!animate) requestAnimationFrame(() => { pill.style.transition = ''; });
 }
+
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
   btn.classList.add('active');
-  const app = document.getElementById('scroll-wrap');
-  if (tab === 'fixture') {
-    app.scrollTop = 0;
-    requestAnimationFrame(scrollToProximo);
-  } else {
-    app.scrollTop = 0;
+  moveNavPill(btn, true);
+  // Apple Music icon bounce
+  const icon = btn.querySelector('svg');
+  if (icon) {
+    icon.style.transition = 'transform 0.1s ease';
+    icon.style.transform = 'scale(0.82)';
+    setTimeout(() => {
+      icon.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+      icon.style.transform = 'none';
+    }, 100);
   }
+  const app = document.getElementById('scroll-wrap');
+  app.scrollTop = 0;
+  if (tab === 'fixture') setTimeout(() => jumpToNextMatch(), 50);
+  if (tab === 'plantel') requestAnimationFrame(() => {
+    const activepill = document.querySelector('#plantelFilters .pill.active');
+    if (activepill) movePlantelPill(activepill, false);
+  });
+}
+
+function initNavDrag() {
+  const nav = document.getElementById('bottomNav');
+  let startX = null, isDragging = false;
+
+  function btnAtClientX(clientX) {
+    return [...nav.querySelectorAll('.nav-item')]
+      .find(b => {
+        const r = b.getBoundingClientRect();
+        return clientX >= r.left && clientX <= r.right;
+      }) || null;
+  }
+
+  function commitBtn(btn, animate) {
+    if (!btn) return;
+    const tab = btn.dataset.tab;
+    moveNavPill(btn, animate);
+    nav.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Apple Music icon bounce: scale down then spring back
+    const icon = btn.querySelector('svg');
+    if (icon && animate) {
+      icon.style.transition = 'transform 0.1s ease';
+      icon.style.transform = 'scale(0.82)';
+      setTimeout(() => {
+        icon.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+        icon.style.transform = 'none';
+      }, 100);
+    }
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${tab}`)?.classList.add('active');
+    document.getElementById('scroll-wrap').scrollTop = 0;
+    if (tab === 'fixture') setTimeout(() => jumpToNextMatch(), 50);
+    if (tab === 'plantel') requestAnimationFrame(() => {
+      const p = document.querySelector('#plantelFilters .pill.active');
+      if (p) movePlantelPill(p, false);
+    });
+  if (tab === 'stats') requestAnimationFrame(() => {
+      const b = document.querySelector('#tab-stats .stat-tab-btn.active');
+      if (b) moveStatPill(b, false);
+    });
+  if (tab === 'posiciones') requestAnimationFrame(() => {
+      const b = document.querySelector('#tab-posiciones .stat-tab-btn.active');
+      if (b) moveStatPill(b, false);
+    });
+  }
+
+  nav.addEventListener('pointerdown', e => {
+    if (!e.target.closest('.nav-item')) return;
+    startX = e.clientX; isDragging = false;
+    nav.setPointerCapture(e.pointerId);
+  });
+
+  nav.addEventListener('pointermove', e => {
+    if (startX === null) return;
+    if (!isDragging && Math.abs(e.clientX - startX) < 8) return;
+    isDragging = true;
+    const btn = btnAtClientX(e.clientX);
+    if (!btn) return;
+    nav.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const pill = document.getElementById('navPill');
+    if (pill) {
+      const pad = 4;
+      pill.style.transition = 'left 0.08s ease, width 0.08s ease';
+      pill.style.left  = (btn.offsetLeft + pad) + 'px';
+      pill.style.width = (btn.offsetWidth - pad * 2) + 'px';
+    }
+  });
+
+  nav.addEventListener('pointerup', e => {
+    if (startX === null) return;
+    const btn = btnAtClientX(e.clientX) || nav.querySelector('.nav-item.active');
+    startX = null; isDragging = false;
+    commitBtn(btn, true);
+  });
+
+  nav.addEventListener('pointercancel', () => { startX = null; isDragging = false; });
 }
 function switchZona(zona, btn) {
-  btn.closest('.filter-row').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.zona-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('zonaA-wrap').style.display    = zona === 'A'     ? '' : 'none';
-  document.getElementById('zonaB-wrap').style.display    = zona === 'B'     ? '' : 'none';
-  document.getElementById('zonaAnual-wrap').style.display = zona === 'anual' ? '' : 'none';
+  document.getElementById('tablaZonaA').style.display = zona === 'A'     ? '' : 'none';
+  document.getElementById('tablaZonaB').style.display = zona === 'B'     ? '' : 'none';
+  document.getElementById('tablaAnual').style.display = zona === 'anual' ? '' : 'none';
 }
 
 // ===== TABLAS =====
-const ff = `font-family:'Barlow Condensed',sans-serif;`;
+const ff = ``;
+function teamLogo(espnId, size = 18) {
+  const src = espnId === BOCA_ID ? './Assets/escudo.svg' : `https://a.espncdn.com/i/teamlogos/soccer/500/${espnId}.png`;
+  return `<img src="${src}" style="width:${size}px;height:${size}px;object-fit:contain;flex-shrink:0" onerror="this.style.opacity=0.2">`;
+}
+
 function zonaRow(t) {
   const dif = t.gf - t.gc;
   const difStr   = dif > 0 ? `+${dif}` : `${dif}`;
@@ -1351,8 +1755,8 @@ function zonaRow(t) {
   const bc = t.boca ? 'var(--gold)' : 'var(--white)';
   return `
   <div style="display:grid;grid-template-columns:24px 1fr repeat(8,22px);gap:4px;padding:7px 12px;border-bottom:1px solid rgba(74,96,143,0.25);align-items:center;${t.boca?'background:rgba(249,190,61,0.07)':''}">
-    <span style="${ff}font-size:13px;font-weight:800;color:${t.boca?'var(--gold)':'var(--gray)'};text-align:center">${t.pos}</span>
-    <span style="${ff}font-size:13px;font-weight:${t.boca?800:600};color:${bc};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.boca?'★ ':''}${t.name}</span>
+    <span style="${ff}font-size:13px;font-weight:700;color:${t.boca?'var(--gold)':'var(--gray)'};text-align:center">${t.pos}</span>
+    <div style="display:flex;align-items:center;gap:6px;overflow:hidden">${teamLogo(t.espnId)}<span style="${ff}font-size:13px;font-weight:${t.boca?800:600};color:${bc};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</span></div>
     <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.pj}</span>
     <span style="${ff}font-size:12px;text-align:center">${t.g}</span>
     <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.e}</span>
@@ -1360,7 +1764,7 @@ function zonaRow(t) {
     <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gf}</span>
     <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gc}</span>
     <span style="${ff}font-size:12px;text-align:center;font-weight:700;color:${difColor}">${difStr}</span>
-    <span style="${ff}font-size:14px;font-weight:800;text-align:center;color:${bc}">${t.pts}</span>
+    <span style="${ff}font-size:14px;font-weight:700;text-align:center;color:${bc}">${t.pts}</span>
   </div>`;
 }
 
@@ -1380,8 +1784,8 @@ function renderTables(data) {
     const bc = t.boca ? 'var(--gold)' : 'var(--white)';
     return `
     <div style="display:grid;grid-template-columns:24px 1fr repeat(8,22px);gap:4px;padding:7px 12px;border-bottom:1px solid rgba(74,96,143,0.25);border-left:3px solid ${borderColor};align-items:center;background:${bg}">
-      <span style="${ff}font-size:13px;font-weight:800;color:${t.boca?'var(--gold)':'var(--gray)'};text-align:center">${t.pos}</span>
-      <span style="${ff}font-size:13px;font-weight:${t.boca?800:600};color:${bc};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.boca?'★ ':''}${t.name}</span>
+      <span style="${ff}font-size:13px;font-weight:700;color:${t.boca?'var(--gold)':'var(--gray)'};text-align:center">${t.pos}</span>
+      <div style="display:flex;align-items:center;gap:6px;overflow:hidden">${teamLogo(t.espnId)}<span style="${ff}font-size:13px;font-weight:${t.boca?800:600};color:${bc};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</span></div>
       <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.pj}</span>
       <span style="${ff}font-size:12px;text-align:center">${t.g}</span>
       <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.e}</span>
@@ -1389,7 +1793,7 @@ function renderTables(data) {
       <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gf}</span>
       <span style="${ff}font-size:12px;text-align:center;color:var(--gray)">${t.gc}</span>
       <span style="${ff}font-size:12px;text-align:center;font-weight:700;color:${difColor}">${difStr}</span>
-      <span style="${ff}font-size:14px;font-weight:800;text-align:center;color:${bc}">${t.pts}</span>
+      <span style="${ff}font-size:14px;font-weight:700;text-align:center;color:${bc}">${t.pts}</span>
     </div>`;
   }).join('') + `
   <div style="display:flex;gap:16px;padding:10px 12px;flex-wrap:wrap">
@@ -1401,30 +1805,13 @@ function renderTables(data) {
   document.getElementById('tablaLibRows').innerHTML = bocaGroup.map(t => `
     <div class="tabla-lib ${t.boca?'boca-row':''}">
       <span class="t-pos">${t.pos}</span>
-      <span class="t-name">${t.name}</span>
+      <div style="display:flex;align-items:center;gap:6px;overflow:hidden">${teamLogo(t.espnId)}<span class="t-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</span></div>
       <span>${t.pj}</span><span>${t.g}</span><span>${t.p}</span>
       <span>${t.gd > 0 ? '+'+t.gd : t.gd}</span>
       <span class="t-pts">${t.pts}</span>
     </div>`).join('');
 }
 
-function renderHomeWidgets(data) {
-  if (!data) return;
-  const bocaZona  = data.zonaA.find(t => t.boca) || data.zonaB.find(t => t.boca);
-  const bocaLib   = data.bocaGroup.find(t => t.boca);
-  const widgets   = document.querySelectorAll('.home-widget');
-  if (bocaZona && widgets[0]) {
-    widgets[0].querySelector('.hw-pos-num').textContent = `${bocaZona.pos}°`;
-    widgets[0].querySelector('.hw-main').innerHTML = `<span>${bocaZona.pts}</span> pts`;
-    widgets[0].querySelector('.hw-sub').textContent = `${bocaZona.pj} PJ · ${bocaZona.g}G ${bocaZona.e}E ${bocaZona.p}P`;
-  }
-  if (bocaLib && widgets[1]) {
-    widgets[1].querySelector('.hw-pos-num').textContent = `${bocaLib.pos}°`;
-    widgets[1].querySelector('.hw-sub').textContent = bocaLib.pj > 0
-      ? `${bocaLib.pj} PJ · ${bocaLib.g}G ${bocaLib.p}P`
-      : 'Fase de grupos · Debut 7 abr';
-  }
-}
 
 const img = f => `./Assets/${f}.jpg`;
 const posLabels = { ARQ:'Arquero', DEF:'Defensor', MED:'Mediocampista', DEL:'Delantero' };
@@ -1472,15 +1859,15 @@ function buildHex(sk, pos) {
   }).join(' ');
   const lbls = labels.map((lbl,i) => {
     const lo = 16, lx = cx+(R+lo)*Math.cos(angles[i]), ly = cy+(R+lo)*Math.sin(angles[i]);
-    return `<text x="${lx.toFixed(1)}" y="${(ly-4).toFixed(1)}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="9" font-weight="700" letter-spacing="0.5" fill="rgba(138,155,181,0.9)">${lbl}</text>
-            <text x="${lx.toFixed(1)}" y="${(ly+8).toFixed(1)}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="13" font-weight="800" fill="#F9BE3D">${sk[i]}</text>`;
+    return `<text x="${lx.toFixed(1)}" y="${(ly-4).toFixed(1)}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="9" font-weight="700" letter-spacing="0.5" fill="rgba(138,155,181,0.9)">${lbl}</text>
+            <text x="${lx.toFixed(1)}" y="${(ly+8).toFixed(1)}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="13" font-weight="800" fill="#F9BE3D">${sk[i]}</text>`;
   }).join('');
 
   return `<svg viewBox="0 0 190 190" width="190" height="190" style="overflow:visible">
     ${grid}${axes}
     <polygon points="${statPts}" fill="rgba(249,190,61,0.15)" stroke="#F9BE3D" stroke-width="1.5" stroke-linejoin="round"/>
-    <text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="10" font-weight="700" letter-spacing="1" fill="rgba(138,155,181,0.8)">OVR</text>
-    <text x="${cx}" y="${cy+16}" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-size="28" font-weight="800" fill="${ovrColor}">${ovr}</text>
+    <text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="10" font-weight="700" letter-spacing="1" fill="rgba(138,155,181,0.8)">OVR</text>
+    <text x="${cx}" y="${cy+16}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,system-ui,sans-serif" font-size="28" font-weight="800" fill="${ovrColor}">${ovr}</text>
     ${lbls}
   </svg>`;
 }
@@ -1529,7 +1916,7 @@ function openPlayer(file) {
       f.birthPlace  ? `<div class="ficha-item full"><div class="ficha-label">Lugar de nacimiento</div><div class="ficha-value">${f.birthPlace}</div></div>` : '',
       f.debut       ? `<div class="ficha-item full"><div class="ficha-label">Debut en Boca</div><div class="ficha-value" style="font-size:12px;font-weight:600">${f.debut}</div></div>` : '',
     ].filter(Boolean).join('');
-    fichaEl.innerHTML = `<div class="ficha-grid">${items}</div>`;
+    fichaEl.innerHTML = `<div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:-0.08px;margin-bottom:8px">Ficha técnica</div><div class="ficha-grid">${items}</div>`;
     fichaEl.style.display = '';
   } else {
     fichaEl.style.display = 'none';
@@ -1636,6 +2023,7 @@ async function refreshLive() {
   try {
     liveData = await loadData();
     renderFixture();
+    buildCalendar();
     checkLiveTimer();
   } catch(e) { console.warn('refreshLive error:', e); }
 }
@@ -1651,12 +2039,26 @@ function checkLiveTimer() {
 }
 
 (async function init() {
+  // Inicializar nav pill en la tab activa inicial
+  initNavDrag();
+  requestAnimationFrame(() => {
+    const activeNav = document.querySelector('.nav-item.active');
+    if (activeNav) moveNavPill(activeNav, false);
+  });
+
   renderPlantel();
   renderAvgAge();
   renderInjuries();
-  document.getElementById('statList').innerHTML = `<div style="padding:32px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700">Cargando stats...</div>`;
+  initPlantelFilterDrag();
+  initStatsDrag(document.querySelector('#tab-stats .stats-tabs'));
+  initStatsDrag(document.querySelector('#tab-posiciones .stats-tabs'));
+  requestAnimationFrame(() => {
+    const activepill = document.querySelector('#plantelFilters .pill.active');
+    if (activepill) movePlantelPill(activepill, false);
+  });
+  document.getElementById('statList').innerHTML = `<div style="padding:32px;text-align:center;color:var(--gray);font-size:14px;font-weight:700">Cargando stats...</div>`;
 
-  const loading = `<div style="padding:24px;text-align:center;color:var(--gray);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700">Cargando datos...</div>`;
+  const loading = `<div style="padding:24px;text-align:center;color:var(--gray);font-size:14px;font-weight:700">Cargando datos...</div>`;
   ['tablaZonaA','tablaZonaB','tablaAnual','tablaLibRows'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = loading;
@@ -1678,17 +2080,17 @@ function checkLiveTimer() {
     }
     renderTables(liveData);
     renderFixture();
+    jumpToNextMatch();
     checkLiveTimer();
   } catch(e) {
     console.error('Error cargando datos ESPN:', e);
     renderStats('goles'); // fallback a datos estáticos si falla la API
-    const err = `<div style="padding:24px;text-align:center;color:var(--alert);font-family:'Barlow Condensed',sans-serif;font-size:13px">Error al cargar. Verificá tu conexión.</div>`;
+    const err = `<div style="padding:24px;text-align:center;color:var(--alert);font-size:13px">Error al cargar. Verificá tu conexión.</div>`;
     ['tablaZonaA','tablaZonaB','tablaAnual'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = err;
     });
   }
-  try { renderHomeWidgets(liveData); } catch(e) { console.warn('renderHomeWidgets:', e); }
 })();
 </script>
 </body>
