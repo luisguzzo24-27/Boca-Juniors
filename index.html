@@ -1075,6 +1075,17 @@ function doTabSwitch(newTab) {
 
 function afterTabSwitch(tab) {
   if (tab === 'fixture') setTimeout(() => jumpToNextMatch(), 50);
+  // Re-position pills after tab becomes visible (elements have real width now)
+  requestAnimationFrame(() => {
+    if (tab === 'stats' || tab === 'posiciones') {
+      const activeStatBtn = document.querySelector(`#tab-${tab} .stats-tabs .stat-tab-btn.active`);
+      if (activeStatBtn) moveStatPill(activeStatBtn, false);
+    }
+    if (tab === 'plantel') {
+      const activePill = document.querySelector('#plantelFilters .pill.active');
+      if (activePill) movePlantelPill(activePill, false);
+    }
+  });
 }
 
 // ===== RENDER PLANTEL =====
