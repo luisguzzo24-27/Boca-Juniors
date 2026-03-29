@@ -383,11 +383,13 @@
         <button class="stat-tab-btn" onclick="switchStat('amarillas',this)">Amarillas</button>
         <button class="stat-tab-btn" onclick="switchStat('rojas',this)">Rojas</button>
       </div>
-      <div id="statsCompFilter" class="stats-tabs" style="display:none">
-        <button class="stat-tab-btn active" onclick="switchStatComp('total',this)">Todos</button>
-        <button class="stat-tab-btn" onclick="switchStatComp('liga',this)">Apertura</button>
-        <button class="stat-tab-btn" onclick="switchStatComp('copa',this)">Copa Arg</button>
-        <button class="stat-tab-btn" onclick="switchStatComp('lib',this)">Libertadores</button>
+      <div id="statsCompFilter" style="display:none;border-bottom:1px solid rgba(74,96,143,0.3);margin:0 16px 8px">
+        <div style="display:flex">
+          <button class="zona-tab active" onclick="switchStatComp('total',this)">Todos</button>
+          <button class="zona-tab" onclick="switchStatComp('liga',this)">Apertura</button>
+          <button class="zona-tab" onclick="switchStatComp('copa',this)">Copa Arg</button>
+          <button class="zona-tab" onclick="switchStatComp('lib',this)">Libertadores</button>
+        </div>
       </div>
       <div class="stat-list" id="statList"></div>
 
@@ -1283,10 +1285,14 @@ function moveStatPill(btn, animate = true) {
 function renderStatsTarjetas(tipo, comp) {
   const ps = liveData?.playerStats;
   const compFilter = comp || activeStatComp || 'total';
+  const cardColor = tipo === 'amarillas' ? '#FFD600' : 'var(--alert)';
+  const cardIcon = `<span style="display:inline-block;width:7px;height:10px;background:${cardColor};border-radius:1px;flex-shrink:0"></span>`;
+
   const rows = players
     .map(p => {
-      const val = ps?.[p.file]?.[tipo]?.[compFilter] ?? p[tipo] ?? 0;
-      return { ...p, _val: val };
+      const d = ps?.[p.file]?.[tipo] || { total:0, liga:0, copa:0, lib:0 };
+      const val = compFilter === 'total' ? d.total : (d[compFilter] ?? 0);
+      return { ...p, _d: d, _val: val };
     })
     .filter(p => p._val > 0)
     .sort((a, b) => b._val - a._val);
@@ -1295,47 +1301,47 @@ function renderStatsTarjetas(tipo, comp) {
     document.getElementById('statList').innerHTML = '<div style="text-align:center;color:var(--gray);padding:32px;font-family:inherit">Sin datos</div>';
     return;
   }
-  const max = rows[0]._val;
-  const cardIcon = tipo === 'amarillas'
-    ? `<span style="display:inline-block;width:8px;height:11px;background:#FFD600;border-radius:1px;flex-shrink:0"></span>`
-    : `<span style="display:inline-block;width:8px;height:11px;background:var(--alert);border-radius:1px;flex-shrink:0"></span>`;
 
-  // Breakdown pills for a row
-  const mkBreakdown = (p) => {
-    if (!ps?.[p.file]?.[tipo]) return '';
-    const d = ps[p.file][tipo];
-    const parts = [
-      d.liga  ? `<span class="stat-pj-tit">${d.liga} APE</span>` : '',
-      d.copa  ? `<span class="stat-pj-sup">${d.copa} COP</span>` : '',
-      d.lib   ? `<span class="stat-pj-sup">${d.lib} LIB</span>`  : '',
-    ].filter(Boolean);
-    return parts.length > 1
-      ? `<div class="stat-pj-breakdown">${parts.join('<span class="stat-pj-sep">·</span>')}</div>`
-      : '';
-  };
+  // Columns depend on filter: Todos → APE COP LIB TOT | single comp → just the count
+  const showAll = compFilter === 'total';
+  const colGrid = showAll ? '20px 1fr repeat(3,28px) 32px' : '20px 1fr 32px';
 
-  document.getElementById('statList').innerHTML = rows.map((p, i) => `
-    <div class="stat-row">
-      <div class="stat-rank ${i < 3 ? 'top' : ''}">${i + 1}</div>
-      <img class="stat-photo" src="${img(p.file)}" alt="${p.short}">
-      <div class="stat-info">
-        <div class="stat-name">${p.short}</div>
-        ${mkBreakdown(p)}
-        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${(p._val/max)*100}%"></div></div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;gap:3px">
-        <div class="stat-value">${p._val}</div>
-        ${cardIcon}
-      </div>
-    </div>`).join('');
+  const header = showAll
+    ? `<div class="tabla-header" style="grid-template-columns:${colGrid};border-radius:var(--radius) var(--radius) 0 0">
+        <span>#</span><span style="text-align:left">Jugador</span>
+        <span>APE</span><span>COP</span><span>LIB</span><span style="display:flex;align-items:center;justify-content:center">${cardIcon}</span>
+       </div>`
+    : `<div class="tabla-header" style="grid-template-columns:${colGrid};border-radius:var(--radius) var(--radius) 0 0">
+        <span>#</span><span style="text-align:left">Jugador</span>
+        <span style="display:flex;align-items:center;justify-content:center">${cardIcon}</span>
+       </div>`;
+
+  const bodyRows = rows.map((p, i) => {
+    const isBoca = true; // all are Boca players
+    const cols = showAll
+      ? `<span>${p._d.liga || '–'}</span><span>${p._d.copa || '–'}</span><span>${p._d.lib || '–'}</span><span class="t-pts" style="color:${cardColor}">${p._val}</span>`
+      : `<span class="t-pts" style="color:${cardColor}">${p._val}</span>`;
+    return `<div class="tabla-row" style="grid-template-columns:${colGrid}">
+      <span class="t-pos ${i < 3 ? 'top' : ''}" style="${i<3?'color:var(--gold)':'color:var(--gray)'}">${i+1}</span>
+      <span class="t-name" style="display:flex;align-items:center;gap:8px;overflow:hidden">
+        <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
+      </span>
+      ${cols}
+    </div>`;
+  }).join('');
+
+  document.getElementById('statList').innerHTML = `
+    <div style="padding:0 16px 16px">
+      <div class="tabla">${header}<div class="tabla-scroll">${bodyRows}</div></div>
+    </div>`;
 }
 
 function switchStatComp(comp, btn) {
   activeStatComp = comp;
-  document.querySelectorAll('#statsCompFilter .stat-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#statsCompFilter .zona-tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  moveStatPill(btn, true);
-  const activeStat = [...document.querySelectorAll('#tab-stats .stats-tabs:first-child .stat-tab-btn')]
+  const activeStat = [...document.querySelectorAll('#tab-stats .stats-tabs .stat-tab-btn')]
     .find(b => b.classList.contains('active'))?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
   if (activeStat === 'amarillas' || activeStat === 'rojas') renderStatsTarjetas(activeStat, comp);
 }
@@ -1346,13 +1352,10 @@ function switchStat(s, btn) {
   moveStatPill(btn, true);
   const compFilter = document.getElementById('statsCompFilter');
   const isCards = s === 'amarillas' || s === 'rojas';
-  compFilter.style.display = isCards ? 'flex' : 'none';
+  compFilter.style.display = isCards ? 'block' : 'none';
   if (isCards) {
-    // Reset competition filter to "Todos" on each card tab switch
     activeStatComp = 'total';
-    const compBtns = compFilter.querySelectorAll('.stat-tab-btn');
-    compBtns.forEach((b, i) => b.classList.toggle('active', i === 0));
-    requestAnimationFrame(() => moveStatPill(compBtns[0], false));
+    compFilter.querySelectorAll('.zona-tab').forEach((b, i) => b.classList.toggle('active', i === 0));
   }
   if (s === 'pj') renderStatsPartidos();
   else if (isCards) renderStatsTarjetas(s);
