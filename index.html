@@ -1263,8 +1263,8 @@ function renderStatsPartidos(comp) {
     return { ...p, _pj: pj, _tit: tit, _ban: pj - tit };
   }).filter(p => p._pj > 0).sort((a, b) => b._pj - a._pj || b._tit - a._tit);
 
-  const colGrid = '20px 1fr 36px 36px';
-  const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}"><span>#</span><span style="text-align:left">Jugador</span><span>TIT</span><span>SUP</span></div>`;
+  const colGrid = '20px 1fr 32px 32px 32px';
+  const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}"><span>#</span><span style="text-align:left">Jugador</span><span>TIT</span><span>SUP</span><span>PJ</span></div>`;
   const bodyRows = rows.length
     ? rows.map((p, i) => `
     <div class="tabla-row" style="grid-template-columns:${colGrid}">
@@ -1273,8 +1273,9 @@ function renderStatsPartidos(comp) {
         <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
       </span>
-      <span class="t-pts" style="text-align:center;${i<3?'color:var(--gold)':''}">${p._tit}</span>
-      <span style="text-align:center;color:var(--gray)">${p._ban || '–'}</span>
+      <span>${p._tit}</span>
+      <span style="color:var(--gray)">${p._ban || '–'}</span>
+      <span class="t-pts" style="${i<3?'color:var(--gold)':''}">${p._pj}</span>
     </div>`).join('')
     : `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
