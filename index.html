@@ -1273,11 +1273,10 @@ function renderStatsPartidos(comp) {
     return { ...p, _pj: pj, _tit: tit, _ban: pj - tit };
   }).sort((a, b) => b._pj - a._pj || b._tit - a._tit);
 
-  const colGrid = '20px 1fr 32px 32px 48px';
+  const colGrid = '20px 1fr 52px 32px 32px';
   const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}">
     <span>#</span><span style="text-align:left">Jugador</span>
-    <span>TIT</span><span>SUP</span>
-    <span>/ ${totalBocaPJ}</span>
+    <span>P</span><span>TIT</span><span>SUP</span>
   </div>`;
 
   const bodyRows = rows.map((p, i) => {
@@ -1290,9 +1289,9 @@ function renderStatsPartidos(comp) {
         <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
       </span>
+      <span class="t-pts" style="font-size:13px;${pjColor}">${p._pj}<span style="font-size:11px;font-weight:500;color:var(--gray)">/${totalBocaPJ}</span></span>
       <span style="${p._tit>0?'':'color:var(--gray)'}">${p._tit || '–'}</span>
       <span style="color:var(--gray)">${p._ban || '–'}</span>
-      <span class="t-pts" style="${pjColor}">${p._pj || '0'}</span>
     </div>`;
   }).join('');
 
