@@ -31,11 +31,11 @@
     }
     html, body { height: 100%; background: var(--bg); color: var(--white); font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
     #app { max-width: 430px; margin: 0 auto; height: 100vh; height: 100dvh; display: flex; flex-direction: column; position: relative; }
-    #scroll-wrap { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    #scroll-wrap { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
     #scroll-wrap::-webkit-scrollbar { width: 0; }
 
     /* HEADER */
-    header { height: var(--header-h); position: sticky; top: 0; background: rgba(22,34,54,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(46,77,130,0.6); display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0; z-index: 10; }
+    header { height: var(--header-h); background: rgba(22,34,54,0.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(46,77,130,0.6); display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0; z-index: 10; }
     .header-logo { width: 38px; height: 38px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .header-logo svg { width: 22px; height: 22px; }
     .header-title { flex: 1; }
@@ -46,9 +46,10 @@
     .header-badge .label { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
 
     /* MAIN */
-    main { flex: 1; }
-    .tab { display: none; padding-bottom: calc(var(--nav-h) + 32px); }
-    .tab.active { display: block; }
+    main { flex: 1; position: relative; min-height: 0; }
+    .tab { position: absolute; inset: 0; padding-bottom: calc(var(--nav-h) + 32px); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; opacity: 0; pointer-events: none; transition: opacity 0.22s ease; }
+    .tab::-webkit-scrollbar { width: 0; }
+    .tab.active { opacity: 1; pointer-events: auto; }
 
     /* BOTTOM NAV — Apple Music Liquid Glass */
     .bottom-nav { position: absolute; bottom: 12px; left: 24px; right: 24px; height: var(--nav-h); border-radius: 22px; background: rgba(28,28,30,0.15); backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%); border: 0.5px solid rgba(255,255,255,0.12); display: flex; align-items: center; z-index: 10; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 0.5px 0 rgba(255,255,255,0.08); overflow: hidden; }
@@ -99,11 +100,11 @@
 
     /* STATS */
     .stats-tabs { display: flex; align-items: center; padding: 0 16px 8px; gap: 8px; }
-    #tab-posiciones .stats-tabs, #tab-stats .stats-tabs { position: sticky; top: var(--header-h); z-index: 8; background: rgba(10,22,40,0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 24px 16px; align-items: center; }
+    #tab-posiciones .stats-tabs, #tab-stats .stats-tabs { position: sticky; top: 0; z-index: 8; background: rgba(10,22,40,0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 24px 16px; align-items: center; }
     .zona-tabs { display: flex; border-bottom: 1px solid rgba(74,96,143,0.3); background:var(--bg-card); border-radius:var(--radius) var(--radius) 0 0; margin-top: 12px; }
     .zona-tab { flex: 1; padding: 12px 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease; margin-bottom: -1px; -webkit-tap-highlight-color: transparent; }
     .zona-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-    .plantel-sticky-header { position: sticky; top: var(--header-h); z-index: 6; background: rgba(10,22,40,0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .plantel-sticky-header { position: sticky; top: 0; z-index: 6; background: rgba(10,22,40,0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
     #plantelFilters { padding: 24px 16px; margin: 0; position: relative; }
     .stats-tabs { position: relative; }
     .stat-tab-btn { flex: 1; padding: 8px; border-radius: 20px; background: transparent; border: none; color: var(--gray); font-size: 13px; font-weight: 600; letter-spacing: -0.08px; cursor: pointer; position: relative; z-index: 1; transition: color 0.22s ease; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; justify-content: center; line-height: 1; align-self: center; }
@@ -178,7 +179,7 @@
     .sev-low .eta-value { color: var(--green); }
 
     /* CALENDAR */
-    .cal-sticky { position: sticky; top: var(--header-h); z-index: 6; background: rgba(10,22,40,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .cal-sticky { position: sticky; top: 0; z-index: 6; background: rgba(10,22,40,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
     .cal-section-header { padding: 10px 16px 4px; }
     .cal-section-title { font-size: 22px; font-weight: 700; letter-spacing: 0.35px; line-height: 1.27; }
     .cal-month-strip { position: relative; display: flex; overflow-x: auto; scrollbar-width: none; padding: 8px 12px; gap: 0; }
@@ -223,6 +224,14 @@
     .fixture-team-name.boca { color: var(--gold); }
     .fixture-center { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; gap: 2px; }
     .fixture-vs { font-size: 13px; font-weight: 600; letter-spacing: -0.08px; color: var(--gray); }
+    .fixture-form { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(74,96,143,0.25); }
+    .form-side { display: flex; gap: 4px; }
+    .form-side.right { flex-direction: row-reverse; }
+    .form-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; letter-spacing: 0; flex-shrink: 0; }
+    .form-dot.G { background: rgba(67,160,71,0.2); color: #81C784; border: 1px solid rgba(67,160,71,0.35); }
+    .form-dot.E { background: rgba(249,190,61,0.15); color: var(--gold); border: 1px solid rgba(249,190,61,0.3); }
+    .form-dot.P { background: rgba(230,81,0,0.15); color: #FF7043; border: 1px solid rgba(230,81,0,0.3); }
+    .form-label { font-size: 9px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; }
     .fixture-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(74,96,143,0.4); }
     .meta-item { text-align: center; }
     .meta-item:first-child { text-align: left; }
@@ -265,7 +274,7 @@
     .fix-grupo-match .hl { color:var(--gold); }
 
     /* HOME */
-    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; height:calc(100vh - var(--header-h) - var(--nav-h) - 24px); height:calc(100dvh - var(--header-h) - var(--nav-h) - 24px); padding:0 20px; text-align:center; }
+    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100%; padding:0 20px; text-align:center; }
     .home-escudo { width:140px; height:auto; filter:drop-shadow(0 8px 32px rgba(249,190,61,0.25)); margin-bottom:24px; animation:escudoPulse 3s ease-in-out infinite; }
     @keyframes escudoPulse { 0%,100%{ filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); } 50%{ filter:drop-shadow(0 8px 48px rgba(249,190,61,0.45)); } }
     .home-frase { font-size:28px; font-weight:700; letter-spacing:0.36px; line-height:1.21; color:var(--gold); margin-bottom:6px; }
@@ -320,8 +329,6 @@
 </head>
 <body>
 <div id="app">
-<div id="scroll-wrap">
-
   <header>
     <img src="./Assets/escudo.svg" alt="CABJ" style="width:38px;height:38px;object-fit:contain;flex-shrink:0">
     <div class="header-title">
@@ -329,6 +336,7 @@
     </div>
   </header>
 
+<div id="scroll-wrap">
   <main>
     <!-- HOME -->
     <section id="tab-home" class="tab active">
@@ -1009,12 +1017,35 @@ async function loadData() {
     });
   }
 
-  return { zonaA, zonaB, tablaAnual, allFix, bocaGroup, playerStats };
+  // Pre-fetch rival form for the next/live match so it's ready on first render
+  const now2 = new Date();
+  const nextMatch = allFix.find(f => f.inProgress) ||
+                    allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now2);
+  const rivalForm = nextMatch ? await fetchRivalForm(nextMatch.rivalId) : [];
+
+  return { zonaA, zonaB, tablaAnual, allFix, bocaGroup, playerStats, rivalForm };
 }
 
 // ===== LIVE DATA STORE =====
 let liveData = null;
 let currentFixCat = 'liga';
+
+// ===== TAB SLIDE TRANSITION =====
+const TAB_ORDER = ['home', 'plantel', 'stats', 'posiciones', 'fixture'];
+let currentTab = 'home';
+let isTabAnimating = false;
+
+function doTabSwitch(newTab) {
+  if (newTab === currentTab) return;
+  document.getElementById(`tab-${currentTab}`).classList.remove('active');
+  document.getElementById(`tab-${newTab}`).classList.add('active');
+  currentTab = newTab;
+  afterTabSwitch(newTab);
+}
+
+function afterTabSwitch(tab) {
+  if (tab === 'fixture') setTimeout(() => jumpToNextMatch(), 50);
+}
 
 // ===== RENDER PLANTEL =====
 function renderAvgAge() {
@@ -1288,7 +1319,47 @@ function teamLogoImg(espnId) {
   return `<img class="fixture-escudo" src="https://a.espncdn.com/i/teamlogos/soccer/500/${espnId}.png" alt="" onerror="this.style.opacity=0.3">`;
 }
 
-function buildFixtureCard(f, highlight = false, showEvents = true) {
+function getBocaForm(allFix) {
+  return allFix
+    .filter(f => f.completed)
+    .slice(-5)
+    .map(f => {
+      const b = parseInt(f.bScore), r = parseInt(f.rScore);
+      return b > r ? 'G' : b < r ? 'P' : 'E';
+    });
+}
+
+async function fetchRivalForm(rivalId) {
+  try {
+    const data = await fetchCached(
+      `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/teams/${rivalId}/schedule?season=2026`,
+      3600000
+    );
+    const events = data?.events || [];
+    const results = [];
+    for (const ev of events) {
+      const comp = ev.competitions?.[0];
+      if (!comp?.status?.type?.completed) continue;
+      const home = comp.competitors.find(c => c.homeAway === 'home');
+      const away = comp.competitors.find(c => c.homeAway === 'away');
+      if (!home || !away) continue;
+      const isHome = home.team.id === rivalId;
+      const teamComp = isHome ? home : away;
+      const oppComp  = isHome ? away  : home;
+      const ts = parseInt(teamComp.score), os = parseInt(oppComp.score);
+      results.push(ts > os ? 'G' : ts < os ? 'P' : 'E');
+    }
+    return results.slice(-5);
+  } catch { return []; }
+}
+
+function buildFormHTML(form, alignRight = false) {
+  if (!form?.length) return '<div class="form-side"></div>';
+  const dots = form.map(r => `<span class="form-dot ${r}">${r}</span>`).join('');
+  return `<div class="form-side${alignRight ? ' right' : ''}">${dots}</div>`;
+}
+
+function buildFixtureCard(f, highlight = false, showEvents = true, formData = null) {
   const bocaTeam = `<div class="fixture-team">${teamLogoImg(BOCA_ID)}<div class="fixture-team-name boca">Boca Juniors</div></div>`;
   const rivalTeam = `<div class="fixture-team">${teamLogoImg(f.rivalId)}<div class="fixture-team-name">${f.rivalShort || f.rival}</div></div>`;
   const isLocal = f.loc === 'Local';
@@ -1357,6 +1428,15 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
           <div class="ev-col right">${rightEvs.map(e => renderEv(e, true)).join('')}</div>
         </div>`;
       })()}
+      ${formData ? (() => {
+        const leftForm  = isLocal ? formData.boca : formData.rival;
+        const rightForm = isLocal ? formData.rival : formData.boca;
+        return `<div class="fixture-form">
+          ${buildFormHTML(leftForm, false)}
+          <span class="form-label">Forma</span>
+          ${buildFormHTML(rightForm, true)}
+        </div>`;
+      })() : ''}
       ${f.inProgress ? '' : `<div class="fixture-meta">
         <div class="meta-item"><div class="meta-label">Fecha</div><div class="meta-value">${fmtDateShort(f.date)}</div></div>
         <div class="meta-item"><div class="meta-label">${f.completed ? 'Estado' : 'Hora'}</div><div class="meta-value">${f.completed ? 'Final' : fmtTimeAR(f.date)}</div></div>
@@ -1375,9 +1455,15 @@ function renderFixture() {
   currentLiveMatch = liveMatch || null;
   const proximo   = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);
   const homeMatch = liveMatch || proximo;
-  document.getElementById('homeProximo').innerHTML = homeMatch
-    ? buildFixtureCard(homeMatch, !liveMatch)
-    : `<div style="padding:16px;text-align:center;color:var(--gray)">Sin próximos partidos</div>`;
+
+  if (homeMatch) {
+    const bocaForm = getBocaForm(allFix);
+    const rivalForm = liveData.rivalForm || [];
+    document.getElementById('homeProximo').innerHTML = buildFixtureCard(homeMatch, !liveMatch, true, { boca: bocaForm, rival: rivalForm });
+  } else {
+    document.getElementById('homeProximo').innerHTML =
+      `<div style="padding:16px;text-align:center;color:var(--gray)">Sin próximos partidos</div>`;
+  }
 
   buildCalendar();
 }
@@ -1614,7 +1700,13 @@ function selectCalDay(dateStr, scroll) {
   const matches = calFixByDate[dateStr] || [];
   const detail = document.getElementById('calDetail');
   if (!matches.length) { detail.innerHTML = ''; return; }
-  detail.innerHTML = matches.map(f => buildFixtureCard(f, false, true)).join('');
+  const allFix = liveData?.allFix || [];
+  const bocaForm = getBocaForm(allFix);
+  // Render immediately, then re-render with rival forms
+  detail.innerHTML = matches.map(f => buildFixtureCard(f, false, true, { boca: bocaForm, rival: [] })).join('');
+  Promise.all(matches.map(f => fetchRivalForm(f.rivalId))).then(rivalForms => {
+    detail.innerHTML = matches.map((f, i) => buildFixtureCard(f, false, true, { boca: bocaForm, rival: rivalForms[i] })).join('');
+  });
 }
 
 // ===== POSICIONES / TABS =====
@@ -1637,12 +1729,10 @@ function moveNavPill(btn, animate = true) {
 }
 
 function switchTab(tab, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (isTabAnimating) return;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`tab-${tab}`).classList.add('active');
   btn.classList.add('active');
   moveNavPill(btn, true);
-  // Apple Music icon bounce
   const icon = btn.querySelector('svg');
   if (icon) {
     icon.style.transition = 'transform 0.1s ease';
@@ -1652,13 +1742,7 @@ function switchTab(tab, btn) {
       icon.style.transform = 'none';
     }, 100);
   }
-  const app = document.getElementById('scroll-wrap');
-  app.scrollTop = 0;
-  if (tab === 'fixture') setTimeout(() => jumpToNextMatch(), 50);
-  if (tab === 'plantel') requestAnimationFrame(() => {
-    const activepill = document.querySelector('#plantelFilters .pill.active');
-    if (activepill) movePlantelPill(activepill, false);
-  });
+  doTabSwitch(tab);
 }
 
 function initNavDrag() {
@@ -1679,7 +1763,6 @@ function initNavDrag() {
     moveNavPill(btn, animate);
     nav.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    // Apple Music icon bounce: scale down then spring back
     const icon = btn.querySelector('svg');
     if (icon && animate) {
       icon.style.transition = 'transform 0.1s ease';
@@ -1689,22 +1772,7 @@ function initNavDrag() {
         icon.style.transform = 'none';
       }, 100);
     }
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(`tab-${tab}`)?.classList.add('active');
-    document.getElementById('scroll-wrap').scrollTop = 0;
-    if (tab === 'fixture') setTimeout(() => jumpToNextMatch(), 50);
-    if (tab === 'plantel') requestAnimationFrame(() => {
-      const p = document.querySelector('#plantelFilters .pill.active');
-      if (p) movePlantelPill(p, false);
-    });
-  if (tab === 'stats') requestAnimationFrame(() => {
-      const b = document.querySelector('#tab-stats .stat-tab-btn.active');
-      if (b) moveStatPill(b, false);
-    });
-  if (tab === 'posiciones') requestAnimationFrame(() => {
-      const b = document.querySelector('#tab-posiciones .stat-tab-btn.active');
-      if (b) moveStatPill(b, false);
-    });
+    doTabSwitch(tab);
   }
 
   nav.addEventListener('pointerdown', e => {
