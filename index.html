@@ -972,11 +972,16 @@ async function loadData() {
       : `<div style="padding:16px;text-align:center;color:var(--gray)">Sin próximos partidos</div>`;
   }
 
-  // Copa Argentina + Libertadores team schedules (for stats)
+  // Copa Argentina + Libertadores team schedules (for stats + fixture)
   const [copaTeamSched, libTeamSched] = await Promise.all([
     fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.copa/teams/${BOCA_ID}/schedule?season=2026`, FIX_TTL),
     fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/teams/${BOCA_ID}/schedule?season=2026`, FIX_TTL)
   ]);
+
+  // Add Copa Argentina matches to allFix
+  const copaFix = extractBocaFix(copaTeamSched?.events, 'copa', 'Copa Argentina', 'comp-cop');
+  allFix.push(...copaFix);
+  allFix.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   // Collect completed event IDs across all competitions
   const completedEvents = [];
