@@ -383,11 +383,11 @@
         <button class="stat-tab-btn" onclick="switchStat('amarillas',this)">Amarillas</button>
         <button class="stat-tab-btn" onclick="switchStat('rojas',this)">Rojas</button>
       </div>
-      <div id="statsCompFilter" style="display:none;padding:0 16px 8px;gap:8px;flex-wrap:wrap" class="filter-row">
-        <button class="pill active" onclick="switchStatComp('total',this)">Todos</button>
-        <button class="pill" onclick="switchStatComp('liga',this)">Apertura</button>
-        <button class="pill" onclick="switchStatComp('copa',this)">Copa Arg</button>
-        <button class="pill" onclick="switchStatComp('lib',this)">Libertadores</button>
+      <div id="statsCompFilter" class="stats-tabs" style="display:none">
+        <button class="stat-tab-btn active" onclick="switchStatComp('total',this)">Todos</button>
+        <button class="stat-tab-btn" onclick="switchStatComp('liga',this)">Apertura</button>
+        <button class="stat-tab-btn" onclick="switchStatComp('copa',this)">Copa Arg</button>
+        <button class="stat-tab-btn" onclick="switchStatComp('lib',this)">Libertadores</button>
       </div>
       <div class="stat-list" id="statList"></div>
 
@@ -1332,10 +1332,11 @@ function renderStatsTarjetas(tipo, comp) {
 
 function switchStatComp(comp, btn) {
   activeStatComp = comp;
-  document.querySelectorAll('#statsCompFilter .pill').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#statsCompFilter .stat-tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const activeStat = document.querySelector('#tab-stats .stat-tab-btn.active')?.dataset?.stat ||
-    [...document.querySelectorAll('#tab-stats .stat-tab-btn')].find(b => b.classList.contains('active'))?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+  moveStatPill(btn, true);
+  const activeStat = [...document.querySelectorAll('#tab-stats .stats-tabs:first-child .stat-tab-btn')]
+    .find(b => b.classList.contains('active'))?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
   if (activeStat === 'amarillas' || activeStat === 'rojas') renderStatsTarjetas(activeStat, comp);
 }
 
@@ -1349,7 +1350,9 @@ function switchStat(s, btn) {
   if (isCards) {
     // Reset competition filter to "Todos" on each card tab switch
     activeStatComp = 'total';
-    compFilter.querySelectorAll('.pill').forEach((b, i) => b.classList.toggle('active', i === 0));
+    const compBtns = compFilter.querySelectorAll('.stat-tab-btn');
+    compBtns.forEach((b, i) => b.classList.toggle('active', i === 0));
+    requestAnimationFrame(() => moveStatPill(compBtns[0], false));
   }
   if (s === 'pj') renderStatsPartidos();
   else if (isCards) renderStatsTarjetas(s);
