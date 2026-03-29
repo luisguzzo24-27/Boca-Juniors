@@ -1191,6 +1191,16 @@ function initPlantelFilterDrag() {
 // ===== RENDER STATS =====
 let activeStatComp = 'total';
 
+function mkStatsTable(zonaFilter, header, bodyRows) {
+  const sth = document.querySelector('#tab-stats .stats-tabs')?.offsetHeight || 0;
+  return `<div style="padding:0 16px 16px"><div class="tabla">
+    <div style="position:sticky;top:${sth}px;z-index:5;background:var(--bg-card);border-radius:var(--radius) var(--radius) 0 0">
+      ${zonaFilter}${header}
+    </div>
+    <div>${bodyRows}</div>
+  </div></div>`;
+}
+
 function mkZonaFilter(comp, fn) {
   return `<div class="zona-tabs">
     <button class="zona-tab${comp==='total'?' active':''}" onclick="${fn}('total')">Todos</button>
@@ -1224,7 +1234,7 @@ function renderStats(stat = 'goles', comp) {
     </div>`).join('')
     : `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
-  document.getElementById('statList').innerHTML = `<div style="padding:0 16px 16px"><div class="tabla">${mkZonaFilter(cf,'switchStatGenComp')}${header}<div class="tabla-scroll">${bodyRows}</div></div></div>`;
+  document.getElementById('statList').innerHTML = mkStatsTable(mkZonaFilter(cf,'switchStatGenComp'), header, bodyRows);
 }
 
 function renderStatsPartidos(comp) {
@@ -1253,7 +1263,7 @@ function renderStatsPartidos(comp) {
     </div>`).join('')
     : `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
-  document.getElementById('statList').innerHTML = `<div style="padding:0 16px 16px"><div class="tabla">${mkZonaFilter(cf,'switchStatGenComp')}${header}<div class="tabla-scroll">${bodyRows}</div></div></div>`;
+  document.getElementById('statList').innerHTML = mkStatsTable(mkZonaFilter(cf,'switchStatGenComp'), header, bodyRows);
 }
 
 function switchStatGenComp(comp) {
@@ -1331,10 +1341,7 @@ function renderStatsTarjetas(tipo, comp) {
     </div>`;
   }).join('') || `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
-  document.getElementById('statList').innerHTML = `
-    <div style="padding:0 16px 16px">
-      <div class="tabla">${zonaTabsHTML}${header}<div class="tabla-scroll">${bodyRows}</div></div>
-    </div>`;
+  document.getElementById('statList').innerHTML = mkStatsTable(zonaTabsHTML, header, bodyRows);
 }
 
 function switchStatComp(comp) { switchStatGenComp(comp); }
