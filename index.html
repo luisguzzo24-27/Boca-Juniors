@@ -1241,12 +1241,12 @@ function renderStats(stat = 'goles', comp) {
   const bodyRows = rows.length
     ? rows.map((p, i) => `
     <div class="tabla-row" style="grid-template-columns:${colGrid}">
-      <span class="t-pos" style="${i<3?'color:var(--gold)':''}">${i+1}</span>
+      <span class="t-pos">${i+1}</span>
       <span class="t-name" style="display:flex;align-items:center;gap:8px">
         <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
       </span>
-      <span class="t-pts" style="${i<3?'color:var(--gold)':''}">${p._val}</span>
+      <span class="t-pts">${p._val}</span>
     </div>`).join('')
     : `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
 
@@ -1354,7 +1354,7 @@ function renderStatsTarjetas(comp) {
 
   const bodyRows = rows.map((p, i) => `
     <div class="tabla-row" style="grid-template-columns:${colGrid}">
-      <span class="t-pos" style="${i<3?'color:var(--gold)':''}">${i+1}</span>
+      <span class="t-pos">${i+1}</span>
       <span class="t-name" style="display:flex;align-items:center;gap:8px;overflow:hidden">
         <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
