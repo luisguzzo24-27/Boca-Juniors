@@ -871,57 +871,40 @@ function buildStatsFromSummaries(summaryData) {
   const lookup = buildNameLookup();
   const stats = {};
   const leagueKey = l => l === 'arg.1' ? 'liga' : l === 'arg.copa' ? 'copa' : 'lib';
+  const mkComp = () => ({ total: 0, liga: 0, copa: 0, lib: 0 });
   players.forEach(p => {
     stats[p.file] = {
-      pj: 0, tit: 0, goles: 0, asist: 0, min: 0,
-      amarillas: { total: 0, liga: 0, copa: 0, lib: 0 },
-      rojas:     { total: 0, liga: 0, copa: 0, lib: 0 }
+      goles: mkComp(), asist: mkComp(), pj: mkComp(), tit: mkComp(),
+      amarillas: mkComp(), rojas: mkComp()
     };
   });
+
+  const getStat = (roster, name) => roster.stats?.find(s => s.name === name)?.value || 0;
 
   for (const { summary, league } of summaryData) {
     if (!summary) continue;
     const lk = leagueKey(league);
 
-    // Boxscore: pj, tit, min, goles, asist
-    const bocaEntry = summary.boxscore?.players?.find(tp => tp.team?.id === BOCA_ID);
-    if (bocaEntry) {
-      for (const sg of (bocaEntry.statistics || [])) {
-        const labels = (sg.labels || sg.keys || []).map(l => (l || '').toUpperCase());
-        const minIdx = labels.findIndex(l => l.startsWith('MIN'));
-        const gIdx   = labels.findIndex(l => l === 'G' || l === 'GOALS');
-        const aIdx   = labels.findIndex(l => l === 'A' || l === 'ASSISTS');
-
-        for (const ath of (sg.athletes || [])) {
-          if (ath.didNotPlay) continue;
-          const file = resolvePlayer(ath.athlete?.displayName || '', lookup);
-          if (!file) continue;
-          const s = stats[file];
-          s.pj++;
-          if (ath.starter) s.tit++;
-          const vals = ath.stats || [];
-          if (minIdx >= 0) s.min += parseInt(vals[minIdx]) || 0;
-          if (gIdx   >= 0) s.goles += parseInt(vals[gIdx]) || 0;
-          if (aIdx   >= 0) s.asist += parseInt(vals[aIdx]) || 0;
-        }
-      }
-    }
-
-    // Cards from keyEvents (always run, independent of boxscore)
-    for (const ev of (summary.keyEvents || [])) {
-      const type = ev.type?.text;
-      if (type !== 'Yellow Card' && type !== 'Red Card') continue;
-      if (ev.team?.id !== BOCA_ID) continue;
-      const name = ev.participants?.[0]?.athlete?.displayName || '';
+    // Roster: pj, tit, goles, asist, amarillas, rojas per player
+    const bocaRoster = summary.rosters?.find(t => t.team?.id === BOCA_ID);
+    for (const p of (bocaRoster?.roster || [])) {
+      if (!p.active) continue;
+      const name = p.athlete?.displayName || '';
       const file = resolvePlayer(name, lookup);
       if (!file || !stats[file]) continue;
-      if (type === 'Yellow Card') {
-        stats[file].amarillas.total++;
-        stats[file].amarillas[lk]++;
-      } else {
-        stats[file].rojas.total++;
-        stats[file].rojas[lk]++;
-      }
+      const s = stats[file];
+      const app = getStat(p, 'appearances');
+      if (!app) continue;
+      s.pj.total++; s.pj[lk]++;
+      if (p.starter) { s.tit.total++; s.tit[lk]++; }
+      const g = getStat(p, 'totalGoals');
+      if (g) { s.goles.total += g; s.goles[lk] += g; }
+      const a = getStat(p, 'goalAssists');
+      if (a) { s.asist.total += a; s.asist[lk] += a; }
+      const yc = getStat(p, 'yellowCards');
+      if (yc) { s.amarillas.total += yc; s.amarillas[lk] += yc; }
+      const rc = getStat(p, 'redCards');
+      if (rc) { s.rojas.total += rc; s.rojas[lk] += rc; }
     }
   }
   return stats;
@@ -1206,57 +1189,80 @@ function initPlantelFilterDrag() {
 
 
 // ===== RENDER STATS =====
-const statLabel = { goles:'gol', asist:'ast', amarillas:'ama', rojas:'roj' };
 let activeStatComp = 'total';
-function renderStats(stat = 'goles') {
-  const sorted = [...players].filter(p => p[stat] > 0).sort((a, b) => b[stat] - a[stat]);
-  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:inherit">Sin datos</div>'; return; }
-  const max = sorted[0][stat];
-  document.getElementById('statList').innerHTML = sorted.map((p, i) => `
-    <div class="stat-row">
-      <div class="stat-rank ${i < 3 ? 'top' : ''}">${i + 1}</div>
-      <img class="stat-photo" src="${img(p.file)}" alt="${p.short}">
-      <div class="stat-info">
-        <div class="stat-name">${p.short}</div>
-        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${(p[stat]/max)*100}%"></div></div>
-      </div>
-      <div>
-        <div class="stat-value">${p[stat]}</div>
-        <div class="stat-unit">${statLabel[stat]}</div>
-      </div>
-    </div>`).join('');
+
+function mkZonaFilter(comp, fn) {
+  return `<div class="zona-tabs">
+    <button class="zona-tab${comp==='total'?' active':''}" onclick="${fn}('total')">Todos</button>
+    <button class="zona-tab${comp==='liga'?' active':''}" onclick="${fn}('liga')">Apertura</button>
+    <button class="zona-tab${comp==='copa'?' active':''}" onclick="${fn}('copa')">Copa Arg</button>
+    <button class="zona-tab${comp==='lib'?' active':''}" onclick="${fn}('lib')">Libertadores</button>
+  </div>`;
 }
 
-function renderStatsPartidos() {
-  const totalPJ = liveData?.allFix?.filter(f => f.completed).length || Math.max(...players.map(p => p.pj));
-  const sorted = [...players].filter(p => p.pj > 0).sort((a, b) => b.pj - a.pj || b.min - a.min);
-  if (!sorted.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px;font-family:inherit">Sin datos</div>'; return; }
-  document.getElementById('statList').innerHTML = sorted.map((p, i) => {
-    const tit = p.tit ?? 0;
-    const ban = p.pj - tit;
-    const pct = Math.round((p.pj / totalPJ) * 100);
-    const minFmt = p.min >= 1000 ? (p.min / 1000).toFixed(1) + 'k' : p.min;
-    return `
-    <div class="stat-row">
-      <div class="stat-rank ${i < 3 ? 'top' : ''}">${i + 1}</div>
-      <img class="stat-photo" src="${img(p.file)}" alt="${p.short}">
-      <div class="stat-info">
-        <div class="stat-name">${p.short}</div>
-        <div class="stat-pj-breakdown">
-          <span class="stat-pj-tit">${tit} TIT</span>
-          <span class="stat-pj-sep">·</span>
-          <span class="stat-pj-sup">${ban} BAN</span>
-          <span class="stat-pj-sep">·</span>
-          <span class="stat-pj-min">${minFmt} min</span>
-        </div>
-        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${pct}%"></div></div>
-      </div>
-      <div style="flex-shrink:0;text-align:center">
-        <div class="stat-pj-total">${p.pj}<span style="font-size:13px;color:var(--gray);font-weight:600"> /${totalPJ}</span></div>
-        <div class="stat-pj-pct">${pct}%</div>
-      </div>
-    </div>`;
-  }).join('');
+function renderStats(stat = 'goles', comp) {
+  const cf = comp || activeStatComp;
+  const ps = liveData?.playerStats;
+  const statLabel = { goles:'GOL', asist:'AST' };
+
+  const rows = players.map(p => {
+    const val = ps?.[p.file]?.[stat]?.[cf] ?? (cf === 'total' ? p[stat] : 0);
+    return { ...p, _val: val };
+  }).filter(p => p._val > 0).sort((a, b) => b._val - a._val);
+
+  if (!rows.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px">Sin datos</div>'; return; }
+
+  const colGrid = '20px 1fr 32px';
+  const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}"><span>#</span><span style="text-align:left">Jugador</span><span>${statLabel[stat]||stat.toUpperCase()}</span></div>`;
+  const bodyRows = rows.map((p, i) => `
+    <div class="tabla-row" style="grid-template-columns:${colGrid}">
+      <span class="t-pos" style="${i<3?'color:var(--gold)':''}">${i+1}</span>
+      <span class="t-name" style="display:flex;align-items:center;gap:8px">
+        <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
+      </span>
+      <span class="t-pts" style="${i<3?'color:var(--gold)':''}">${p._val}</span>
+    </div>`).join('');
+
+  document.getElementById('statList').innerHTML = `<div style="padding:0 16px 16px"><div class="tabla">${mkZonaFilter(cf,'switchStatGenComp')}${header}<div class="tabla-scroll">${bodyRows}</div></div></div>`;
+}
+
+function renderStatsPartidos(comp) {
+  const cf = comp || activeStatComp;
+  const ps = liveData?.playerStats;
+
+  const rows = players.map(p => {
+    const pj  = ps?.[p.file]?.pj?.[cf]  ?? (cf==='total' ? p.pj  : 0);
+    const tit = ps?.[p.file]?.tit?.[cf] ?? (cf==='total' ? p.tit : 0);
+    return { ...p, _pj: pj, _tit: tit, _ban: pj - tit };
+  }).filter(p => p._pj > 0).sort((a, b) => b._pj - a._pj || b._tit - a._tit);
+
+  if (!rows.length) { document.getElementById('statList').innerHTML='<div style="text-align:center;color:var(--gray);padding:32px">Sin datos</div>'; return; }
+
+  const colGrid = '20px 1fr 28px 28px 32px';
+  const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}"><span>#</span><span style="text-align:left">Jugador</span><span>TIT</span><span>BAN</span><span>PJ</span></div>`;
+  const bodyRows = rows.map((p, i) => `
+    <div class="tabla-row" style="grid-template-columns:${colGrid}">
+      <span class="t-pos" style="${i<3?'color:var(--gold)':''}">${i+1}</span>
+      <span class="t-name" style="display:flex;align-items:center;gap:8px">
+        <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
+      </span>
+      <span>${p._tit}</span>
+      <span>${p._ban}</span>
+      <span class="t-pts" style="${i<3?'color:var(--gold)':''}">${p._pj}</span>
+    </div>`).join('');
+
+  document.getElementById('statList').innerHTML = `<div style="padding:0 16px 16px"><div class="tabla">${mkZonaFilter(cf,'switchStatGenComp')}${header}<div class="tabla-scroll">${bodyRows}</div></div></div>`;
+}
+
+function switchStatGenComp(comp) {
+  activeStatComp = comp;
+  const activeStat = [...document.querySelectorAll('#tab-stats .stats-tabs .stat-tab-btn')]
+    .find(b => b.classList.contains('active'))?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'goles';
+  if (activeStat === 'pj') renderStatsPartidos(comp);
+  else if (activeStat === 'amarillas' || activeStat === 'rojas') renderStatsTarjetas(activeStat, comp);
+  else renderStats(activeStat, comp);
 }
 function moveStatPill(btn, animate = true) {
   const tabs = btn?.closest('.stats-tabs');
@@ -1336,19 +1342,13 @@ function renderStatsTarjetas(tipo, comp) {
     </div>`;
 }
 
-function switchStatComp(comp) {
-  activeStatComp = comp;
-  const activeStat = [...document.querySelectorAll('#tab-stats .stats-tabs .stat-tab-btn')]
-    .find(b => b.classList.contains('active'))?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
-  if (activeStat === 'amarillas' || activeStat === 'rojas') renderStatsTarjetas(activeStat, comp);
-}
+function switchStatComp(comp) { switchStatGenComp(comp); }
 
 function switchStat(s, btn) {
   document.querySelectorAll('#tab-stats .stat-tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   moveStatPill(btn, true);
-  const isCards = s === 'amarillas' || s === 'rojas';
-  if (isCards) activeStatComp = 'total';
+  activeStatComp = 'total';
   if (s === 'pj') renderStatsPartidos();
   else if (isCards) renderStatsTarjetas(s);
   else renderStats(s);
@@ -2248,10 +2248,9 @@ function checkLiveTimer() {
     if (liveData.playerStats) {
       players.forEach(p => {
         const s = liveData.playerStats[p.file];
-        if (!s || s.pj === 0) return;
-        p.pj = s.pj; p.tit = s.tit; p.goles = s.goles; p.asist = s.asist; p.min = s.min;
-        p.amarillas = s.amarillas?.total || 0;
-        p.rojas = s.rojas?.total || 0;
+        if (!s || !s.pj?.total) return;
+        p.pj = s.pj.total; p.tit = s.tit.total; p.goles = s.goles.total; p.asist = s.asist.total;
+        p.amarillas = s.amarillas.total; p.rojas = s.rojas.total;
       });
       const activeBtn = document.querySelector('#tab-stats .stat-tab-btn.active');
       const activeStat = activeBtn?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
