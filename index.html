@@ -1281,15 +1281,14 @@ function renderStatsPartidos(comp) {
 
   const bodyRows = rows.map((p, i) => {
     const rank = p._pj > 0 ? i + 1 : '–';
-    const pjColor = p._pj === 0 ? 'color:var(--gray)' : i < 3 ? 'color:var(--gold)' : '';
     return `
     <div class="tabla-row" style="grid-template-columns:${colGrid}${p._pj === 0 ? ';opacity:0.45' : ''}">
-      <span class="t-pos" style="${i<3&&p._pj>0?'color:var(--gold)':'color:var(--gray)'}">${rank}</span>
+      <span class="t-pos" style="color:var(--gray)">${rank}</span>
       <span class="t-name" style="display:flex;align-items:center;gap:8px">
         <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
       </span>
-      <span class="t-pts" style="font-size:13px;${pjColor}">${p._pj}<span style="font-size:11px;font-weight:500;color:var(--gray)">/${totalBocaPJ}</span></span>
+      <span style="font-size:13px;font-weight:700;${p._pj===0?'color:var(--gray)':''}">${p._pj}<span style="font-size:11px;font-weight:500;color:var(--gray)">/${totalBocaPJ}</span></span>
       <span style="${p._tit>0?'':'color:var(--gray)'}">${p._tit || '–'}</span>
       <span style="color:var(--gray)">${p._ban || '–'}</span>
     </div>`;
