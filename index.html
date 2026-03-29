@@ -1256,28 +1256,45 @@ function renderStats(stat = 'goles', comp) {
 function renderStatsPartidos(comp) {
   const cf = comp || activeStatComp;
   const ps = liveData?.playerStats;
+  const allFix = liveData?.allFix || [];
 
+  // Total Boca completed matches for this competition filter
+  const leagueMap = { liga: 'arg.1', copa: 'arg.copa', lib: 'conmebol.libertadores' };
+  const totalBocaPJ = allFix.filter(f => {
+    if (!f.completed) return false;
+    if (cf === 'total') return true;
+    return f.league === leagueMap[cf];
+  }).length;
+
+  // All squad players, including those who didn't play
   const rows = players.map(p => {
-    const pj  = ps?.[p.file]?.pj?.[cf]  ?? (cf==='total' ? p.pj  : 0);
-    const tit = ps?.[p.file]?.tit?.[cf] ?? (cf==='total' ? p.tit : 0);
+    const pj  = ps?.[p.file]?.pj?.[cf]  ?? (cf === 'total' ? p.pj  : 0);
+    const tit = ps?.[p.file]?.tit?.[cf] ?? (cf === 'total' ? p.tit : 0);
     return { ...p, _pj: pj, _tit: tit, _ban: pj - tit };
-  }).filter(p => p._pj > 0).sort((a, b) => b._pj - a._pj || b._tit - a._tit);
+  }).sort((a, b) => b._pj - a._pj || b._tit - a._tit);
 
-  const colGrid = '20px 1fr 32px 32px 32px';
-  const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}"><span>#</span><span style="text-align:left">Jugador</span><span>TIT</span><span>SUP</span><span>PJ</span></div>`;
-  const bodyRows = rows.length
-    ? rows.map((p, i) => `
-    <div class="tabla-row" style="grid-template-columns:${colGrid}">
-      <span class="t-pos" style="${i<3?'color:var(--gold)':''}">${i+1}</span>
+  const colGrid = '20px 1fr 32px 32px 48px';
+  const header = `<div class="tabla-header" style="grid-template-columns:${colGrid}">
+    <span>#</span><span style="text-align:left">Jugador</span>
+    <span>TIT</span><span>SUP</span>
+    <span>/ ${totalBocaPJ}</span>
+  </div>`;
+
+  const bodyRows = rows.map((p, i) => {
+    const rank = p._pj > 0 ? i + 1 : '–';
+    const pjColor = p._pj === 0 ? 'color:var(--gray)' : i < 3 ? 'color:var(--gold)' : '';
+    return `
+    <div class="tabla-row" style="grid-template-columns:${colGrid}${p._pj === 0 ? ';opacity:0.45' : ''}">
+      <span class="t-pos" style="${i<3&&p._pj>0?'color:var(--gold)':'color:var(--gray)'}">${rank}</span>
       <span class="t-name" style="display:flex;align-items:center;gap:8px">
         <img src="${img(p.file)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:top;flex-shrink:0;background:var(--blue)">
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.short}</span>
       </span>
-      <span>${p._tit}</span>
+      <span style="${p._tit>0?'':'color:var(--gray)'}">${p._tit || '–'}</span>
       <span style="color:var(--gray)">${p._ban || '–'}</span>
-      <span class="t-pts" style="${i<3?'color:var(--gold)':''}">${p._pj}</span>
-    </div>`).join('')
-    : `<div style="text-align:center;color:var(--gray);padding:24px">Sin datos</div>`;
+      <span class="t-pts" style="${pjColor}">${p._pj || '0'}</span>
+    </div>`;
+  }).join('');
 
   document.getElementById('statList').innerHTML = mkStatsTable(mkZonaFilter(cf,'switchStatGenComp'), header, bodyRows);
 }
