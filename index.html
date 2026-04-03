@@ -2220,11 +2220,61 @@ function bustFixtureCache() {
 }
 
 async function refreshLive() {
-  bustFixtureCache();
+  // Refresh liviano: solo scoreboard + summary del partido en vivo
+  // No re-ejecuta loadData() completo (evita cuelgues por standings y summaries)
   try {
-    liveData = await loadData();
+    const now = new Date();
+    const today = fmt8(new Date(now.getTime() - 2 * 86400000));
+    const to    = fmt8(new Date(now.getTime() + 120 * 86400000));
+    const sbUrls = [
+      `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}`,
+      `https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=${today}-${to}`
+    ];
+    sbUrls.forEach(url => {
+      try { localStorage.removeItem('espnv2_' + url.replace(/\W/g, '').slice(-40)); } catch(e) {}
+    });
+
+    const [lFutFix, libFix] = await Promise.all(sbUrls.map(u => fetchCached(u, 3 * 60 * 1000)));
+    const allSbEvents = [...(lFutFix?.events || []), ...(libFix?.events || [])];
+
+    if (liveData?.allFix) {
+      for (const ev of allSbEvents) {
+        const c = ev.competitions?.[0];
+        if (!c) continue;
+        const f = liveData.allFix.find(x => x.eventId === ev.id);
+        if (!f) continue;
+        const state = c.status?.type?.state;
+        const completed = c.status?.type?.completed || false;
+        const inProgress = state === 'in';
+        const bocaT = c.competitors?.find(t => t.team?.id === BOCA_ID);
+        const rival = c.competitors?.find(t => t.team?.id !== BOCA_ID);
+        f.inProgress = inProgress;
+        f.completed  = completed;
+        f.clock  = inProgress ? (c.status?.displayClock || '') : null;
+        f.period = inProgress ? (c.status?.period || 1) : null;
+        f.bScore = (completed || inProgress) ? getScore(bocaT?.score) : null;
+        f.rScore = (completed || inProgress) ? getScore(rival?.score) : null;
+      }
+
+      // Actualizar summary del partido en vivo
+      const liveEvents = liveData.allFix.filter(f => f.inProgress);
+      if (liveEvents.length) {
+        const summaryUrls = liveEvents.map(f =>
+          `https://site.api.espn.com/apis/site/v2/sports/soccer/${f.league}/summary?event=${f.eventId}`
+        );
+        summaryUrls.forEach(url => {
+          try { localStorage.removeItem('espnv2_' + url.replace(/\W/g, '').slice(-40)); } catch(e) {}
+        });
+        const summaries = await Promise.all(summaryUrls.map(u => fetchCached(u, 30000)));
+        liveEvents.forEach((f, i) => {
+          const p = parseLiveSummary(summaries[i], BOCA_ID);
+          f.events = p.events;
+          f.lineup = p.lineup;
+        });
+      }
+    }
+
     renderFixture();
-    buildCalendar();
     checkLiveTimer();
   } catch(e) { console.warn('refreshLive error:', e); }
 }
