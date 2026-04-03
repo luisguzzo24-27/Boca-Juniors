@@ -2316,6 +2316,28 @@ function checkLiveTimer() {
   }
 }
 
+// ===== AUTO-UPDATE =====
+(function() {
+  let currentEtag = null;
+  async function checkVersion() {
+    try {
+      const res = await fetch(location.href, { method: 'HEAD', cache: 'no-cache' });
+      const etag = res.headers.get('etag') || res.headers.get('last-modified') || '';
+      if (currentEtag && etag && etag !== currentEtag) {
+        const toast = document.createElement('div');
+        toast.textContent = '✦ Nueva versión disponible';
+        toast.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#F9BE3D;color:#0A1628;font-size:13px;font-weight:700;padding:10px 20px;border-radius:20px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.3)';
+        document.body.appendChild(toast);
+        setTimeout(() => location.reload(), 1500);
+        return;
+      }
+      currentEtag = etag;
+    } catch(e) {}
+  }
+  checkVersion();
+  setInterval(checkVersion, 2 * 60 * 1000);
+})();
+
 (async function init() {
   // Inicializar nav pill en la tab activa inicial
   initNavDrag();
