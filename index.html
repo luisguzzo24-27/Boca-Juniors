@@ -963,7 +963,7 @@ async function loadData() {
   // teamSched = all Boca liga matches this season (completed only, no 100-event limit)
   // lFutFix   = scoreboard from today = only upcoming liga matches
   // libFix    = upcoming Libertadores matches
-  const FIX_TTL = 15 * 60 * 1000; // 15 min para fixture (se actualizan con frecuencia)
+  const FIX_TTL = 3 * 60 * 1000; // 3 min para fixture (detecta partidos que arrancan)
   const STD_TTL = 60 * 60 * 1000; // 1 hora para standings
   const [lStd, teamSched, lFutFix, libFix, libStd] = await Promise.all([
     fetchCached(`https://site.web.api.espn.com/apis/v2/sports/soccer/arg.1/standings?season=2026&type=0`, STD_TTL),
@@ -2197,6 +2197,7 @@ function closeLineup() {
 
 // ===== LIVE MATCH REFRESH =====
 let liveTimer = null;
+let preMatchTimer = null;
 
 function bustFixtureCache() {
   const now = new Date();
@@ -2229,11 +2230,24 @@ async function refreshLive() {
 
 function checkLiveTimer() {
   const hasLive = liveData?.allFix?.some(f => f.inProgress);
-  if (hasLive && !liveTimer) {
-    liveTimer = setInterval(refreshLive, 45000);
-  } else if (!hasLive && liveTimer) {
-    clearInterval(liveTimer);
-    liveTimer = null;
+
+  if (hasLive) {
+    // Partido en vivo → 45s
+    if (!liveTimer) liveTimer = setInterval(refreshLive, 45000);
+    if (preMatchTimer) { clearInterval(preMatchTimer); preMatchTimer = null; }
+  } else {
+    if (liveTimer) { clearInterval(liveTimer); liveTimer = null; }
+
+    // Pre-partido: si hay partido en las próximas 3h → refresh cada 2 min
+    const now = new Date();
+    const next = liveData?.allFix?.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);
+    const soon = next && (new Date(next.date) - now) < 3 * 60 * 60 * 1000;
+    if (soon && !preMatchTimer) {
+      preMatchTimer = setInterval(refreshLive, 2 * 60 * 1000);
+    } else if (!soon && preMatchTimer) {
+      clearInterval(preMatchTimer);
+      preMatchTimer = null;
+    }
   }
 }
 
