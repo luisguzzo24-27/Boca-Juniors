@@ -2278,6 +2278,9 @@ function checkLiveTimer() {
     if (el) el.innerHTML = loading;
   });
 
+  // Bust fixture cache en cada init para detectar partidos en vivo inmediatamente
+  bustFixtureCache();
+
   try {
     liveData = await loadData();
     // Merge live stats into players array
