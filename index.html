@@ -870,7 +870,7 @@ function parseLiveSummary(summary, bocaId) {
       const entry = { num: parseInt(ath.jersey) || localP?.num || 0, name: espnName };
       if (p.starter) {
         starters.push(entry);
-      } else if (p.subbedIn) {
+      } else if (p.active !== false) {
         const sub = subMap[ath.id];
         subs.push({ ...entry, ...(sub ? { replaces: sub.replaces, clock: sub.clock } : {}) });
       }
