@@ -1006,8 +1006,8 @@ async function loadData() {
   const ligaFix = [...futureFix, ...pastFix.filter(f => !futureIds.has(f.eventId))];
   const allFix    = [...ligaFix, ...liberFix].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Render home card early — no esperar summaries ni copa (Phase 3)
-  {
+  // Render home card early — solo en primer load (si liveData ya existe, esperar el render completo)
+  if (!liveData) {
     const _now = new Date();
     const _live = allFix.find(f => f.inProgress);
     const _prox = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= _now);
