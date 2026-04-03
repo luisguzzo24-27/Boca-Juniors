@@ -847,32 +847,21 @@ function parseLiveSummary(summary, bocaId) {
   const rosters = summary.rosters || [];
   if (!rosters.length) return { events, lineup: null };
 
-  // Build substitution map from plays: subbedIn athleteId → { replaces, clock }
-  const subMap = {};
-  (summary.plays || []).forEach(play => {
-    if (play.type?.text !== 'Substitution') return;
-    const subIn  = (play.participants || []).find(p => p.type === 'subIn');
-    const subOut = (play.participants || []).find(p => p.type === 'subOut');
-    if (subIn?.athlete?.id && subOut?.athlete) {
-      subMap[subIn.athlete.id] = {
-        replaces: subOut.athlete.shortName || subOut.athlete.displayName || '',
-        clock:    play.clock?.displayValue || ''
-      };
-    }
-  });
-
   const parseTeam = rosterEntry => {
     const starters = [], subs = [];
     (rosterEntry.roster || []).forEach(p => {
       const ath = p.athlete || {};
       const espnName = ath.shortName || ath.displayName || '';
-      const localP = players.find(p => normName(p.short) === normName(espnName) || normName(p.name) === normName(espnName));
-      const entry = { num: parseInt(ath.jersey) || localP?.num || 0, name: espnName };
+      const localP = players.find(lp => normName(lp.short) === normName(espnName) || normName(lp.name) === normName(espnName));
+      const entry = { num: parseInt(p.jersey) || localP?.num || 0, name: espnName };
       if (p.starter) {
         starters.push(entry);
       } else if (p.active !== false) {
-        const sub = subMap[ath.id];
-        subs.push({ ...entry, ...(sub ? { replaces: sub.replaces, clock: sub.clock } : {}) });
+        // subbedInFor y plays vienen directo en el roster entry (no en plays globales)
+        const replacedAth = p.subbedInFor?.athlete;
+        const clock = p.plays?.[0]?.clock?.displayValue || '';
+        const replaces = replacedAth ? (replacedAth.shortName || replacedAth.displayName || '') : '';
+        subs.push({ ...entry, ...(replaces ? { replaces, clock } : {}) });
       }
     });
     return { formation: rosterEntry.formation || '', starters, subs };
