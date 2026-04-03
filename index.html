@@ -2185,7 +2185,6 @@ function openLineup(e) {
     const subIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 12" width="13" height="9" style="flex-shrink:0;display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="0,11 4.5,1 9,11" fill="#43A047"/><polygon points="9,1 13.5,11 18,1" fill="#E53935"/></svg>`;
     const renderPlayers = (list, isSub) => list.map(p =>
       `<div class="lineup-player">
-        <span class="lineup-num">${p.num}</span>
         ${isSub && p.replaces ? subIcon : ''}
         <span class="lineup-name${isSub ? ' sub' : ''}">${p.name}</span>
         ${isSub && p.replaces ? `<span class="lineup-replaces">${p.replaces}</span>` : ''}
