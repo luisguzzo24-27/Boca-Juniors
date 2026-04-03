@@ -808,16 +808,27 @@ function extractBocaFix(events, cat, compLabel, ccClass) {
 function parseLiveSummary(summary, bocaId) {
   if (!summary) return { events: [], lineup: null };
 
-  // Events from header details
+  // Events: keyEvents (live) o header details (completados)
   const comp = summary.header?.competitions?.[0];
-  const events = (comp?.details || [])
-    .filter(d => ['Goal','Yellow Card','Red Card','Own Goal','Injury'].includes(d.type?.text))
+  const VALID = ['Goal','Yellow Card','Red Card','Own Goal','Injury'];
+  const fromDetails = (comp?.details || [])
+    .filter(d => VALID.includes(d.type?.text))
     .map(d => ({
       type:   d.type.text,
       clock:  d.clock?.displayValue || '',
       teamId: d.team?.id || '',
       player: d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || ''
     }));
+  const fromKeyEvents = (summary.keyEvents || [])
+    .filter(e => VALID.includes(e.type?.text))
+    .map(e => ({
+      type:   e.type.text,
+      clock:  e.clock?.displayValue || '',
+      teamId: e.team?.id || '',
+      player: e.participants?.[0]?.athlete?.shortName || e.participants?.[0]?.athlete?.displayName || ''
+    }));
+  // Usar keyEvents si details está vacío (partido en vivo)
+  const events = fromDetails.length ? fromDetails : fromKeyEvents;
 
   // Injuries from plays (ESPN sometimes doesn't put them in details)
   (summary.plays || [])
