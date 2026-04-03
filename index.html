@@ -1000,9 +1000,9 @@ async function loadData() {
   const futureFix = extractBocaFix(lFutFix?.events,    'liga', 'Apertura 2026', 'comp-ape');
   const liberFix  = extractBocaFix(libFix?.events, 'libertadores', 'Libertadores 2026', 'comp-lib');
 
-  // Merge liga (deduplicate on date in case of overlap)
-  const seenDates = new Set(pastFix.map(f => f.date));
-  const ligaFix   = [...pastFix, ...futureFix.filter(f => !seenDates.has(f.date))];
+  // Merge liga: scoreboard (futureFix) tiene prioridad — tiene estado live correcto
+  const seenInFuture = new Set(futureFix.map(f => f.date));
+  const ligaFix = [...futureFix, ...pastFix.filter(f => !seenInFuture.has(f.date))];
   const allFix    = [...ligaFix, ...liberFix].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   // Render home card early — no esperar summaries ni copa (Phase 3)
