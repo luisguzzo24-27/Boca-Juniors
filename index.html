@@ -2182,15 +2182,28 @@ function openLineup(e) {
       ? `<img class="lineup-col-logo" src="./Assets/escudo.svg">`
       : `<img class="lineup-col-logo" src="${rivalLogoSrc}" onerror="this.style.opacity=0.3">`;
     const name = isBoca ? 'Boca Juniors' : rivalName;
-    const subIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 12" width="13" height="9" style="flex-shrink:0;display:inline-block;vertical-align:middle;margin-right:3px"><polygon points="0,11 4.5,1 9,11" fill="#43A047"/><polygon points="9,1 13.5,11 18,1" fill="#E53935"/></svg>`;
-    const renderPlayers = (list, isSub) => list.map(p =>
-      `<div class="lineup-player">
-        ${isSub && p.replaces ? subIcon : ''}
+    const arrowIn  = `<span style="color:#43A047;font-size:11px;flex-shrink:0">▲</span>`;
+    const arrowOut = `<span style="color:#E53935;font-size:11px;flex-shrink:0">▼</span>`;
+    const renderPlayers = (list, isSub) => list.map(p => {
+      if (isSub && p.replaces) {
+        return `<div class="lineup-player" style="flex-direction:column;align-items:flex-start;gap:2px">
+          <div style="display:flex;align-items:center;gap:5px;width:100%">
+            ${arrowIn}
+            <span class="lineup-name">${p.name}</span>
+            ${eventIcons(p.name)}
+            ${p.clock ? `<span style="font-size:10px;color:var(--gray);margin-left:auto">${p.clock}</span>` : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:5px">
+            ${arrowOut}
+            <span class="lineup-name sub">${p.replaces}</span>
+          </div>
+        </div>`;
+      }
+      return `<div class="lineup-player">
         <span class="lineup-name${isSub ? ' sub' : ''}">${p.name}</span>
-        ${isSub && p.replaces ? `<span class="lineup-replaces">${p.replaces}</span>` : ''}
         ${eventIcons(p.name)}
-      </div>`
-    ).join('');
+      </div>`;
+    }).join('');
     return `<div class="lineup-col">
       <div class="lineup-col-header">${logoHtml}<div><div class="lineup-col-name">${name}</div><div class="lineup-formation">${team.formation}</div></div></div>
       <div class="lineup-section-lbl">Titulares</div>${renderPlayers(team.starters, false)}
