@@ -865,7 +865,9 @@ function parseLiveSummary(summary, bocaId) {
     const starters = [], subs = [];
     (rosterEntry.roster || []).forEach(p => {
       const ath = p.athlete || {};
-      const entry = { num: parseInt(ath.jersey) || 0, name: ath.shortName || ath.displayName || '' };
+      const espnName = ath.shortName || ath.displayName || '';
+      const localP = players.find(p => normName(p.short) === normName(espnName) || normName(p.name) === normName(espnName));
+      const entry = { num: parseInt(ath.jersey) || localP?.num || 0, name: espnName };
       if (p.starter) {
         starters.push(entry);
       } else if (p.subbedIn) {
