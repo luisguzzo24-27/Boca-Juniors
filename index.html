@@ -957,7 +957,7 @@ function buildStatsFromSummaries(summaryData) {
 
 async function loadData() {
   const now   = new Date();
-  const today = fmt8(now);
+  const today = fmt8(new Date(now.getTime() - 2 * 86400000)); // 2 días atrás para no perder partidos nocturnos
   const to    = fmt8(new Date(now.getTime() + 120 * 86400000)); // 4 months ahead
 
   // teamSched = all Boca liga matches this season (completed only, no 100-event limit)
@@ -2202,7 +2202,7 @@ let preMatchTimer = null;
 
 function bustFixtureCache() {
   const now = new Date();
-  const today = fmt8(now);
+  const today = fmt8(new Date(now.getTime() - 2 * 86400000));
   const to = fmt8(new Date(now.getTime() + 120 * 86400000));
   const urls = [
     `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}`,
