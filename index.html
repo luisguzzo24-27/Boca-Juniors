@@ -979,7 +979,7 @@ function updateInjuryStatus(summaryData) {
 
 async function loadInjuries() {
   try {
-    const data = await fetch('./injuries.json?_=' + Date.now()).then(r => r.json());
+    const data = await fetch('https://raw.githubusercontent.com/luisguzzo24-27/Boca-Juniors/main/injuries.json?_=' + Date.now()).then(r => r.json());
     injuries = data.injuries || [];
     // Reset all injured flags, then apply from JSON
     players.forEach(p => p.injured = false);
