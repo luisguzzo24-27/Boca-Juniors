@@ -2234,24 +2234,25 @@ function bustFixtureCache() {
 }
 
 async function refreshLive() {
-  // Refresh liviano: solo scoreboard + summary del partido en vivo
-  // No re-ejecuta loadData() completo (evita cuelgues por standings y summaries)
+  // Refresh liviano: fetch directo (sin cache) con rango corto de 3 días
   try {
     const now = new Date();
-    const today = fmt8(new Date(now.getTime() - 2 * 86400000));
-    const to    = fmt8(new Date(now.getTime() + 120 * 86400000));
+    const today = fmt8(new Date(now.getTime() - 1 * 86400000));
+    const to    = fmt8(new Date(now.getTime() + 1 * 86400000));
+    const bust  = `&_=${now.getTime()}`;
     const sbUrls = [
-      `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}`,
-      `https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=${today}-${to}`
+      `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}${bust}`,
+      `https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=${today}-${to}${bust}`
     ];
-    sbUrls.forEach(url => {
-      try { localStorage.removeItem('espnv2_' + url.replace(/\W/g, '').slice(-40)); } catch(e) {}
-    });
 
-    const [lFutFix, libFix] = await Promise.all(sbUrls.map(u => fetchCached(u, 3 * 60 * 1000)));
+    // Fetch directo sin pasar por localStorage
+    const [lFutFix, libFix] = await Promise.all(sbUrls.map(u =>
+      fetch(u).then(r => r.json()).catch(() => null)
+    ));
     const allSbEvents = [...(lFutFix?.events || []), ...(libFix?.events || [])];
 
     if (liveData?.allFix) {
+      const liveEvents = [];
       for (const ev of allSbEvents) {
         const c = ev.competitions?.[0];
         if (!c) continue;
@@ -2268,18 +2269,15 @@ async function refreshLive() {
         f.period = inProgress ? (c.status?.period || 1) : null;
         f.bScore = (completed || inProgress) ? getScore(bocaT?.score) : null;
         f.rScore = (completed || inProgress) ? getScore(rival?.score) : null;
+        if (inProgress) liveEvents.push(f);
       }
 
-      // Actualizar summary del partido en vivo
-      const liveEvents = liveData.allFix.filter(f => f.inProgress);
+      // Actualizar summary del partido en vivo (fetch directo)
       if (liveEvents.length) {
-        const summaryUrls = liveEvents.map(f =>
-          `https://site.api.espn.com/apis/site/v2/sports/soccer/${f.league}/summary?event=${f.eventId}`
-        );
-        summaryUrls.forEach(url => {
-          try { localStorage.removeItem('espnv2_' + url.replace(/\W/g, '').slice(-40)); } catch(e) {}
-        });
-        const summaries = await Promise.all(summaryUrls.map(u => fetchCached(u, 30000)));
+        const summaries = await Promise.all(liveEvents.map(f =>
+          fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${f.league}/summary?event=${f.eventId}${bust}`)
+            .then(r => r.json()).catch(() => null)
+        ));
         liveEvents.forEach((f, i) => {
           const p = parseLiveSummary(summaries[i], BOCA_ID);
           f.events = p.events;
@@ -2288,17 +2286,36 @@ async function refreshLive() {
       }
     }
 
-    renderFixture();
+    renderLiveUI();
     checkLiveTimer();
   } catch(e) { console.warn('refreshLive error:', e); }
+}
+
+function renderLiveUI() {
+  // Render liviano: solo actualiza home card y detalle del fixture seleccionado
+  const allFix = liveData?.allFix || [];
+  const now = new Date();
+  const liveMatch = allFix.find(f => f.inProgress);
+  currentLineup = liveMatch?.lineup || null;
+  currentLiveMatch = liveMatch || null;
+  const proximo = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now);
+  const homeMatch = liveMatch || proximo;
+  const homeEl = document.getElementById('homeProximo');
+  if (homeEl && homeMatch) homeEl.innerHTML = buildFixtureCard(homeMatch, !liveMatch);
+
+  // Re-render detalle del día seleccionado en el calendario (si tiene el partido live)
+  if (calSelectedDate && calFixByDate[calSelectedDate]) {
+    const detail = document.getElementById('calDetail');
+    if (detail) detail.innerHTML = calFixByDate[calSelectedDate].map(f => buildFixtureCard(f, false, true)).join('');
+  }
 }
 
 function checkLiveTimer() {
   const hasLive = liveData?.allFix?.some(f => f.inProgress);
 
   if (hasLive) {
-    // Partido en vivo → 45s
-    if (!liveTimer) liveTimer = setInterval(refreshLive, 45000);
+    // Partido en vivo → 15s
+    if (!liveTimer) liveTimer = setInterval(refreshLive, 15000);
     if (preMatchTimer) { clearInterval(preMatchTimer); preMatchTimer = null; }
   } else {
     if (liveTimer) { clearInterval(liveTimer); liveTimer = null; }
