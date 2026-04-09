@@ -957,6 +957,35 @@ function buildStatsFromSummaries(summaryData) {
   return stats;
 }
 
+function updateInjuryStatus(summaryData) {
+  const lookup = buildNameLookup();
+  const recentRosters = summaryData
+    .filter(d => d.summary?.header?.competitions?.[0]?.status?.type?.completed)
+    .map(d => ({
+      date: d.summary.header.competitions[0].date,
+      roster: d.summary.rosters?.find(r => r.team?.id === BOCA_ID)?.roster || []
+    }))
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 3);
+
+  const recentFiles = new Set();
+  for (const { roster } of recentRosters) {
+    for (const p of roster) {
+      if (p.active === false) continue;
+      const name = p.athlete?.displayName || '';
+      const file = resolvePlayer(name, lookup);
+      if (file) recentFiles.add(file);
+    }
+  }
+
+  players.forEach(p => {
+    if (p.injured && recentFiles.has(p.file)) p.injured = false;
+  });
+  for (let i = injuries.length - 1; i >= 0; i--) {
+    if (recentFiles.has(injuries[i].file)) injuries.splice(i, 1);
+  }
+}
+
 async function loadData() {
   const now   = new Date();
   const today = fmt8(new Date(now.getTime() - 2 * 86400000)); // 2 días atrás para no perder partidos nocturnos
@@ -1050,6 +1079,7 @@ async function loadData() {
   );
   const summaries = summaryData.map(d => d.summary);
   const playerStats = buildStatsFromSummaries(summaryData);
+  updateInjuryStatus(summaryData);
 
   // Libertadores group (Boca's group)
   let bocaGroup = [];
@@ -2396,6 +2426,9 @@ function checkLiveTimer() {
       else if (activeStat === 'tarjetas') renderStatsTarjetas();
       else renderStats(activeStat || 'goles');
     }
+    // Re-render plantel y lesionados con injury status actualizado
+    renderPlantel();
+    renderInjuries();
     renderTables(liveData);
     renderFixture();
     jumpToNextMatch();
