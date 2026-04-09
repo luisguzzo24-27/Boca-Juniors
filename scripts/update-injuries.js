@@ -178,5 +178,7 @@ async function main() {
 
 main().catch(e => {
   console.error('Error:', e.message);
-  process.exit(1);
+  // Don't fail the workflow — keep existing injuries.json
+  console.log('Keeping existing injuries.json unchanged.');
+  process.exit(0);
 });
