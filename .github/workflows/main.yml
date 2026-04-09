@@ -1,4 +1,4 @@
- name: Update Injuries
+name: Update Injuries
 
   on:
     schedule:
