@@ -1093,12 +1093,14 @@ async function loadData() {
   libGroups.forEach(group => {
     const entries = group.standings?.entries || group.entries || [];
     if (entries.some(e => e.team?.id === BOCA_ID)) {
-      bocaGroup = entries.map((e, i) => ({
-        pos: i + 1, name: e.team.displayName, espnId: e.team.id,
+      bocaGroup = entries.map(e => ({
+        name: e.team.displayName, espnId: e.team.id,
         pj: getStat(e, 'gamesPlayed'), g: getStat(e, 'wins'), p: getStat(e, 'losses'),
         gd: getStat(e, 'pointsFor') - getStat(e, 'pointsAgainst'),
         pts: getStat(e, 'points'), boca: e.team.id === BOCA_ID
       }));
+      bocaGroup.sort((a, b) => b.pts - a.pts || b.gd - a.gd);
+      bocaGroup.forEach((t, i) => t.pos = i + 1);
     }
   });
 
