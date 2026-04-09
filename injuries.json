@@ -1,0 +1,12 @@
+{
+  "updated": "2026-04-09",
+  "source": "BeSoccer + ESPN",
+  "injuries": [
+    { "file": "Rodrigo_Battaglia",  "name": "Rodrigo Battaglia",  "num": 6,  "injury": "Tendón de Aquiles (cirugía)", "eta": "Julio 2026",     "sev": "high"   },
+    { "file": "Edinson_Cavani",     "name": "Edinson Cavani",     "num": 10, "injury": "Lesión en la espalda",        "eta": "Julio 2026",     "sev": "high"   },
+    { "file": "Agustin_Marchesin",  "name": "Agustín Marchesín",  "num": 1,  "injury": "Lesión muscular",             "eta": "Sin fecha",      "sev": "medium" },
+    { "file": "Carlos_Palacios",    "name": "Carlos Palacios",    "num": 8,  "injury": "Operación rodilla (menisco)", "eta": "Fin abril 2026", "sev": "medium" },
+    { "file": "Exequiel_Zeballos",  "name": "Exequiel Zeballos",  "num": 7,  "injury": "Lesión isquiotibiales",       "eta": "~1 mes",         "sev": "medium" },
+    { "file": "Miguel_Merentiel",   "name": "Miguel Merentiel",   "num": 16, "injury": "Lesión inguinal",             "eta": "Sin fecha",      "sev": "medium" }
+  ]
+}

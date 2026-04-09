@@ -571,13 +571,13 @@
 // ===== STATIC DATA =====
 const players = [
   // sk orden: ARQ→[DIV,HAN,KIC,REF,SPD,POS] | resto→[RIT,TIR,PAS,REG,DEF,FIS] — forma Apertura 2026
-  { name:'Agustín Marchesín', short:'Marchesín', num:1,  pos:'ARQ', file:'Agustin_Marchesin',  pj:11, tit:11, goles:0, asist:0, min:982,  injured:true, sk:[84,80,74,85,56,86] },
+  { name:'Agustín Marchesín', short:'Marchesín', num:1,  pos:'ARQ', file:'Agustin_Marchesin',  pj:11, tit:11, goles:0, asist:0, min:982,  sk:[84,80,74,85,56,86] },
   { name:'Leandro Brey',       short:'Brey',       num:12, pos:'ARQ', file:'Leandro_Brey',       pj:2,  tit:1,  goles:0, asist:0, min:98,               sk:[72,70,60,74,34,74] },
   { name:'Javier García',      short:'J. García',  num:13, pos:'ARQ', file:'Javier_Garcia',      pj:0,  tit:0,  goles:0, asist:0, min:0,                sk:[76,70,72,74,40,72] },
   { name:'Lautaro Di Lollo',   short:'Di Lollo',   num:2,  pos:'DEF', file:'Lautaro_Di_Lollo',   pj:11, tit:11, goles:1, asist:0, min:990,              sk:[72,48,66,68,74,80] },
   { name:'Lautaro Blanco',     short:'L. Blanco',  num:3,  pos:'DEF', file:'Lautaro_Blanco',     pj:11, tit:11, goles:1, asist:0, min:990,              sk:[80,58,74,76,74,80] },
   { name:'Nicolás Figal',      short:'Figal',      num:4,  pos:'DEF', file:'Nicolas_Figal',      pj:1,  tit:1,  goles:0, asist:0, min:90,               sk:[72,48,66,68,78,80] },
-  { name:'Rodrigo Battaglia',  short:'Battaglia',  num:6,  pos:'DEF', file:'Rodrigo_Battaglia',  pj:0,  tit:0,  goles:0, asist:0, min:0,   injured:true, sk:[66,55,70,68,80,80] },
+  { name:'Rodrigo Battaglia',  short:'Battaglia',  num:6,  pos:'DEF', file:'Rodrigo_Battaglia',  pj:0,  tit:0,  goles:0, asist:0, min:0,   sk:[66,55,70,68,80,80] },
   { name:'Malcom Braida',      short:'Braida',     num:27, pos:'DEF', file:'Malcom_Braida',      pj:2,  tit:1,  goles:0, asist:0, min:93,               sk:[78,58,70,74,72,76] },
   { name:'Marcelo Weigandt',   short:'Weigandt',   num:23, pos:'DEF', file:'Marcelo_Weigandt',   pj:9,  tit:7,  goles:0, asist:0, min:656,              sk:[80,55,70,72,74,74] },
   { name:'Juan Barinaga',      short:'Barinaga',   num:24, pos:'DEF', file:'Juan_Barinaga',      pj:5,  tit:5,  goles:0, asist:0, min:409,              sk:[70,46,64,65,70,72] },
@@ -585,25 +585,25 @@ const players = [
   { name:'Ayrton Costa',       short:'A. Costa',   num:32, pos:'DEF', file:'Ayrton_Costa',       pj:11, tit:11, goles:0, asist:0, min:990,              sk:[74,50,68,70,78,74] },
   { name:'Dylan Gorosito',     short:'Gorosito',   num:48, pos:'DEF', file:'Dylan_Gorosito',     pj:1,  tit:0,  goles:0, asist:0, min:16,               sk:[64,36,52,58,60,60] },
   { name:'Leandro Paredes',    short:'Paredes',    num:5,  pos:'MED', file:'Leandro_Paredes',    pj:10, tit:9,  goles:1, asist:3, min:835,              sk:[66,74,88,84,76,76] },
-  { name:'Carlos Palacios',    short:'Palacios',   num:8,  pos:'MED', file:'Carlos_Palacios',    pj:0,  tit:0,  goles:0, asist:0, min:0,   injured:true, sk:[86,74,76,82,56,68] },
+  { name:'Carlos Palacios',    short:'Palacios',   num:8,  pos:'MED', file:'Carlos_Palacios',    pj:0,  tit:0,  goles:0, asist:0, min:0,   sk:[86,74,76,82,56,68] },
   { name:'Williams Alarcón',   short:'Alarcón',    num:15, pos:'MED', file:'Williams_Alarcon',   pj:5,  tit:5,  goles:0, asist:0, min:340,              sk:[72,62,72,74,68,74] },
   { name:'Milton Delgado',     short:'M. Delgado', num:18, pos:'MED', file:'Milton_Delgado',     pj:11, tit:8,  goles:0, asist:1, min:698,              sk:[78,66,76,74,84,86] },
   { name:'Agustín Martegani',  short:'Martegani',  num:19, pos:'MED', file:'Agustin_Martegani',  pj:0,  tit:0,  goles:0, asist:0, min:0,                sk:[72,66,74,74,62,66] },
   { name:'Alan Velasco',       short:'A. Velasco', num:20, pos:'MED', file:'Alan_Velasco',       pj:3,  tit:1,  goles:0, asist:0, min:99,               sk:[82,70,72,80,56,64] },
   { name:'Ander Herrera',      short:'A. Herrera', num:21, pos:'MED', file:'Ander_Herrera',      pj:6,  tit:3,  goles:0, asist:0, min:320,              sk:[64,70,80,78,78,74] },
   { name:'Kevin Zenón',        short:'Zenón',      num:22, pos:'MED', file:'Kevin_Zenon',        pj:4,  tit:2,  goles:0, asist:0, min:216,              sk:[84,68,78,78,64,70] },
-  { name:'Santiago Ascacíbar', short:'Ascacíbar',  num:25, pos:'MED', file:'Santiago_Ascacibar', pj:10, tit:9,  goles:2, asist:0, min:687, injured:true, sk:[70,68,70,66,82,84] },
-  { name:'Tomás Belmonte',     short:'Belmonte',   num:30, pos:'MED', file:'Tomas_Belmonte',     pj:6,  tit:4,  goles:0, asist:0, min:339, injured:true, sk:[72,66,70,72,74,84] },
+  { name:'Santiago Ascacíbar', short:'Ascacíbar',  num:25, pos:'MED', file:'Santiago_Ascacibar', pj:10, tit:9,  goles:2, asist:0, min:687, sk:[70,68,70,66,82,84] },
+  { name:'Tomás Belmonte',     short:'Belmonte',   num:30, pos:'MED', file:'Tomas_Belmonte',     pj:6,  tit:4,  goles:0, asist:0, min:339, sk:[72,66,70,72,74,84] },
   { name:'Tomás Aranda',       short:'T. Aranda',  num:36, pos:'MED', file:'Tomas_Aranda',       pj:10, tit:4,  goles:1, asist:0, min:462,              sk:[78,70,78,76,70,76] },
   { name:'Camilo Rey Domenech',short:'Rey D.',     num:38, pos:'MED', file:'Camilo_Rey_Domenech',pj:1,  tit:0,  goles:0, asist:0, min:4,                sk:[68,55,64,62,64,64] },
   { name:'Joaquín Ruiz',       short:'J. Ruiz',    num:53, pos:'MED', file:'Joaquin_Ruiz',       pj:0,  tit:0,  goles:0, asist:0, min:0,                sk:[70,58,64,66,62,66] },
-  { name:'Exequiel Zeballos',  short:'Zeballos',   num:7,  pos:'DEL', file:'Exequiel_Zeballos',  pj:3,  tit:3,  goles:1, asist:1, min:270, injured:true, sk:[94,78,74,90,38,58] },
-  { name:'Milton Giménez',     short:'M. Giménez', num:9,  pos:'DEL', file:'Milton_Gimenez',     pj:0,  tit:0,  goles:0, asist:0, min:0,   injured:true, sk:[74,76,56,70,36,80] },
-  { name:'Edinson Cavani',     short:'Cavani',     num:10, pos:'DEL', file:'Edinson_Cavani',     pj:2,  tit:1,  goles:0, asist:0, min:104, injured:true, sk:[58,84,72,74,54,74] },
+  { name:'Exequiel Zeballos',  short:'Zeballos',   num:7,  pos:'DEL', file:'Exequiel_Zeballos',  pj:3,  tit:3,  goles:1, asist:1, min:270, sk:[94,78,74,90,38,58] },
+  { name:'Milton Giménez',     short:'M. Giménez', num:9,  pos:'DEL', file:'Milton_Gimenez',     pj:0,  tit:0,  goles:0, asist:0, min:0,   sk:[74,76,56,70,36,80] },
+  { name:'Edinson Cavani',     short:'Cavani',     num:10, pos:'DEL', file:'Edinson_Cavani',     pj:2,  tit:1,  goles:0, asist:0, min:104, sk:[58,84,72,74,54,74] },
   { name:'Lucas Janson',       short:'Janson',     num:11, pos:'DEL', file:'Lucas_Janson',       pj:4,  tit:4,  goles:0, asist:1, min:260,              sk:[86,70,66,76,42,66] },
   { name:'Miguel Merentiel',   short:'Merentiel',  num:16, pos:'DEL', file:'Miguel_Merentiel',   pj:9,  tit:8,  goles:4, asist:1, min:680,              sk:[84,80,62,78,40,82] },
   { name:'Adam Bareiro',       short:'Bareiro',    num:28, pos:'DEL', file:'Adam_Bareiro',       pj:6,  tit:6,  goles:3, asist:1, min:516,              sk:[78,80,64,74,42,80] },
-  { name:'Ángel Romero',       short:'Á. Romero',  num:29, pos:'DEL', file:'Angel_Romero',       pj:5,  tit:2,  goles:0, asist:0, min:213, injured:true, sk:[80,74,68,78,44,72] },
+  { name:'Ángel Romero',       short:'Á. Romero',  num:29, pos:'DEL', file:'Angel_Romero',       pj:5,  tit:2,  goles:0, asist:0, min:213, sk:[80,74,68,78,44,72] },
   { name:'Gonzalo Gelini',     short:'Gelini',     num:37, pos:'DEL', file:'Gonzalo_Gelini',     pj:5,  tit:2,  goles:0, asist:1, min:184,              sk:[74,68,64,70,40,66] },
   { name:'Iker Zufiaurre',     short:'Zufiaurre',  num:41, pos:'DEL', file:'Iker_Zufiaurre',     pj:10, tit:2,  goles:1, asist:0, min:236,              sk:[76,70,64,72,38,68] },
   { name:'Juan Cruz Payal',    short:'Payal',      num:46, pos:'DEL', file:'Juan_Cruz_Payal',    pj:0,  goles:0, asist:0, min:0,                sk:[72,64,60,68,36,64] },
@@ -652,17 +652,8 @@ const fichas = {
   'Iker_Zufiaurre':     { born:'7 de agosto de 2005',       birthPlace:'Río Cuarto, Córdoba',           nationality:'Argentino',  height:'1,78 m', from:'Inferiores',                   debut:'Nacional (Bol) 0 - Boca 0, Copa Sudamericana 2024 (3/4/2024)' },
 };
 
-const injuries = [
-  { name:'Rodrigo Battaglia',  file:'Rodrigo_Battaglia',  num:6,  injury:'Cirugía tendón de Aquiles', eta:'6-8 meses',       sev:'high'   },
-  { name:'Agustín Marchesín',  file:'Agustin_Marchesin',  num:1,  injury:'Desgarro aductor grado 3',  eta:'~6 semanas',       sev:'high'   },
-  { name:'Edinson Cavani',     file:'Edinson_Cavani',     num:10, injury:'Lumbalgia recurrente',       eta:'2-3 semanas',      sev:'medium' },
-  { name:'Carlos Palacios',    file:'Carlos_Palacios',    num:8,  injury:'Sinovitis de rodilla',       eta:'Fin mar/abr',      sev:'medium' },
-  { name:'Milton Giménez',     file:'Milton_Gimenez',     num:9,  injury:'Pubalgia (postoperatorio)',  eta:'Fin mar/abr',      sev:'medium' },
-  { name:'Ángel Romero',       file:'Angel_Romero',       num:29, injury:'Lesión muscular',            eta:'Fin mar/abr',      sev:'medium' },
-  { name:'Santiago Ascacíbar', file:'Santiago_Ascacibar', num:25, injury:'Lesión muscular',            eta:'Sin fecha',        sev:'medium' },
-  { name:'Tomás Belmonte',     file:'Tomas_Belmonte',     num:30, injury:'En recuperación',            eta:'Sin fecha',        sev:'medium' },
-  { name:'Exequiel Zeballos',  file:'Exequiel_Zeballos',  num:7,  injury:'Desgarro grado 2',           eta:'Próximo a volver', sev:'low'    },
-];
+// Injuries loaded dynamically from injuries.json (updated by scheduled agent)
+let injuries = [];
 
 const staff = [
   { name: 'Claudio Úbeda',      short: 'Úbeda',     role: 'DT',             file: 'Claudio_Ubeda'      },
@@ -983,6 +974,21 @@ function updateInjuryStatus(summaryData) {
   });
   for (let i = injuries.length - 1; i >= 0; i--) {
     if (recentFiles.has(injuries[i].file)) injuries.splice(i, 1);
+  }
+}
+
+async function loadInjuries() {
+  try {
+    const data = await fetch('./injuries.json?_=' + Date.now()).then(r => r.json());
+    injuries = data.injuries || [];
+    // Reset all injured flags, then apply from JSON
+    players.forEach(p => p.injured = false);
+    injuries.forEach(inj => {
+      const p = players.find(x => x.file === inj.file);
+      if (p) p.injured = true;
+    });
+  } catch(e) {
+    console.warn('Could not load injuries.json:', e);
   }
 }
 
@@ -2389,6 +2395,7 @@ function checkLiveTimer() {
     if (activeNav) moveNavPill(activeNav, false);
   });
 
+  await loadInjuries();
   renderPlantel();
   renderAvgAge();
   renderInjuries();
