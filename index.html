@@ -254,12 +254,30 @@
     .fix-grupo-match .hl { color:var(--gold); }
 
     /* HOME */
-    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100%; padding:0 20px; text-align:center; }
-    .home-escudo { width:140px; height:auto; filter:drop-shadow(0 8px 32px rgba(249,190,61,0.25)); margin-bottom:24px; animation:escudoPulse 3s ease-in-out infinite; }
+    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100%; padding:0 20px; text-align:center; position:relative; overflow:hidden; }
+    .home-aurora { position:absolute; inset:-60% -40%; width:180%; height:220%; pointer-events:none; z-index:0; }
+    .home-aurora-a { position:absolute; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle, rgba(249,190,61,0.14) 0%, transparent 70%); top:8%; left:15%; animation:auroraA 7s ease-in-out infinite; }
+    .home-aurora-b { position:absolute; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle, rgba(34,57,107,0.35) 0%, transparent 70%); top:20%; right:10%; animation:auroraB 9s ease-in-out infinite; }
+    .home-aurora-c { position:absolute; width:280px; height:280px; border-radius:50%; background:radial-gradient(circle, rgba(249,190,61,0.10) 0%, transparent 70%); bottom:15%; left:30%; animation:auroraC 11s ease-in-out infinite; }
+    @keyframes auroraA { 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(30px,-20px) scale(1.15); } }
+    @keyframes auroraB { 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(-25px,30px) scale(1.1); } }
+    @keyframes auroraC { 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(20px,-25px) scale(1.2); } }
+    .home-particles { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .home-particle { position:absolute; width:3px; height:3px; border-radius:50%; background:var(--gold); opacity:0; animation:particleFloat linear infinite; }
+    .home-particle:nth-child(1) { left:15%; animation-duration:6s; animation-delay:0s; }
+    .home-particle:nth-child(2) { left:35%; animation-duration:8s; animation-delay:1.5s; width:2px; height:2px; }
+    .home-particle:nth-child(3) { left:55%; animation-duration:7s; animation-delay:3s; }
+    .home-particle:nth-child(4) { left:75%; animation-duration:9s; animation-delay:0.8s; width:2px; height:2px; }
+    .home-particle:nth-child(5) { left:25%; animation-duration:10s; animation-delay:4s; }
+    .home-particle:nth-child(6) { left:65%; animation-duration:7.5s; animation-delay:2s; width:4px; height:4px; }
+    .home-particle:nth-child(7) { left:45%; animation-duration:8.5s; animation-delay:5s; width:2px; height:2px; }
+    .home-particle:nth-child(8) { left:85%; animation-duration:6.5s; animation-delay:3.5s; }
+    @keyframes particleFloat { 0%{ transform:translateY(100vh) scale(0); opacity:0; } 10%{ opacity:0.6; } 90%{ opacity:0.3; } 100%{ transform:translateY(-20vh) scale(1); opacity:0; } }
+    .home-escudo { width:140px; height:auto; filter:drop-shadow(0 8px 32px rgba(249,190,61,0.25)); margin-bottom:24px; animation:escudoPulse 3s ease-in-out infinite; position:relative; z-index:1; }
     @keyframes escudoPulse { 0%,100%{ filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); } 50%{ filter:drop-shadow(0 8px 48px rgba(249,190,61,0.45)); } }
-    .home-frase { font-size:28px; font-weight:700; letter-spacing:0.36px; line-height:1.21; color:var(--gold); margin-bottom:6px; }
-    .home-sub { font-size:11px; font-weight:500; color:var(--blue-light); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:28px; }
-    .home-divider { width:48px; height:2px; background:var(--gold); border-radius:1px; margin:0 auto 24px; opacity:0.4; }
+    .home-frase { font-size:28px; font-weight:700; letter-spacing:0.36px; line-height:1.21; color:var(--gold); margin-bottom:6px; position:relative; z-index:1; }
+    .home-sub { font-size:11px; font-weight:500; color:var(--blue-light); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:28px; position:relative; z-index:1; }
+    .home-divider { width:48px; height:2px; background:var(--gold); border-radius:1px; margin:0 auto 24px; opacity:0.4; position:relative; z-index:1; }
     .home-widgets { display:flex; flex-direction:column; gap:6px; width:100%; }
     .home-widget { background:var(--bg-card); border:1px solid var(--blue-mid); border-radius:8px; padding:8px 12px; display:flex; align-items:center; gap:10px; text-align:left; }
     .hw-badge { flex-shrink:0; padding:2px 6px; border-radius:3px; font-size:10px; font-weight:700; letter-spacing:0.3px; text-transform:uppercase; }
@@ -317,11 +335,13 @@
     <!-- HOME -->
     <section id="tab-home" class="tab active">
       <div class="home-wrap">
+        <div class="home-aurora"><div class="home-aurora-a"></div><div class="home-aurora-b"></div><div class="home-aurora-c"></div></div>
+        <div class="home-particles"><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div></div>
         <img class="home-escudo" src="./Assets/escudo.svg" alt="Escudo CABJ">
         <div class="home-frase">Boca no teme luchar</div>
         <div class="home-sub">Club Atlético Boca Juniors</div>
         <div class="home-divider"></div>
-        <div id="homeProximo" style="width:100%;margin-bottom:16px"></div>
+        <div id="homeProximo" style="width:100%;margin-bottom:16px;position:relative;z-index:1"></div>
       </div>
     </section>
 
