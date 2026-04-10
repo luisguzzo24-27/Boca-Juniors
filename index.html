@@ -683,6 +683,10 @@ function getScore(s) {
 
 function fmt8(d) { return d.toISOString().slice(0, 10).replace(/-/g, ''); }
 
+function toAR(iso) {
+  const d = new Date(new Date(iso).getTime() - 3 * 3600000);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
 function fmtDateShort(iso) {
   const d = new Date(new Date(iso).getTime() - 3 * 3600000);
   const M = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -1548,7 +1552,7 @@ function jumpToNextMatch() {
   const next = liveData.allFix.find(f => f.inProgress) ||
                liveData.allFix.find(f => !f.completed && new Date(f.date) >= now);
   if (!next) return;
-  const dateStr = next.date.slice(0, 10);
+  const dateStr = toAR(next.date);
   const [y, m] = dateStr.split('-').map(Number);
   const targetMonth = m - 1;
   if (y !== calActiveYear || targetMonth !== calActiveMonth) {
@@ -1679,7 +1683,7 @@ function buildCalendar() {
 
   calFixByDate = {};
   allFix.forEach(f => {
-    const d = f.date.slice(0, 10);
+    const d = toAR(f.date);
     if (!calFixByDate[d]) calFixByDate[d] = [];
     calFixByDate[d].push(f);
   });
