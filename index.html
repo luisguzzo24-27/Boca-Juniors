@@ -254,8 +254,9 @@
     .fix-grupo-match .hl { color:var(--gold); }
 
     /* HOME */
-    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; min-height:100%; padding:32px 20px 0; text-align:center; position:relative; overflow:hidden; }
-    .home-aurora { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; filter:blur(60px); }
+    #tab-home { position:relative; }
+    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; min-height:100%; padding:32px 20px 0; text-align:center; position:relative; }
+    .home-aurora { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; filter:blur(60px); }
     .home-aurora-a { position:absolute; width:55%; height:45%; border-radius:50%; background:rgba(249,190,61,0.22); top:-10%; left:-15%; animation:auroraA 14s ease-in-out infinite; }
     .home-aurora-b { position:absolute; width:50%; height:50%; border-radius:50%; background:rgba(34,57,107,0.45); top:10%; right:-20%; animation:auroraB 18s ease-in-out infinite; }
     .home-aurora-c { position:absolute; width:45%; height:40%; border-radius:50%; background:rgba(249,190,61,0.18); bottom:5%; left:20%; animation:auroraC 16s ease-in-out infinite; }
@@ -268,7 +269,7 @@
     @keyframes auroraD { 0%{ transform:translate(0,0) scale(1) rotate(0deg); } 33%{ transform:translate(-50px,-70px) scale(1.1) rotate(-6deg); } 66%{ transform:translate(60px,-40px) scale(1.2) rotate(10deg); } 100%{ transform:translate(0,0) scale(1) rotate(0deg); } }
     @keyframes auroraE { 0%{ transform:translate(0,0) scale(1) rotate(0deg); } 33%{ transform:translate(50px,70px) scale(1.3) rotate(8deg); } 66%{ transform:translate(90px,-20px) scale(1.1) rotate(-12deg); } 100%{ transform:translate(0,0) scale(1) rotate(0deg); } }
     @keyframes auroraF { 0%{ transform:translate(0,0) scale(1) rotate(0deg); } 33%{ transform:translate(-70px,50px) scale(1.2) rotate(-10deg); } 66%{ transform:translate(-20px,90px) scale(0.9) rotate(6deg); } 100%{ transform:translate(0,0) scale(1) rotate(0deg); } }
-    .home-particles { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .home-particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
     .home-particle { position:absolute; width:3px; height:3px; border-radius:50%; background:var(--gold); opacity:0; animation:particleFloat linear infinite; }
     .home-particle:nth-child(1) { left:15%; animation-duration:6s; animation-delay:0s; }
     .home-particle:nth-child(2) { left:35%; animation-duration:8s; animation-delay:1.5s; width:2px; height:2px; }
@@ -341,9 +342,9 @@
   <main>
     <!-- HOME -->
     <section id="tab-home" class="tab active">
+      <div class="home-aurora"><div class="home-aurora-a"></div><div class="home-aurora-b"></div><div class="home-aurora-c"></div><div class="home-aurora-d"></div><div class="home-aurora-e"></div><div class="home-aurora-f"></div></div>
+      <div class="home-particles"><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div></div>
       <div class="home-wrap">
-        <div class="home-aurora"><div class="home-aurora-a"></div><div class="home-aurora-b"></div><div class="home-aurora-c"></div><div class="home-aurora-d"></div><div class="home-aurora-e"></div><div class="home-aurora-f"></div></div>
-        <div class="home-particles"><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div><div class="home-particle"></div></div>
         <img class="home-escudo" src="./Assets/escudo.svg" alt="Escudo CABJ">
         <div class="home-frase">Boca no teme luchar</div>
         <div class="home-sub">Club Atlético Boca Juniors</div>
