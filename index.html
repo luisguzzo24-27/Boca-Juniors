@@ -338,50 +338,9 @@
         <div class="home-sub">Club Atlético Boca Juniors</div>
         <div class="home-divider"></div>
         <div id="homeProximo" style="width:100%;margin-bottom:16px"></div>
-        <button id="installBanner" onclick="openInstallSheet()" style="width:100%;background:rgba(249,190,61,0.08);border:1px solid rgba(249,190,61,0.25);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-bottom:8px">
-          <span style="font-size:26px;flex-shrink:0">📲</span>
-          <div style="flex:1;text-align:left">
-            <div style="font-size:15px;font-weight:700;color:var(--white);letter-spacing:-0.24px">Agregá la app</div>
-            <div style="font-size:12px;color:var(--gray);margin-top:2px">Accedé rápido desde tu pantalla de inicio</div>
-          </div>
-          <span style="font-size:18px;color:var(--gold);flex-shrink:0">›</span>
-        </button>
       </div>
     </section>
 
-    <!-- INSTALL SHEET -->
-    <div id="installOverlay" class="modal-overlay" onclick="closeInstallSheet()"></div>
-    <div id="installSheet" class="modal-sheet" style="padding-bottom:env(safe-area-inset-bottom)">
-      <div class="modal-drag"></div>
-      <div style="padding:20px 20px 32px">
-        <div style="font-size:20px;font-weight:700;letter-spacing:-0.37px;margin-bottom:4px">Agregá la app 📲</div>
-        <div style="font-size:14px;color:var(--gray);margin-bottom:24px">Seguí estos pasos para instalarla en tu celular</div>
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div style="display:flex;align-items:center;gap:14px">
-            <div style="width:36px;height:36px;border-radius:50%;background:rgba(249,190,61,0.12);border:1px solid rgba(249,190,61,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gold);flex-shrink:0">1</div>
-            <div>
-              <div style="font-size:15px;font-weight:600;color:var(--white)">Abrí el link en Safari</div>
-              <div style="font-size:13px;color:var(--gray);margin-top:2px">Si venís de Instagram, tocá los 3 puntitos y "Abrir en Safari"</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:14px">
-            <div style="width:36px;height:36px;border-radius:50%;background:rgba(249,190,61,0.12);border:1px solid rgba(249,190,61,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gold);flex-shrink:0">2</div>
-            <div>
-              <div style="font-size:15px;font-weight:600;color:var(--white)">Tocá el ícono de compartir</div>
-              <div style="font-size:13px;color:var(--gray);margin-top:2px">El botón <span style="color:var(--white)">⎙</span> en la barra de abajo de Safari</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:14px">
-            <div style="width:36px;height:36px;border-radius:50%;background:rgba(249,190,61,0.12);border:1px solid rgba(249,190,61,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--gold);flex-shrink:0">3</div>
-            <div>
-              <div style="font-size:15px;font-weight:600;color:var(--white)">Tocá "Agregar a inicio"</div>
-              <div style="font-size:13px;color:var(--gray);margin-top:2px">Scrolleá en el menú hasta encontrar la opción y tocá Agregar</div>
-            </div>
-          </div>
-        </div>
-        <button onclick="closeInstallSheet()" style="width:100%;margin-top:28px;padding:16px;background:var(--gold);border:none;border-radius:14px;font-size:16px;font-weight:700;color:var(--bg);cursor:pointer">Entendido</button>
-      </div>
-    </div>
 
     <!-- PLANTEL -->
     <section id="tab-plantel" class="tab">
@@ -1145,14 +1104,6 @@ function doTabSwitch(newTab) {
   afterTabSwitch(newTab);
 }
 
-function openInstallSheet() {
-  document.getElementById('installOverlay').classList.add('open');
-  document.getElementById('installSheet').classList.add('open');
-}
-function closeInstallSheet() {
-  document.getElementById('installOverlay').classList.remove('open');
-  document.getElementById('installSheet').classList.remove('open');
-}
 
 function afterTabSwitch(tab) {
   if (tab === 'fixture') setTimeout(() => jumpToNextMatch(), 50);
