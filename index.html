@@ -78,7 +78,6 @@
     .player-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 4px 12px; }
     .player-card { border-radius: 14px; overflow: hidden; position: relative; cursor: pointer; transition: transform 0.15s; aspect-ratio: 3/4; box-shadow: 0 2px 16px rgba(0,0,0,0.35), 0 0 18px rgba(22,40,80,0.2); }
     .player-card:active { transform: scale(0.96); }
-    .player-card.injured::after { content: ''; position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; background: var(--alert); border-radius: 50%; box-shadow: 0 0 6px rgba(230,81,0,0.6); z-index: 3; }
     .player-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; background: var(--blue); }
     .player-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 8px 8px; background: linear-gradient(to top, rgba(6,14,26,0.92) 0%, rgba(17,40,68,0.6) 50%, transparent 100%); z-index: 2; }
     .player-num { font-size: 10px; font-weight: 600; color: var(--gold); letter-spacing: 0.06em; text-transform: uppercase; }
@@ -161,17 +160,6 @@
     .stat-pj-total { font-size: 13px; font-weight: 700; color: var(--gold); line-height: 1; text-align: center; white-space: nowrap; letter-spacing: -0.08px; }
     .stat-pj-pct { font-size: 10px; font-weight: 500; color: var(--gray); text-align: center; letter-spacing: 0.12px; margin-top: 2px; text-transform: uppercase; }
 
-    /* LESIONADOS */
-    .injury-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
-    .injury-card { background: var(--bg-card); border-radius: var(--radius); padding: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--blue-mid); border-left-width: 3px; }
-    .injury-card.sev-high { border-left-color: var(--alert); }
-    .injury-card.sev-medium { border-left-color: var(--orange); }
-    .injury-card.sev-low { border-left-color: var(--green); }
-    .injury-photo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; object-position: top; flex-shrink: 0; background: var(--blue); }
-    .injury-info { flex: 1; min-width: 0; }
-    .injury-name { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .injury-type { font-size: 13px; font-weight: 400; color: var(--gray); margin-top: 2px; letter-spacing: -0.08px; }
-    .injury-eta { text-align: right; flex-shrink: 0; max-width: 80px; }
     .eta-label { font-size: 10px; font-weight: 500; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; }
     .eta-value { font-size: 13px; font-weight: 600; line-height: 1.38; letter-spacing: -0.08px; }
     .sev-high .eta-value { color: var(--alert); }
@@ -304,10 +292,6 @@
     .modal-stat-box { background:rgba(255,255,255,0.08); backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%); border-radius:12px; padding:12px 8px; text-align:center; border:0.5px solid rgba(255,255,255,0.1); box-shadow:inset 0 0.5px 0 rgba(255,255,255,0.15); }
     .modal-stat-val { font-size:26px; font-weight:700; color:var(--gold); line-height:1; letter-spacing:0.36px; }
     .modal-stat-lbl { font-size:9px; font-weight:500; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px; }
-    .modal-injury-box { background:rgba(230,81,0,0.1); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:12px; padding:12px 14px; border:0.5px solid rgba(230,81,0,0.25); display:flex; align-items:center; gap:10px; margin-top:12px; }
-    .modal-injury-icon { font-size:20px; flex-shrink:0; }
-    .modal-injury-title { font-size:13px; font-weight:600; color:var(--alert); letter-spacing:-0.08px; }
-    .modal-injury-detail { font-size:12px; color:rgba(255,255,255,0.5); margin-top:2px; }
     .ficha-grid { display:flex; flex-direction:column; border-radius:12px; overflow:hidden; background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.08); }
     .ficha-item { padding:10px 14px; border-bottom:0.5px solid rgba(255,255,255,0.06); }
     .ficha-item:last-child { border-bottom:none; }
@@ -352,18 +336,11 @@
           <button class="pill" onclick="filterPlantel('MED',this)">Mediocampistas</button>
           <button class="pill" onclick="filterPlantel('DEL',this)">Delanteros</button>
           <button class="pill" onclick="filterPlantel('CT',this)">C. Técnico</button>
-          <button class="pill" onclick="filterPlantel('lesionados',this)">Lesionados</button>
         </div>
       </div>
       <!-- Vista plantel -->
       <div id="plantelView">
         <div class="player-grid" id="playerGrid"></div>
-      </div>
-      <!-- Vista bajas -->
-      <div id="bajasView" style="display:none">
-        <div style="padding:8px 16px 0">
-          <div class="injury-list" id="injuryList"></div>
-        </div>
       </div>
     </section>
 
@@ -515,13 +492,6 @@
       <div class="modal-stat-box"><div class="modal-stat-val" id="mMin">0</div><div class="modal-stat-lbl">Minutos</div></div>
     </div>
     <div id="mFicha" style="display:none;margin-bottom:12px"></div>
-<div class="modal-injury-box" id="mInjuryBox" style="display:none">
-      <div class="modal-injury-icon">🚨</div>
-      <div>
-        <div class="modal-injury-title">Lesionado</div>
-        <div class="modal-injury-detail" id="mInjuryDetail"></div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -610,8 +580,6 @@ const fichas = {
   'Iker_Zufiaurre':     { born:'7 de agosto de 2005',       birthPlace:'Río Cuarto, Córdoba',           nationality:'Argentino',  height:'1,78 m', from:'Inferiores',                   debut:'Nacional (Bol) 0 - Boca 0, Copa Sudamericana 2024 (3/4/2024)' },
 };
 
-// Injuries loaded dynamically from injuries.json (updated by scheduled agent)
-let injuries = [];
 
 const staff = [
   { name: 'Claudio Úbeda',      short: 'Úbeda',     role: 'DT',             file: 'Claudio_Ubeda'      },
@@ -906,50 +874,6 @@ function buildStatsFromSummaries(summaryData) {
   return stats;
 }
 
-function updateInjuryStatus(summaryData) {
-  const lookup = buildNameLookup();
-  const recentRosters = summaryData
-    .filter(d => d.summary?.header?.competitions?.[0]?.status?.type?.completed)
-    .map(d => ({
-      date: d.summary.header.competitions[0].date,
-      roster: d.summary.rosters?.find(r => r.team?.id === BOCA_ID)?.roster || []
-    }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 3);
-
-  const recentFiles = new Set();
-  for (const { roster } of recentRosters) {
-    for (const p of roster) {
-      if (p.active === false) continue;
-      const name = p.athlete?.displayName || '';
-      const file = resolvePlayer(name, lookup);
-      if (file) recentFiles.add(file);
-    }
-  }
-
-  players.forEach(p => {
-    if (p.injured && recentFiles.has(p.file)) p.injured = false;
-  });
-  for (let i = injuries.length - 1; i >= 0; i--) {
-    if (recentFiles.has(injuries[i].file)) injuries.splice(i, 1);
-  }
-}
-
-async function loadInjuries() {
-  try {
-    const data = await fetch('https://raw.githubusercontent.com/luisguzzo24-27/Boca-Juniors/main/injuries.json?_=' + Date.now()).then(r => r.json());
-    injuries = data.injuries || [];
-    // Reset all injured flags, then apply from JSON
-    players.forEach(p => p.injured = false);
-    injuries.forEach(inj => {
-      const p = players.find(x => x.file === inj.file);
-      if (p) p.injured = true;
-    });
-  } catch(e) {
-    console.warn('Could not load injuries.json:', e);
-  }
-}
-
 async function loadData() {
   const now   = new Date();
   const today = fmt8(new Date(now.getTime() - 2 * 86400000)); // 2 días atrás para no perder partidos nocturnos
@@ -1043,7 +967,6 @@ async function loadData() {
   );
   const summaries = summaryData.map(d => d.summary);
   const playerStats = buildStatsFromSummaries(summaryData);
-  updateInjuryStatus(summaryData);
 
   // Libertadores group (Boca's group)
   let bocaGroup = [];
@@ -1153,7 +1076,7 @@ function renderPlantel(filter = 'all') {
     if (wrap) wrap.style.display = 'none';
     const data = filter === 'all' ? players : players.filter(p => p.pos === filter);
     html = data.map(p => `
-      <div class="player-card ${p.injured ? 'injured' : ''}" onclick="openPlayer('${p.file}')">
+      <div class="player-card" onclick="openPlayer('${p.file}')">
         <img class="player-photo" src="${img(p.file)}" alt="${p.short}" loading="lazy">
         <div class="player-info">
           <div class="player-num">#${p.num}</div>
@@ -1182,15 +1105,7 @@ function applyPlantelFilter(f, btn, animate = true) {
   document.querySelectorAll('#plantelFilters .pill').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   movePlantelPill(btn, animate);
-  if (f === 'lesionados') {
-    document.getElementById('playerGrid').style.display = 'none';
-    const staff = document.getElementById('staffList');
-    if (staff) staff.style.display = 'none';
-    document.getElementById('bajasView').style.display = '';
-  } else {
-    document.getElementById('bajasView').style.display = 'none';
-    renderPlantel(f);
-  }
+  renderPlantel(f);
 }
 
 function filterPlantel(f, btn) { applyPlantelFilter(f, btn, true); }
@@ -1468,21 +1383,6 @@ function initStatsDrag(tabsEl) {
   tabs.addEventListener('pointercancel', () => { startX = null; isDragging = false; });
 }
 
-// ===== RENDER INJURIES =====
-function renderInjuries() {
-  document.getElementById('injuryList').innerHTML = injuries.map(inj => `
-    <div class="injury-card sev-${inj.sev}">
-      <img class="injury-photo" src="${img(inj.file)}" alt="${inj.name}">
-      <div class="injury-info">
-        <div class="injury-name">${inj.name}</div>
-        <div class="injury-type">${inj.injury}</div>
-      </div>
-      <div class="injury-eta">
-        <div class="eta-label">Regreso</div>
-        <div class="eta-value">${inj.eta}</div>
-      </div>
-    </div>`).join('');
-}
 
 // ===== FIXTURE =====
 function teamLogoImg(espnId) {
@@ -2080,19 +1980,6 @@ function openPlayer(file) {
   document.getElementById('mAsist').textContent = p.asist;
   document.getElementById('mMin').textContent = p.min.toLocaleString();
 
-  const injuryBox = document.getElementById('mInjuryBox');
-  const injData = injuries.find(x => x.file === file);
-  if (injData) {
-    document.getElementById('mInjuryDetail').textContent = `${injData.injury} · Regreso: ${injData.eta}`;
-    injuryBox.style.display = 'flex';
-    const colors = { high: 'var(--alert)', medium: 'var(--orange)', low: 'var(--green)' };
-    injuryBox.style.borderLeftColor = colors[injData.sev];
-    injuryBox.querySelector('.modal-injury-title').style.color = colors[injData.sev];
-    injuryBox.querySelector('.modal-injury-icon').textContent = injData.sev === 'low' ? '🟡' : '🚨';
-  } else {
-    injuryBox.style.display = 'none';
-  }
-
   const fichaEl = document.getElementById('mFicha');
   const f = fichas[p.file];
   if (f) {
@@ -2347,10 +2234,8 @@ function checkLiveTimer() {
     if (activeNav) moveNavPill(activeNav, false);
   });
 
-  await loadInjuries();
   renderPlantel();
   renderAvgAge();
-  renderInjuries();
   initPlantelFilterDrag();
   initStatsDrag(document.querySelector('#tab-stats .stats-tabs'));
   initStatsDrag(document.querySelector('#tab-posiciones .stats-tabs'));
@@ -2385,9 +2270,7 @@ function checkLiveTimer() {
       else if (activeStat === 'tarjetas') renderStatsTarjetas();
       else renderStats(activeStat || 'goles');
     }
-    // Re-render plantel y lesionados con injury status actualizado
     renderPlantel();
-    renderInjuries();
     renderTables(liveData);
     renderFixture();
     jumpToNextMatch();
