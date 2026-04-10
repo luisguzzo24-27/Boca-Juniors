@@ -1637,6 +1637,46 @@ function initCalStripDrag(strip) {
   strip.addEventListener('pointercancel', () => { startX = null; isDragging = false; });
 }
 
+function initCalSwipe() {
+  const area = document.querySelector('.cal-sticky');
+  if (!area) return;
+  let sx = null, sy = null;
+  area.addEventListener('touchstart', e => {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, { passive: true });
+  area.addEventListener('touchend', e => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    sx = null; sy = null;
+    if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+    const strip = document.getElementById('calMonthStrip');
+    const btns = [...(strip?.querySelectorAll('.cal-month-btn') || [])];
+    const curIdx = btns.findIndex(b => parseInt(b.dataset.month) === calActiveMonth);
+    const newIdx = dx < 0 ? curIdx + 1 : curIdx - 1;
+    if (newIdx >= 0 && newIdx < btns.length) {
+      commitCalMonth(btns[newIdx]);
+    }
+  }, { passive: true });
+}
+
+function commitCalMonth(btn) {
+  const strip = document.getElementById('calMonthStrip');
+  if (!strip || !btn) return;
+  strip.querySelectorAll('.cal-month-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  moveCalPill(btn, true);
+  const month = parseInt(btn.dataset.month);
+  if (month !== calActiveMonth) {
+    calActiveMonth = month;
+    calSelectedDate = null;
+    renderCalGrid();
+    autoSelectMonth(calActiveYear, month);
+  }
+  btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+}
+
 function buildCalendar() {
   const allFix = liveData?.allFix || [];
   if (!allFix.length) return;
@@ -1668,6 +1708,7 @@ function buildCalendar() {
     return `<button class="cal-month-btn${active?' active':''}" data-month="${m-1}">${CAL_MONTHS_ES[m-1]}</button>`;
   }).join('');
   initCalStripDrag(strip);
+  initCalSwipe();
 
   renderCalGrid();
   autoSelectMonth(calActiveYear, calActiveMonth);
