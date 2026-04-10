@@ -254,7 +254,7 @@
     .fix-grupo-match .hl { color:var(--gold); }
 
     /* HOME */
-    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100%; padding:0 20px; text-align:center; position:relative; overflow:hidden; }
+    .home-wrap { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; min-height:100%; padding:32px 20px 0; text-align:center; position:relative; overflow:hidden; }
     .home-aurora { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; filter:blur(60px); }
     .home-aurora-a { position:absolute; width:55%; height:45%; border-radius:50%; background:rgba(249,190,61,0.22); top:-10%; left:-15%; animation:auroraA 14s ease-in-out infinite; }
     .home-aurora-b { position:absolute; width:50%; height:50%; border-radius:50%; background:rgba(34,57,107,0.45); top:10%; right:-20%; animation:auroraB 18s ease-in-out infinite; }
@@ -279,6 +279,8 @@
     .home-particle:nth-child(7) { left:45%; animation-duration:8.5s; animation-delay:5s; width:2px; height:2px; }
     .home-particle:nth-child(8) { left:85%; animation-duration:6.5s; animation-delay:3.5s; }
     @keyframes particleFloat { 0%{ transform:translateY(100vh) scale(0); opacity:0; } 10%{ opacity:0.6; } 90%{ opacity:0.3; } 100%{ transform:translateY(-20vh) scale(1); opacity:0; } }
+    .skel { background:linear-gradient(90deg, rgba(74,96,143,0.15) 25%, rgba(74,96,143,0.3) 50%, rgba(74,96,143,0.15) 75%); background-size:200% 100%; border-radius:6px; animation:shimmer 1.5s ease-in-out infinite; }
+    @keyframes shimmer { 0%{ background-position:200% 0; } 100%{ background-position:-200% 0; } }
     .home-escudo { width:140px; height:auto; filter:drop-shadow(0 8px 32px rgba(249,190,61,0.25)); margin-bottom:24px; position:relative; z-index:1; }
     .home-frase { font-size:28px; font-weight:700; letter-spacing:0.36px; line-height:1.21; color:var(--gold); margin-bottom:6px; position:relative; z-index:1; }
     .home-sub { font-size:11px; font-weight:500; color:var(--blue-light); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:28px; position:relative; z-index:1; }
@@ -346,7 +348,21 @@
         <div class="home-frase">Boca no teme luchar</div>
         <div class="home-sub">Club Atlético Boca Juniors</div>
         <div class="home-divider"></div>
-        <div id="homeProximo" style="width:100%;margin-bottom:16px;position:relative;z-index:1"></div>
+        <div id="homeProximo" style="width:100%;margin-bottom:16px;position:relative;z-index:1">
+          <div class="fixture-card next" style="border-color:var(--blue-mid)">
+            <div class="fixture-top"><div class="skel" style="width:80px;height:14px"></div></div>
+            <div class="fixture-main">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="skel" style="width:36px;height:36px;border-radius:50%"></div><div class="skel" style="width:56px;height:10px"></div></div>
+              <div class="skel" style="width:24px;height:20px"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="skel" style="width:36px;height:36px;border-radius:50%"></div><div class="skel" style="width:56px;height:10px"></div></div>
+            </div>
+            <div class="fixture-meta" style="border-top:1px solid rgba(74,96,143,0.2)">
+              <div style="text-align:center"><div class="skel" style="width:32px;height:8px;margin:0 auto 4px"></div><div class="skel" style="width:44px;height:10px;margin:0 auto"></div></div>
+              <div style="text-align:center"><div class="skel" style="width:32px;height:8px;margin:0 auto 4px"></div><div class="skel" style="width:44px;height:10px;margin:0 auto"></div></div>
+              <div style="text-align:center"><div class="skel" style="width:32px;height:8px;margin:0 auto 4px"></div><div class="skel" style="width:44px;height:10px;margin:0 auto"></div></div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
