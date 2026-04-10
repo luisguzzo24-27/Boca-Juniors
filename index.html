@@ -274,7 +274,14 @@
     .home-particle:nth-child(8) { left:85%; animation-duration:6.5s; animation-delay:3.5s; }
     @keyframes particleFloat { 0%{ transform:translateY(100vh) scale(0); opacity:0; } 10%{ opacity:0.6; } 90%{ opacity:0.3; } 100%{ transform:translateY(-20vh) scale(1); opacity:0; } }
     .home-escudo { width:140px; height:auto; filter:drop-shadow(0 8px 32px rgba(249,190,61,0.25)); margin-bottom:24px; animation:escudoPulse 3s ease-in-out infinite; position:relative; z-index:1; }
-    @keyframes escudoPulse { 0%,100%{ filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); } 50%{ filter:drop-shadow(0 8px 48px rgba(249,190,61,0.45)); } }
+    @keyframes escudoPulse {
+      0%  { transform:scale(1);    filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); }
+      14% { transform:scale(1.06); filter:drop-shadow(0 8px 40px rgba(249,190,61,0.4)); }
+      22% { transform:scale(1);    filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); }
+      32% { transform:scale(1.04); filter:drop-shadow(0 8px 36px rgba(249,190,61,0.35)); }
+      40% { transform:scale(1);    filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); }
+      100%{ transform:scale(1);    filter:drop-shadow(0 8px 32px rgba(249,190,61,0.2)); }
+    }
     .home-frase { font-size:28px; font-weight:700; letter-spacing:0.36px; line-height:1.21; color:var(--gold); margin-bottom:6px; position:relative; z-index:1; }
     .home-sub { font-size:11px; font-weight:500; color:var(--blue-light); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:28px; position:relative; z-index:1; }
     .home-divider { width:48px; height:2px; background:var(--gold); border-radius:1px; margin:0 auto 24px; opacity:0.4; position:relative; z-index:1; }
