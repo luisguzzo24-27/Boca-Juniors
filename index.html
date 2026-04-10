@@ -884,11 +884,33 @@ async function loadData() {
   // libFix    = upcoming Libertadores matches
   const FIX_TTL = 3 * 60 * 1000; // 3 min para fixture (detecta partidos que arrancan)
   const STD_TTL = 60 * 60 * 1000; // 1 hora para standings
-  const [lStd, teamSched, lFutFix, libFix, libStd] = await Promise.all([
+
+  // Phase 1: scoreboards first → render home card fast
+  const [lFutFix, libFix] = await Promise.all([
+    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}`, FIX_TTL),
+    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=${today}-${to}`, FIX_TTL)
+  ]);
+
+  // Quick home card render from scoreboards
+  const quickFix = [
+    ...extractBocaFix(lFutFix?.events, 'liga', 'Apertura 2026', 'comp-ape'),
+    ...extractBocaFix(libFix?.events, 'libertadores', 'Libertadores 2026', 'comp-lib')
+  ].sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (!liveData) {
+    const _now = new Date();
+    const _live = quickFix.find(f => f.inProgress);
+    const _prox = quickFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= _now);
+    const _match = _live || _prox;
+    const el = document.getElementById('homeProximo');
+    if (el) el.innerHTML = _match
+      ? buildFixtureCard(_match, !_live)
+      : `<div style="padding:16px;text-align:center;color:var(--gray)">Sin próximos partidos</div>`;
+  }
+
+  // Phase 2: standings + team schedules in parallel
+  const [lStd, teamSched, libStd] = await Promise.all([
     fetchCached(`https://site.web.api.espn.com/apis/v2/sports/soccer/arg.1/standings?season=2026&type=0`, STD_TTL),
     fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/teams/${BOCA_ID}/schedule?season=2026`, FIX_TTL),
-    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${today}-${to}`, FIX_TTL),
-    fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/scoreboard?dates=${today}-${to}`, FIX_TTL),
     fetchCached(`https://site.web.api.espn.com/apis/v2/sports/soccer/conmebol.libertadores/standings?season=2026`, STD_TTL)
   ]);
 
@@ -925,17 +947,6 @@ async function loadData() {
   const ligaFix = [...futureFix, ...pastFix.filter(f => !futureIds.has(f.eventId))];
   const allFix    = [...ligaFix, ...liberFix].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // Render home card early — solo en primer load (si liveData ya existe, esperar el render completo)
-  if (!liveData) {
-    const _now = new Date();
-    const _live = allFix.find(f => f.inProgress);
-    const _prox = allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= _now);
-    const _match = _live || _prox;
-    const el = document.getElementById('homeProximo');
-    if (el) el.innerHTML = _match
-      ? buildFixtureCard(_match, !_live)
-      : `<div style="padding:16px;text-align:center;color:var(--gray)">Sin próximos partidos</div>`;
-  }
 
   // Copa Argentina + Libertadores team schedules (for stats + fixture)
   const [copaTeamSched, libTeamSched] = await Promise.all([
