@@ -983,13 +983,18 @@ async function loadData() {
   //   futureFix = scoreboard from today (upcoming liga matches, filter for Boca)
   const pastFix   = extractBocaFix(teamSched?.events,  'liga', 'Apertura 2026', 'comp-ape');
   const futureFix = extractBocaFix(lFutFix?.events,    'liga', 'Apertura 2026', 'comp-ape');
-  const liberFix  = extractBocaFix(libFix?.events, 'libertadores', 'Libertadores 2026', 'comp-lib');
+  const libScoreFix = extractBocaFix(libFix?.events, 'libertadores', 'Libertadores 2026', 'comp-lib');
+  const libSchedFix = extractBocaFix(libTeamSched?.events, 'libertadores', 'Libertadores 2026', 'comp-lib');
 
-  // Merge liga: scoreboard (futureFix) tiene prioridad — tiene estado live correcto
-  // Dedup por eventId (más robusto que por fecha)
+  // Merge liga: scoreboard tiene prioridad (estado live correcto), dedup por eventId
   const futureIds = new Set(futureFix.map(f => f.eventId));
   const ligaFix = [...futureFix, ...pastFix.filter(f => !futureIds.has(f.eventId))];
-  const allFix    = [...ligaFix, ...liberFix].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Merge libertadores: scoreboard tiene prioridad, team schedule llena el historial
+  const libScoreIds = new Set(libScoreFix.map(f => f.eventId));
+  const liberFix = [...libScoreFix, ...libSchedFix.filter(f => !libScoreIds.has(f.eventId))];
+
+  const allFix = [...ligaFix, ...liberFix].sort((a, b) => new Date(a.date) - new Date(b.date));
 
 
   // Copa Argentina + Libertadores team schedules (for stats + fixture)
