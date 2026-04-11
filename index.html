@@ -2114,7 +2114,7 @@ let currentLineup = null;
 let currentLiveMatch = null;
 
 function openLineup(e) {
-  e.stopPropagation();
+  if (e) e.stopPropagation();
   if (!currentLineup || !currentLiveMatch) return;
   const { boca, rival } = currentLineup;
   const events = currentLiveMatch.events || [];
@@ -2337,6 +2337,11 @@ function renderLiveUI() {
   if (calSelectedDate && calFixByDate[calSelectedDate]) {
     const detail = document.getElementById('calDetail');
     if (detail) detail.innerHTML = calFixByDate[calSelectedDate].map(f => buildFixtureCard(f, false, true)).join('');
+  }
+
+  // Re-render lineup sheet if open (so new cards/goals/injuries show up live)
+  if (document.getElementById('lineupOverlay')?.classList.contains('open') && currentLineup) {
+    openLineup();
   }
 }
 
