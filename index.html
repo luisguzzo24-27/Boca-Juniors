@@ -117,7 +117,7 @@
     .ev-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--white); line-height:1; }
     .ev-item.right { flex-direction:row-reverse; }
     .ev-icon { flex-shrink:0; }
-    .ev-icon.goal   { width:7px; height:7px; background:var(--white); border-radius:50%; }
+    .ev-icon.goal   { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; background:var(--white); border-radius:50%; color:#1a1a2e; font-size:8px; font-weight:900; line-height:1; }
     .ev-icon.yellow { width:6px; height:8px; background:#FFD600; border-radius:1px; }
     .ev-icon.red    { width:6px; height:8px; background:var(--alert); border-radius:1px; }
     .ev-clock { color:var(--gray); font-size:10px; }
@@ -1513,7 +1513,7 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
         const leftEvs  = isLocal ? bocaEvs  : rivalEvs;
         const rightEvs = isLocal ? rivalEvs : bocaEvs;
         const evIcon = t => {
-          if (t === 'Goal')        return `<span class="ev-icon goal"></span>`;
+          if (t === 'Goal')        return `<span class="ev-icon goal">G</span>`;
           if (t === 'Yellow Card') return `<span class="ev-icon yellow"></span>`;
           if (t === 'Red Card')    return `<span class="ev-icon red"></span>`;
           if (t === 'Injury')      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="9" height="9" style="flex-shrink:0;display:inline-block;vertical-align:middle"><circle cx="50" cy="50" r="48" fill="#E53935"/><rect x="42" y="18" width="16" height="64" rx="4" fill="white"/><rect x="18" y="42" width="64" height="16" rx="4" fill="white"/></svg>`;
