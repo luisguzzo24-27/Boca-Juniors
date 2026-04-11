@@ -2136,7 +2136,7 @@ function openLineup(e) {
   const eventIcons = name => {
     const types = evMap[name.toLowerCase()] || evMap[surname(name)] || [];
     return types.map(t => {
-      if (t === 'Goal')        return `<span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:white;color:#1a1a2e;font-size:9px;font-weight:700;margin-left:4px;flex-shrink:0;line-height:1">G</span>`;
+      if (t === 'Goal')        return `<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:white;color:#1a1a2e;font-size:10px;font-weight:900;margin-left:4px;flex-shrink:0;line-height:1;padding-top:0.5px">G</span>`;
       if (t === 'Yellow Card') return `<span style="display:inline-block;width:7px;height:9px;background:#FFD600;border-radius:1px;margin-left:4px;flex-shrink:0"></span>`;
       if (t === 'Red Card')    return `<span style="display:inline-block;width:7px;height:9px;background:#E53935;border-radius:1px;margin-left:4px;flex-shrink:0"></span>`;
       if (t === 'Injury')      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="11" height="11" style="margin-left:4px;flex-shrink:0;display:inline-block;vertical-align:middle"><circle cx="50" cy="50" r="48" fill="#E53935"/><rect x="42" y="18" width="16" height="64" rx="4" fill="white"/><rect x="18" y="42" width="64" height="16" rx="4" fill="white"/></svg>`;
