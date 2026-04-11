@@ -1487,7 +1487,7 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
       <div class="fixture-top">
         <span class="comp-badge ${f.cc}">${f.comp}</span>
         ${f.inProgress ? '<span class="live-tag">En vivo</span>' : highlight ? '<span class="next-tag">Próximo</span>' : ''}
-        ${f.inProgress && showEvents ? `<button class="lineup-btn" onclick="openLineup(event)">Ver formaciones</button>` : ''}
+        ${f.inProgress && showEvents ? `<button class="lineup-btn" onclick="openLineup(event)">Ver formaciones ›</button>` : ''}
       </div>
       <div class="fixture-main">
         ${isLocal ? bocaTeam : rivalTeam}
