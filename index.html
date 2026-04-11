@@ -2120,15 +2120,21 @@ function openLineup(e) {
   const events = currentLiveMatch.events || [];
 
   // Build event map: normalized player name → array of event types
+  // ESPN uses full names in events ("Matías Abaldo") but short names in lineup ("M. Abaldo")
+  // so we match by last word (surname) as fallback
   const evMap = {};
+  const surname = s => { const parts = s.toLowerCase().split(/\s+/); return parts[parts.length - 1]; };
   events.forEach(ev => {
     const key = ev.player.toLowerCase();
     if (!evMap[key]) evMap[key] = [];
     evMap[key].push(ev.type);
+    // Also index by surname for fuzzy match
+    const sn = surname(ev.player);
+    if (sn !== key) { if (!evMap[sn]) evMap[sn] = []; evMap[sn].push(ev.type); }
   });
 
   const eventIcons = name => {
-    const types = evMap[name.toLowerCase()] || [];
+    const types = evMap[name.toLowerCase()] || evMap[surname(name)] || [];
     return types.map(t => {
       if (t === 'Goal')        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="11" height="11" style="margin-left:4px;flex-shrink:0;display:inline-block;vertical-align:middle"><circle cx="50" cy="50" r="48" fill="#111"/><polygon points="50,7 63,17 59,32 41,32 37,17" fill="white"/><polygon points="15,29 29,24 39,38 30,51 14,46" fill="white"/><polygon points="85,29 86,46 70,51 61,38 71,24" fill="white"/><polygon points="13,57 30,51 37,65 25,76 10,68" fill="white"/><polygon points="87,57 90,68 75,76 63,65 70,51" fill="white"/><polygon points="41,72 59,72 64,86 50,94 36,86" fill="white"/></svg>`;
       if (t === 'Yellow Card') return `<span style="display:inline-block;width:7px;height:9px;background:#FFD600;border-radius:1px;margin-left:4px;flex-shrink:0"></span>`;
