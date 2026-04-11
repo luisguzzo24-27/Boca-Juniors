@@ -767,6 +767,7 @@ function extractBocaFix(events, cat, compLabel, ccClass) {
           player: d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || ''
         }))
     }];
+    if (inProgress) updateLiveClockState(comp.status?.displayClock || '', comp.status?.period || 1);
   });
 }
 
@@ -1458,12 +1459,13 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
     const homeScore = isLocal ? f.bScore : f.rScore;
     const awayScore = isLocal ? f.rScore : f.bScore;
     const half = f.period === 2 ? '2T' : '1T';
-    const clockStr = f.clock ? `${f.clock} · ${half}` : half;
+    const interpolated = getInterpolatedClock();
+    const clockStr = interpolated || (f.clock ? `${f.clock} · ${half}` : half);
     center = `<div style="text-align:center;flex-shrink:0">
       <div style="font-size:26px;font-weight:700;color:var(--white);line-height:1">${homeScore ?? 0} - ${awayScore ?? 0}</div>
       <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:4px">
         <span class="live-dot"></span>
-        <span style="font-size:10px;color:var(--alert);font-weight:700;letter-spacing:0.5px">${clockStr}</span>
+        <span id="liveClockDisplay" style="font-size:10px;color:var(--alert);font-weight:700;letter-spacing:0.5px">${clockStr}</span>
       </div>
     </div>`;
   } else if (f.completed) {
@@ -2187,6 +2189,52 @@ function closeLineup() {
 let liveTimer = null;
 let preMatchTimer = null;
 
+// Clock interpolation: ESPN updates the clock sporadically, so we interpolate locally
+let liveClockState = null; // { apiMinute, apiPeriod, apiTimestamp }
+let clockTickTimer = null;
+
+function parseClockMinute(clockStr) {
+  // "8'" → 8, "45'+2'" → 47, "90'+5'" → 95, "45'" → 45
+  if (!clockStr) return null;
+  const m = clockStr.match(/^(\d+)'(?:\s*\+\s*(\d+)'?)?$/);
+  if (!m) return null;
+  return parseInt(m[1]) + (m[2] ? parseInt(m[2]) : 0);
+}
+
+function updateLiveClockState(clockStr, period) {
+  const apiMinute = parseClockMinute(clockStr);
+  if (apiMinute == null) return;
+  liveClockState = { apiMinute, apiPeriod: period, apiTimestamp: Date.now() };
+}
+
+function getInterpolatedClock() {
+  if (!liveClockState) return null;
+  const elapsed = (Date.now() - liveClockState.apiTimestamp) / 60000; // minutes
+  let minute = Math.floor(liveClockState.apiMinute + elapsed);
+  const period = liveClockState.apiPeriod || 1;
+  // Cap at 45+extra for 1st half, don't go past 90+extra for 2nd
+  if (period === 1 && minute > 50) minute = 50;
+  if (period === 2 && minute > 100) minute = 100;
+  const half = period === 2 ? '2T' : '1T';
+  return `${minute}' · ${half}`;
+}
+
+function tickLiveClock() {
+  const el = document.getElementById('liveClockDisplay');
+  if (!el || !liveClockState) return;
+  const str = getInterpolatedClock();
+  if (str) el.textContent = str;
+}
+
+function startClockTick() {
+  if (!clockTickTimer) clockTickTimer = setInterval(tickLiveClock, 1000);
+}
+
+function stopClockTick() {
+  if (clockTickTimer) { clearInterval(clockTickTimer); clockTickTimer = null; }
+  liveClockState = null;
+}
+
 function bustFixtureCache() {
   const now = new Date();
   const today = fmt8(new Date(now.getTime() - 2 * 86400000));
@@ -2242,7 +2290,10 @@ async function refreshLive() {
         f.period = inProgress ? (c.status?.period || 1) : null;
         f.bScore = (completed || inProgress) ? getScore(bocaT?.score) : null;
         f.rScore = (completed || inProgress) ? getScore(rival?.score) : null;
-        if (inProgress) liveEvents.push(f);
+        if (inProgress) {
+          liveEvents.push(f);
+          updateLiveClockState(f.clock, f.period);
+        }
       }
 
       // Actualizar summary del partido en vivo (fetch directo)
@@ -2290,8 +2341,10 @@ function checkLiveTimer() {
     // Partido en vivo → 15s
     if (!liveTimer) liveTimer = setInterval(refreshLive, 15000);
     if (preMatchTimer) { clearInterval(preMatchTimer); preMatchTimer = null; }
+    startClockTick();
   } else {
     if (liveTimer) { clearInterval(liveTimer); liveTimer = null; }
+    stopClockTick();
 
     // Pre-partido: si hay partido en las próximas 3h → refresh cada 2 min
     const now = new Date();
