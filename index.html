@@ -726,6 +726,17 @@ function sortZona(arr) {
   return arr;
 }
 
+// Normalize player name to "I. Apellido" format to avoid flickering between short/full names
+function shortName(name) {
+  if (!name) return '';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length <= 1) return name;
+  // Already short format like "M. Abaldo"
+  if (parts[0].length <= 2 && parts[0].endsWith('.')) return name;
+  // "Matías Abaldo" → "M. Abaldo"
+  return parts[0][0].toUpperCase() + '. ' + parts.slice(1).join(' ');
+}
+
 function extractBocaFix(events, cat, compLabel, ccClass) {
   const leagueSlug = cat === 'liga' ? 'arg.1' : cat === 'libertadores' ? 'conmebol.libertadores' : 'arg.copa';
   return (events || []).flatMap(event => {
@@ -764,7 +775,7 @@ function extractBocaFix(events, cat, compLabel, ccClass) {
           type:   d.type.text,
           clock:  d.clock?.displayValue || '',
           teamId: d.team?.id || '',
-          player: d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || ''
+          player: shortName(d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || '')
         }))
     }];
     if (inProgress) updateLiveClockState(comp.status?.displayClock || '', comp.status?.period || 1);
@@ -783,7 +794,7 @@ function parseLiveSummary(summary, bocaId) {
       type:   d.type.text,
       clock:  d.clock?.displayValue || '',
       teamId: d.team?.id || '',
-      player: d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || ''
+      player: shortName(d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || '')
     }));
   const fromKeyEvents = (summary.keyEvents || [])
     .filter(e => VALID.includes(e.type?.text))
@@ -791,7 +802,7 @@ function parseLiveSummary(summary, bocaId) {
       type:   e.type.text,
       clock:  e.clock?.displayValue || '',
       teamId: e.team?.id || '',
-      player: e.participants?.[0]?.athlete?.shortName || e.participants?.[0]?.athlete?.displayName || ''
+      player: shortName(e.participants?.[0]?.athlete?.shortName || e.participants?.[0]?.athlete?.displayName || '')
     }));
   // Usar keyEvents si details está vacío (partido en vivo)
   const events = fromDetails.length ? fromDetails : fromKeyEvents;
