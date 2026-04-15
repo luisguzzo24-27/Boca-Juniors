@@ -770,9 +770,9 @@ function extractBocaFix(events, cat, compLabel, ccClass) {
       rScore: (completed || inProgress) ? getScore(rival.score) : null,
       statusDetail: comp.status?.type?.shortDetail || '',
       events: (comp.details || [])
-        .filter(d => ['Goal','Yellow Card','Red Card','Own Goal'].includes(d.type?.text))
+        .filter(d => { const t = d.type?.text || ''; return t.startsWith('Goal') || t === 'Own Goal' || t === 'Yellow Card' || t === 'Red Card'; })
         .map(d => ({
-          type:   d.type.text,
+          type:   d.type.text.startsWith('Goal') ? 'Goal' : d.type.text,
           clock:  d.clock?.displayValue || '',
           teamId: d.team?.id || '',
           player: shortName(d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || '')
@@ -787,19 +787,20 @@ function parseLiveSummary(summary, bocaId) {
 
   // Events: keyEvents (live) o header details (completados)
   const comp = summary.header?.competitions?.[0];
-  const VALID = ['Goal','Yellow Card','Red Card','Own Goal','Injury'];
+  const isValid = t => t && (t.startsWith('Goal') || t === 'Own Goal' || t === 'Yellow Card' || t === 'Red Card' || t === 'Injury');
+  const normType = t => t.startsWith('Goal') && t !== 'Own Goal' ? 'Goal' : t;
   const fromDetails = (comp?.details || [])
-    .filter(d => VALID.includes(d.type?.text))
+    .filter(d => isValid(d.type?.text))
     .map(d => ({
-      type:   d.type.text,
+      type:   normType(d.type.text),
       clock:  d.clock?.displayValue || '',
       teamId: d.team?.id || '',
       player: shortName(d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || '')
     }));
   const fromKeyEvents = (summary.keyEvents || [])
-    .filter(e => VALID.includes(e.type?.text))
+    .filter(e => isValid(e.type?.text))
     .map(e => ({
-      type:   e.type.text,
+      type:   normType(e.type.text),
       clock:  e.clock?.displayValue || '',
       teamId: e.team?.id || '',
       player: shortName(e.participants?.[0]?.athlete?.shortName || e.participants?.[0]?.athlete?.displayName || '')
