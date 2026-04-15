@@ -1060,7 +1060,7 @@ async function loadData() {
   const summaryData = await Promise.all(
     completedEvents.map(({ id, league }) =>
       fetchCached(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/summary?event=${id}`, 86400000)
-        .then(s => ({ summary: s, league }))
+        .then(s => ({ summary: s, league, eventId: id }))
     )
   );
   const summaries = summaryData.map(d => d.summary);
@@ -1108,7 +1108,7 @@ async function loadData() {
   const liveLiga = allFix.filter(f => f.inProgress && f.cat === 'liga');
   if (liveLiga.length) { adjustStandingsWithLive(zonaA, liveLiga); adjustStandingsWithLive(zonaB, liveLiga); sortZona(zonaA); sortZona(zonaB); const ta2 = sortZona([...zonaA, ...zonaB].map(t => ({ ...t }))); ta2.forEach((t, i) => { t.copa = i < 3 ? 'lib' : i < 9 ? 'sud' : null; t.desc = i === 29; t.pos = i + 1; }); tablaAnual.length = 0; ta2.forEach(t => tablaAnual.push(t)); }
 
-  return { zonaA, zonaB, tablaAnual, allFix, bocaGroup, playerStats };
+  return { zonaA, zonaB, tablaAnual, allFix, bocaGroup, playerStats, summaryData };
 }
 
 // ===== LIVE DATA STORE =====
@@ -2328,6 +2328,8 @@ async function refreshLive() {
 
     if (liveData?.allFix) {
       const liveEvents = [];
+      const newlyCompleted = [];
+      const knownSummaryIds = new Set((liveData.summaryData || []).map(d => d.eventId));
       for (const ev of allSbEvents) {
         const c = ev.competitions?.[0];
         if (!c) continue;
@@ -2349,19 +2351,63 @@ async function refreshLive() {
           liveEvents.push(f);
           updateLiveClockState(f.clock, f.period, c.status?.type?.shortDetail === 'HT');
         }
+        if (completed && !knownSummaryIds.has(ev.id)) newlyCompleted.push(f);
+      }
+
+      // Fetch summaries for newly completed matches
+      if (newlyCompleted.length) {
+        const newSums = await Promise.all(newlyCompleted.map(f =>
+          fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${f.league}/summary?event=${f.eventId}${bust}`)
+            .then(r => r.json()).catch(() => null)
+        ));
+        liveData.summaryData = liveData.summaryData || [];
+        newlyCompleted.forEach((f, i) => {
+          if (newSums[i]) liveData.summaryData.push({ summary: newSums[i], league: f.league, eventId: f.eventId });
+        });
       }
 
       // Actualizar summary del partido en vivo (fetch directo)
+      let statsRebuilt = false;
       if (liveEvents.length) {
-        const summaries = await Promise.all(liveEvents.map(f =>
+        const liveSummaries = await Promise.all(liveEvents.map(f =>
           fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${f.league}/summary?event=${f.eventId}${bust}`)
             .then(r => r.json()).catch(() => null)
         ));
         liveEvents.forEach((f, i) => {
-          const p = parseLiveSummary(summaries[i], BOCA_ID);
+          const p = parseLiveSummary(liveSummaries[i], BOCA_ID);
           f.events = p.events;
           f.lineup = p.lineup;
         });
+
+        // Rebuild player stats: completed matches + live matches
+        const liveSummaryData = liveEvents.map((f, i) => ({ summary: liveSummaries[i], league: f.league }));
+        const combined = [...(liveData.summaryData || []), ...liveSummaryData];
+        const ps = buildStatsFromSummaries(combined);
+        liveData.playerStats = ps;
+        statsRebuilt = true;
+      }
+
+      // Rebuild stats from completed-only if no live but new matches finished
+      if (!statsRebuilt && newlyCompleted.length) {
+        const ps = buildStatsFromSummaries(liveData.summaryData || []);
+        liveData.playerStats = ps;
+        statsRebuilt = true;
+      }
+
+      // Merge stats into players and re-render
+      if (statsRebuilt) {
+        const ps = liveData.playerStats;
+        players.forEach(p => {
+          const s = ps[p.file];
+          if (!s || !s.pj?.total) return;
+          p.pj = s.pj.total; p.tit = s.tit.total; p.goles = s.goles.total; p.asist = s.asist.total;
+          p.amarillas = s.amarillas.total; p.rojas = s.rojas.total;
+        });
+        const activeBtn = document.querySelector('#tab-stats .stat-tab-btn.active');
+        const activeStat = activeBtn?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+        if (activeStat === 'pj') renderStatsPartidos();
+        else if (activeStat === 'tarjetas') renderStatsTarjetas();
+        else renderStats(activeStat || 'goles');
       }
     }
 
