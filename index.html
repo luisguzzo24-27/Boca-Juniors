@@ -726,6 +726,36 @@ function sortZona(arr) {
   return arr;
 }
 
+// Adjust standings with live match results (ESPN doesn't include in-progress matches)
+function adjustStandingsWithLive(group, liveFixtures) {
+  for (const f of liveFixtures) {
+    const homeId = f.loc === 'Local' ? BOCA_ID : f.rivalId;
+    const awayId = f.loc === 'Local' ? f.rivalId : BOCA_ID;
+    const homeGoals = f.loc === 'Local' ? (parseInt(f.bScore) || 0) : (parseInt(f.rScore) || 0);
+    const awayGoals = f.loc === 'Local' ? (parseInt(f.rScore) || 0) : (parseInt(f.bScore) || 0);
+    const homeT = group.find(t => t.espnId === homeId);
+    const awayT = group.find(t => t.espnId === awayId);
+    if (!homeT || !awayT) continue;
+    // Add 1 game played
+    homeT.pj++; awayT.pj++;
+    // Goals
+    if (homeT.gf !== undefined) { homeT.gf += homeGoals; homeT.gc += awayGoals; }
+    if (awayT.gf !== undefined) { awayT.gf += awayGoals; awayT.gc += homeGoals; }
+    homeT.gd = (homeT.gd || 0) + homeGoals - awayGoals;
+    awayT.gd = (awayT.gd || 0) + awayGoals - homeGoals;
+    // W/D/L and points
+    if (homeGoals > awayGoals) {
+      homeT.g++; homeT.pts += 3; awayT.p++;
+    } else if (homeGoals < awayGoals) {
+      awayT.g++; awayT.pts += 3; homeT.p++;
+    } else {
+      if (homeT.e !== undefined) homeT.e++;
+      if (awayT.e !== undefined) awayT.e++;
+      homeT.pts++; awayT.pts++;
+    }
+  }
+}
+
 // Normalize player name to "I. Apellido" format to avoid flickering between short/full names
 function shortName(name) {
   if (!name) return '';
@@ -1071,10 +1101,12 @@ async function loadData() {
     });
   }
 
-  // Pre-fetch rival form for the next/live match so it's ready on first render
-  const now2 = new Date();
-  const nextMatch = allFix.find(f => f.inProgress) ||
-                    allFix.find(f => !f.completed && !f.inProgress && new Date(f.date) >= now2);
+  // Adjust standings with live match results
+  const liveLib = allFix.filter(f => f.inProgress && f.cat === 'libertadores');
+  if (liveLib.length) { adjustStandingsWithLive(bocaGroup, liveLib); bocaGroup.sort((a, b) => b.pts - a.pts || b.gd - a.gd); bocaGroup.forEach((t, i) => t.pos = i + 1); }
+  const liveLiga = allFix.filter(f => f.inProgress && f.cat === 'liga');
+  if (liveLiga.length) { adjustStandingsWithLive(zonaA, liveLiga); adjustStandingsWithLive(zonaB, liveLiga); sortZona(zonaA); sortZona(zonaB); const ta2 = sortZona([...zonaA, ...zonaB].map(t => ({ ...t }))); ta2.forEach((t, i) => { t.copa = i < 3 ? 'lib' : i < 9 ? 'sud' : null; t.desc = i === 29; t.pos = i + 1; }); tablaAnual.length = 0; ta2.forEach(t => tablaAnual.push(t)); }
+
   return { zonaA, zonaB, tablaAnual, allFix, bocaGroup, playerStats };
 }
 
@@ -2364,6 +2396,24 @@ async function refreshLive() {
         }
       });
       liveData.bocaGroup = bocaGroup;
+    }
+
+    // Adjust standings with live match results
+    const allFix2 = liveData?.allFix || [];
+    const liveLib = allFix2.filter(f => f.inProgress && f.cat === 'libertadores');
+    if (liveLib.length && liveData.bocaGroup) {
+      adjustStandingsWithLive(liveData.bocaGroup, liveLib);
+      liveData.bocaGroup.sort((a, b) => b.pts - a.pts || b.gd - a.gd);
+      liveData.bocaGroup.forEach((t, i) => t.pos = i + 1);
+    }
+    const liveLiga = allFix2.filter(f => f.inProgress && f.cat === 'liga');
+    if (liveLiga.length && liveData.zonaA) {
+      adjustStandingsWithLive(liveData.zonaA, liveLiga);
+      adjustStandingsWithLive(liveData.zonaB, liveLiga);
+      sortZona(liveData.zonaA); sortZona(liveData.zonaB);
+      const ta = sortZona([...liveData.zonaA, ...liveData.zonaB].map(t => ({ ...t })));
+      ta.forEach((t, i) => { t.copa = i < 3 ? 'lib' : i < 9 ? 'sud' : null; t.desc = i === 29; t.pos = i + 1; });
+      liveData.tablaAnual = ta;
     }
 
     renderLiveUI();
