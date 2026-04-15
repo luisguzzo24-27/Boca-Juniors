@@ -239,7 +239,7 @@
     .t-pts { font-weight: 700; font-size: 15px !important; }
     .boca-row .t-pts { color: var(--gold); }
     .disclaimer { font-size: 10px; color: var(--blue-light); text-align: center; padding: 8px; font-style: italic; }
-    .tabla-lib { display: grid; grid-template-columns: 24px 1fr repeat(5,28px); gap: 4px; padding: 8px 12px; border-bottom: 1px solid rgba(74,96,143,0.25); align-items: center; }
+    .tabla-lib { display: grid; grid-template-columns: 24px 1fr repeat(7,22px); gap: 4px; padding: 8px 12px; border-bottom: 1px solid rgba(74,96,143,0.25); align-items: center; }
     .tabla-lib:last-child { border-bottom: none; }
     .tabla-lib.boca-row { background: rgba(249,190,61,0.07); }
     .tabla-lib span { font-size:13px; text-align:center; }
@@ -432,8 +432,8 @@
       <div id="posView-libertadores" class="table-section" style="display:none">
         <div class="table-title">Grupo D</div>
         <div class="tabla">
-          <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(5,28px)">
-            <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>P</span><span>GD</span><span>Pts</span>
+          <div class="tabla-header" style="grid-template-columns:24px 1fr repeat(7,22px)">
+            <span>#</span><span>Equipo</span><span>PJ</span><span>G</span><span>P</span><span>GF</span><span>GC</span><span>GD</span><span>Pts</span>
           </div>
           <div id="tablaLibRows"></div>
         </div>
@@ -1075,6 +1075,7 @@ async function loadData() {
       bocaGroup = entries.map(e => ({
         name: e.team.displayName, espnId: e.team.id,
         pj: getStat(e, 'gamesPlayed'), g: getStat(e, 'wins'), p: getStat(e, 'losses'),
+        gf: getStat(e, 'pointsFor'), gc: getStat(e, 'pointsAgainst'),
         gd: getStat(e, 'pointsFor') - getStat(e, 'pointsAgainst'),
         pts: getStat(e, 'points'), boca: e.team.id === BOCA_ID
       }));
@@ -2042,6 +2043,7 @@ function renderTables(data) {
       <span class="t-pos">${t.pos}</span>
       <div style="display:flex;align-items:center;gap:6px;overflow:hidden">${teamLogo(t.espnId)}<span class="t-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</span></div>
       <span>${t.pj}</span><span>${t.g}</span><span>${t.p}</span>
+      <span style="color:var(--gray)">${t.gf}</span><span style="color:var(--gray)">${t.gc}</span>
       <span>${t.gd > 0 ? '+'+t.gd : t.gd}</span>
       <span class="t-pts">${t.pts}</span>
     </div>`).join('');
@@ -2388,6 +2390,7 @@ async function refreshLive() {
           bocaGroup = entries.map(e => ({
             name: e.team.displayName, espnId: e.team.id,
             pj: getStat(e, 'gamesPlayed'), g: getStat(e, 'wins'), p: getStat(e, 'losses'),
+            gf: getStat(e, 'pointsFor'), gc: getStat(e, 'pointsAgainst'),
             gd: getStat(e, 'pointsFor') - getStat(e, 'pointsAgainst'),
             pts: getStat(e, 'points'), boca: e.team.id === BOCA_ID
           }));
