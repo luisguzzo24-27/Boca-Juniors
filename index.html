@@ -2331,7 +2331,43 @@ async function refreshLive() {
       }
     }
 
+    // Refresh standings (ESPN updates them live during matches)
+    const [lStd, libStd] = await Promise.all([
+      fetch(`https://site.web.api.espn.com/apis/v2/sports/soccer/arg.1/standings?season=2026&type=0${bust}`).then(r => r.json()).catch(() => null),
+      fetch(`https://site.web.api.espn.com/apis/v2/sports/soccer/conmebol.libertadores/standings?season=2026${bust}`).then(r => r.json()).catch(() => null)
+    ]);
+    if (lStd) {
+      let zonaA = [], zonaB = [];
+      (lStd.children || lStd.groups || []).forEach(group => {
+        const entries = (group.standings?.entries || group.entries || []).map((e, i) => mkZonaEntry(e, i));
+        const gName = (group.name || group.abbreviation || '').toUpperCase();
+        if (gName.includes('A')) zonaA = entries; else zonaB = entries;
+      });
+      sortZona(zonaA); sortZona(zonaB);
+      const tablaAnual = sortZona([...zonaA, ...zonaB].map(t => ({ ...t })));
+      tablaAnual.forEach((t, i) => { t.copa = i < 3 ? 'lib' : i < 9 ? 'sud' : null; t.desc = i === 29; t.pos = i + 1; });
+      liveData.zonaA = zonaA; liveData.zonaB = zonaB; liveData.tablaAnual = tablaAnual;
+    }
+    if (libStd) {
+      let bocaGroup = [];
+      (libStd.children || libStd.groups || []).forEach(group => {
+        const entries = group.standings?.entries || group.entries || [];
+        if (entries.some(e => e.team?.id === BOCA_ID)) {
+          bocaGroup = entries.map(e => ({
+            name: e.team.displayName, espnId: e.team.id,
+            pj: getStat(e, 'gamesPlayed'), g: getStat(e, 'wins'), p: getStat(e, 'losses'),
+            gd: getStat(e, 'pointsFor') - getStat(e, 'pointsAgainst'),
+            pts: getStat(e, 'points'), boca: e.team.id === BOCA_ID
+          }));
+          bocaGroup.sort((a, b) => b.pts - a.pts || b.gd - a.gd);
+          bocaGroup.forEach((t, i) => t.pos = i + 1);
+        }
+      });
+      liveData.bocaGroup = bocaGroup;
+    }
+
     renderLiveUI();
+    renderTables(liveData);
     checkLiveTimer();
   } catch(e) { console.warn('refreshLive error:', e); }
 }
