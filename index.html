@@ -778,7 +778,7 @@ function extractBocaFix(events, cat, compLabel, ccClass) {
           player: shortName(d.athletesInvolved?.[0]?.shortName || d.athletesInvolved?.[0]?.displayName || '')
         }))
     }];
-    if (inProgress) updateLiveClockState(comp.status?.displayClock || '', comp.status?.period || 1);
+    if (inProgress) updateLiveClockState(comp.status?.displayClock || '', comp.status?.period || 1, comp.status?.type?.shortDetail === 'HT');
   });
 }
 
@@ -1471,8 +1471,9 @@ function buildFixtureCard(f, highlight = false, showEvents = true) {
     const homeScore = isLocal ? f.bScore : f.rScore;
     const awayScore = isLocal ? f.rScore : f.bScore;
     const half = f.period === 2 ? '2T' : '1T';
+    const isHT = f.statusDetail === 'HT';
     const interpolated = getInterpolatedClock();
-    const clockStr = interpolated || (f.clock ? `${f.clock} · ${half}` : half);
+    const clockStr = isHT ? 'Entretiempo' : interpolated || (f.clock ? `${f.clock} · ${half}` : half);
     center = `<div style="text-align:center;flex-shrink:0">
       <div style="font-size:26px;font-weight:700;color:var(--white);line-height:1">${homeScore ?? 0} - ${awayScore ?? 0}</div>
       <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:4px">
@@ -2219,14 +2220,15 @@ function parseClockMinute(clockStr) {
   return parseInt(m[1]) + (m[2] ? parseInt(m[2]) : 0);
 }
 
-function updateLiveClockState(clockStr, period) {
+function updateLiveClockState(clockStr, period, halftime = false) {
   const apiMinute = parseClockMinute(clockStr);
   if (apiMinute == null) return;
-  liveClockState = { apiMinute, apiPeriod: period, apiTimestamp: Date.now() };
+  liveClockState = { apiMinute, apiPeriod: period, apiTimestamp: Date.now(), halftime };
 }
 
 function getInterpolatedClock() {
   if (!liveClockState) return null;
+  if (liveClockState.halftime) return 'Entretiempo';
   const elapsed = (Date.now() - liveClockState.apiTimestamp) / 60000; // minutes
   let minute = Math.floor(liveClockState.apiMinute + elapsed);
   const period = liveClockState.apiPeriod || 1;
@@ -2306,11 +2308,12 @@ async function refreshLive() {
         f.completed  = completed;
         f.clock  = inProgress ? (c.status?.displayClock || '') : null;
         f.period = inProgress ? (c.status?.period || 1) : null;
+        f.statusDetail = c.status?.type?.shortDetail || '';
         f.bScore = (completed || inProgress) ? getScore(bocaT?.score) : null;
         f.rScore = (completed || inProgress) ? getScore(rival?.score) : null;
         if (inProgress) {
           liveEvents.push(f);
-          updateLiveClockState(f.clock, f.period);
+          updateLiveClockState(f.clock, f.period, c.status?.type?.shortDetail === 'HT');
         }
       }
 
